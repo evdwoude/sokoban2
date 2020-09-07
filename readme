@@ -1,0 +1,32 @@
+Setup file syntax notes:
+    - Numbers:  To specifiy the game number. Delimiter: any non number.
+    - Comments: Everything between number and ":".
+    - Space:    Preambling and trainling spaces are ignored.
+
+    - "#": Wall.
+    - "X": Box.
+    - "H": Box at target position.
+    - ".": Target position for box.
+    - "O": Man.
+    - "o": Man at box target position.
+
+
+Setup file example:
+
+8:
+
+    #########
+    # . # . #
+    # X # X #
+    #   O   #
+    #########
+
+9:
+
+    #########
+    #        #
+    #  #  O  #
+    #  ###   #
+    #        #
+    #########
+

@@ -3,7 +3,8 @@
 
 
 /* We use "move" when referring to a game move. I.e. the moving of
- * Johnny, the floor manager to the an adjecent spot in the warehouse. */
+ * Johnny, the floor manager to an adjecent spot in the warehouse. */
+typedef enum {mv_right=0, mv_up=1, mv_left=2, mv_down=3} t_move_direction;
 
 /* We use "step" end "walk" when referring to traversing the move tree. */
 

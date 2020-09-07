@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "setup.h"
-#include "resolve.h"
+//#include "resolve.h"
 #include "sokoban2.h"
 
 
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     if (!setup(argc, argv))
         return error;
 
-    resolve(&game_data);
+//     resolve(&game_data);
 
     end_time = time(NULL);
     diff_time = (long) difftime(end_time, start_time);
