@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "setup.h"
 #include "sokoban2.h"
+#include "error.h"
+#include "setup.h"
 
 /* Debug defs */
 
@@ -46,7 +47,7 @@ skbn_err setup(int argc, char *argv[])
 
     int chr;
     int target_game_number;
-    skbn_err error = none;
+    skbn_err error = no_error;
     int done = 0;
 
     if (argc < 3)
@@ -69,7 +70,7 @@ skbn_err setup(int argc, char *argv[])
         chr = fgetc(setupfile);
         error = parse_setup(chr, target_game_number, &done);
     }
-    while (error == none && !done);
+    while (error == no_error && !done);
 
     if (error)
         return error;
@@ -121,12 +122,12 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
         if (isdigit(chr))
         {
             current_game_number = 10 * current_game_number + (chr=='.' ? chr-'.' : chr-'0');
-            return none;
+            return no_error;
         }
         if (target_game_number != current_game_number)
         {
             current_game_number = 0;
-            return none;
+            return no_error;
         }
 
         state = looking_for_colon;
@@ -140,25 +141,25 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
             return print_error(no_colon);
 
         if (':' != chr)
-            return none;
+            return no_error;
 
         state = scanning_leading_spaces;
         space_counter = 0;
         character_position = 0;
 
-        return none;
+        return no_error;
 
     case scanning_leading_spaces:
         if (' ' == chr)
         {
             print_cond("%c", chr);
-            return none;
+            return no_error;
         }
 
         if (EOF == chr || isdigit(chr)) // A digit is a valid game-end, since it starts the successing game.
         {
             *done = 1;
-            return none;
+            return no_error;
         }
 
         space_counter = 0;
@@ -170,13 +171,13 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
         {
             space_counter += 1;
             print_cond("%c", chr);
-            return none;
+            return no_error;
         }
 
         if (EOF == chr || isdigit(chr)) // A digit is a valid game-end, since it starts the successing game.
         {
             *done = 1;
-            return none;
+            return no_error;
         }
 
         if ('#' == chr || '.' == chr || 'X' == chr || 'H' == chr || 'O' == chr || 'o' == chr )
@@ -198,7 +199,7 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
         if (EOF == chr || isdigit(chr)) // A digit is a valid game-end, since it starts the successing game.
         {
             *done = 1;
-            return none;
+            return no_error;
         }
 
         print_cond("%c", chr);
@@ -209,13 +210,13 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
             space_counter = 1;
 
             state = scanning_other_spaces;
-            return none;
+            return no_error;
         case '\n':
             character_position = 0;
             state = scanning_leading_spaces;
-            return none;
+            return no_error;
         case '#':
-            return none;
+            return no_error;
         case '.':
         case 'X':
         case 'H':
@@ -224,10 +225,10 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
             error = add_new_spot(chr, character_position, line_number, character_position);
             if (error)
                 return error;
-            return none;
+            return no_error;
         default:
             return print_error(illegal_character, line_number, character_position);
-            return none;
+            return no_error;
         }
     }
 }
@@ -242,10 +243,10 @@ skbn_err add_new_spot(int chr, int position, int line_number, int character_posi
         return print_error(not_enough_static_memory);
 
     // Initialise it.
-    game_data.pool_ptr->neighbour[mv_up   ] = NULL;
-    game_data.pool_ptr->neighbour[mv_down ] = NULL;
-    game_data.pool_ptr->neighbour[mv_left ] = NULL;
-    game_data.pool_ptr->neighbour[mv_right] = NULL;
+    game_data.pool_ptr->neighbour[up   ] = NULL;
+    game_data.pool_ptr->neighbour[down ] = NULL;
+    game_data.pool_ptr->neighbour[left ] = NULL;
+    game_data.pool_ptr->neighbour[right] = NULL;
     game_data.pool_ptr->has_box             = ('X' == chr) || ('H' == chr);
     game_data.pool_ptr->is_target           = ('.' == chr) || ('H' == chr) || ('o' == chr);
     game_data.pool_ptr->no_go               = 0;
@@ -273,7 +274,7 @@ skbn_err add_new_spot(int chr, int position, int line_number, int character_posi
     }
 
     game_data.pool_ptr++;                 // Advance to the new spot on the pool.
-    return none;
+    return no_error;
 }
 
 
@@ -305,8 +306,8 @@ void set_all_pointers(void)
             curr_spot->position == next_line->position)
         {
             /* Vertically adjecent spots. Chain together; */
-            curr_spot->neighbour[mv_down] = next_line;
-            next_line->neighbour[mv_up  ] = curr_spot;
+            curr_spot->neighbour[down] = next_line;
+            next_line->neighbour[up  ] = curr_spot;
         }
 
         /* Horizontal chaining. */
@@ -316,8 +317,8 @@ void set_all_pointers(void)
             if (curr_spot->position + 1 == next_spot->position)
             {
                 /* Horizontally adjecent spots. Chain together; */
-                curr_spot->neighbour[mv_right] = next_spot;
-                next_spot->neighbour[mv_left ] = curr_spot;
+                curr_spot->neighbour[right] = next_spot;
+                next_spot->neighbour[left ] = curr_spot;
             }
             if (curr_spot->position >= next_spot->position)
                 line_no++; /* Line wrap. */
@@ -383,15 +384,15 @@ void print_setup(void)
         switch (line_rep)
         {
             case 1:
-                printf("    %s   ", spot_number_str(curr_spot->neighbour[mv_up], "||"));
+                printf("    %s   ", spot_number_str(curr_spot->neighbour[up], "||"));
                 break;
             case 2:
-                printf(" %s", spot_number_str(curr_spot->neighbour[mv_left], "  "));
+                printf(" %s", spot_number_str(curr_spot->neighbour[left], "  "));
                 printf("=%02d=", curr_spot->spot_number);
-                printf("%s", spot_number_str(curr_spot->neighbour[mv_right], "  "));
+                printf("%s", spot_number_str(curr_spot->neighbour[right], "  "));
                 break;
             case 3:
-                printf("    %s   ", spot_number_str(curr_spot->neighbour[mv_down], "||"));
+                printf("    %s   ", spot_number_str(curr_spot->neighbour[down], "||"));
                 break;
             default /* Should not happen */:
                 printf("/n/t????\n\n");

@@ -2,9 +2,9 @@
 #define SOKOBAN2_H
 
 
-/* We use "move" when referring to a game move. I.e. the moving of
- * Johnny, the floor manager to an adjecent spot in the warehouse. */
-typedef enum {mv_right=0, mv_up=1, mv_left=2, mv_down=3} t_move_direction;
+/* We use "move" when referring to a game move. I.e. the moving of Johhny,
+ * the floor manager, or the boxes, to an adjecent spot in the warehouse. */
+typedef enum {right=0, up=1, left=2, down=3} t_direction;
 
 /* We use "step" end "walk" when referring to traversing the move tree. */
 

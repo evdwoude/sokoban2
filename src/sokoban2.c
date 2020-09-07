@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <time.h>
-#include "setup.h"
-//#include "resolve.h"
 #include "sokoban2.h"
+#include "error.h"
+#include "setup.h"
+#include "resolve.h"
 
 
 /* Internal protos */
@@ -33,10 +34,10 @@ int main(int argc, char *argv[])
 
     printf("\nSokoban2 v0.");
 
-    if (!setup(argc, argv))
+    if (setup(argc, argv) != no_error)
         return error;
 
-//     resolve(&game_data);
+    resolve(&game_data);
 
     end_time = time(NULL);
     diff_time = (long) difftime(end_time, start_time);

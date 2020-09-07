@@ -3,7 +3,7 @@
 
 typedef enum
 {
-    none = 0,
+    no_error = 0,
     usage,
     cant_open_setupfile,
     cant_close_setupfile,
