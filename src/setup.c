@@ -37,6 +37,7 @@ extern struct game_data game_data; // TODO: Make this a parameter:
 
 /* Local data */
 
+int number_of_boxes   = 0;
 int number_of_targets = 0;
 
 /* Code */
@@ -75,10 +76,10 @@ skbn_err setup(int argc, char *argv[])
     if (error)
         return error;
 
-    if (game_data.number_of_boxes != number_of_targets)
+    if (number_of_boxes != number_of_targets)
         return print_error(boxes_unequal_targets);
 
-    if (!game_data.man)
+    if (!game_data.johnny)
         return print_error(no_man);
 
     set_all_pointers();
@@ -247,30 +248,27 @@ skbn_err add_new_spot(int chr, int position, int line_number, int character_posi
     game_data.pool_ptr->neighbour[down ] = NULL;
     game_data.pool_ptr->neighbour[left ] = NULL;
     game_data.pool_ptr->neighbour[right] = NULL;
-    game_data.pool_ptr->has_box             = ('X' == chr) || ('H' == chr);
-    game_data.pool_ptr->is_target           = ('.' == chr) || ('H' == chr) || ('o' == chr);
-    game_data.pool_ptr->no_go               = 0;
-    game_data.pool_ptr->has_box_bw          = game_data.pool_ptr->is_target;
-    game_data.pool_ptr->is_target_bw        = game_data.pool_ptr->has_box;
+    game_data.pool_ptr->reach_chain      = NULL;
+    game_data.pool_ptr->has_box          = ('X' == chr) || ('H' == chr);
+    game_data.pool_ptr->is_target        = ('.' == chr) || ('H' == chr) || ('o' == chr);
+    game_data.pool_ptr->no_go            = 0;
+    game_data.pool_ptr->reach_mark       = 0;
 
-    game_data.pool_ptr->position    = position;       /* For setup parsing only.    */
-    game_data.pool_ptr->spot_number = spot_number++;  /* For debug printing only.   */
+    game_data.pool_ptr->position         = position;       /* For setup parsing only.    */
+    game_data.pool_ptr->spot_number      = spot_number++;  /* For debug printing only.   */
 
     if (game_data.pool_ptr->has_box)
-        game_data.number_of_boxes++;      /* Counted for reaching the final goal (and for double checking the setup). */
+        number_of_boxes++;              /* Counted for double checking the setup. */
 
     if (game_data.pool_ptr->is_target)
-        number_of_targets++;            /* Counted for double checking the setup only. */
-
-    if (game_data.pool_ptr->has_box && game_data.pool_ptr->is_target)
-        game_data.number_of_boxes_on_target++;
+        number_of_targets++;            /* Counted for double checking the setup. */
 
     if ('O' == chr || 'o' == chr)
     {
-        if (game_data.man)
+        if (game_data.johnny)
             return print_error(second_man, line_number, character_position);
         else
-            game_data.man = game_data.pool_ptr;
+            game_data.johnny = game_data.pool_ptr;
     }
 
     game_data.pool_ptr++;                 // Advance to the new spot on the pool.
@@ -467,7 +465,7 @@ void print_setup(void)
 
         if (first_line)
             printf("#");
-        else if (curr_spot == game_data.man)
+        else if (curr_spot == game_data.johnny)
             printf("O");
         else if (curr_spot->has_box)
             printf("X");
@@ -505,9 +503,6 @@ void print_setup(void)
 }
 #endif /* 0 */
 #endif /* PRINT_LARGE_SETUP */
-
-
-
 
 
 

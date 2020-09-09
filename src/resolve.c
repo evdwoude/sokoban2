@@ -4,9 +4,9 @@
 #include <ctype.h>
 #include "sokoban2.h"
 #include "error.h"
-#include "resolve.h"
 #include "resolve_int.h"
-
+#include "forward.h"
+#include "resolve.h"
 
 /* Local defs */
 
@@ -14,12 +14,9 @@
 
 /* Internal protos */
 
-
 /* Exported data */
 
 /* Imported data */
-
-extern struct  game_data game_data; // TODO: Make this a parameter:
 
 /* Local data */
 
@@ -27,6 +24,18 @@ extern struct  game_data game_data; // TODO: Make this a parameter:
 
 void  resolve(struct game_data *p_game_data)
 {
-    printf("\nStart resolving now.\n");
+    p_spot johnny = p_game_data->johnny;
+
+    explore_reach(p_game_data, johnny);
+
+    printf("\nChained (2):");
+
+    /* test print: */
+    while (johnny)
+    {
+        printf("  %d", johnny->spot_number );
+        johnny = johnny->reach_chain;
+    }
+
     return;
 }

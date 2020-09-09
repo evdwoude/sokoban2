@@ -1,0 +1,17 @@
+Next:
+    Document the explore_reach function.
+    Define movetree and tranposisiton tree data structures.
+
+Dont forget:
+    From the guarding of the wrapping of next marker.
+    -   Remove printfs and test loop.
+
+Later:
+    Tip: Separate fw and bw in separate files (Try using the same function names, with static.)
+    Malloc the playing grounds (instead of static 50*50.)
+
+
+
+
+
+

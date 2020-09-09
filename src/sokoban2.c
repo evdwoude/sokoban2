@@ -23,16 +23,15 @@ int main(int argc, char *argv[])
 {
     skbn_err error;
     game_data.pool_ptr = &(game_data.spot_pool[0]);
-    game_data.man = NULL;
-    game_data.number_of_boxes = 0;
-    game_data.number_of_boxes_on_target = 0;
+    game_data.johnny = NULL;
+    game_data.next_reach = 0;
 
     time_t start_time, end_time;
     long diff_time;
 
     start_time = time(NULL);
 
-    printf("\nSokoban2 v0.");
+    printf("\nSokoban2 v0.5.");
 
     if (setup(argc, argv) != no_error)
         return error;

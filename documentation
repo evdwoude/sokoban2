@@ -1,0 +1,105 @@
+Definitions:
+
+    Johnny:
+        The floor manager hwo is trying to move the boxes onto their target spots.
+
+    Step:
+        Refers to a game move where Johhny walks to an adjecent spot in the warehouse, without
+        moving a box.
+
+    Push:
+        Refers to a game move where Johhny pushes a box to an adjecent spot in the warehouse.
+
+    Pull:
+        Refers to a search move where Johhny pulls a box to an adjecent spot in the warehouse.
+        This is not a legal game move, but is used in the backward search.
+
+    Move:
+        Refers to either a Step, Push or Pull.
+
+    Direction:
+        Refers to the direction of a Move. (I.e. within the warehouse; not in a search tree.)
+        Values: up (north), down (south), left (west), right (east).
+
+
+
+
+Procedure:
+
+Functions:
+
+    explore_reach()
+
+        Exploring the reach of johnny in the current position, meaning, find out what spots johnny can
+        legally reach from his current position whithoug moving any boxes.
+        The resulting spots are chained througt the reach_chain pointers that all spots have, starting
+        from johnny's spot, ending with a NULL pointer.
+
+        Notes:
+        - The reach_chain pointers of the irrelevant spots are un touched.
+        - The spot's reach_mark are use to mark the found spots while searching from more.
+        - New found spots are deliberately chained at the end of the chain, not the current position.
+        The latter would have been equally possible for the use of this funtion and would have saved
+        the use of the end poiter, but this way the chain of spots is sorted for distance to johnny.
+        This is useful for the third exploring-like function, find_shortest(), and to keep the code
+        similar, we choose to do that here as well.
+
+        Pointer handling:
+
+        I:  From:           Johhny's           New neingbour
+                            +---+---+          +---+---+
+                Johnny      | N |   |--------->| N | X |
+                ----------->|   +---+          |   +---+
+                            | C | 0 |          | C | X |
+                            +---+---+          +---+---+
+                              ^
+                              |
+                              | End
+
+            To:             Johhny's           New neingbour added to reach chain
+                            +---+---+          +---+---+
+                Johnny      | N |   |--------->| N | X |
+                ----------->|   +---+          |   +---+
+                            | C |   |--------->| C | O |
+                            +---+---+          +---+---+
+                                                 ^
+                                                 | End
+
+        II: From:           Johhny's                                 New neingbour
+                            +---+---+                                +---+---+
+                Johnny      | N |   |------------------------------->| N | X |
+                ----------->|   +---+                                |   +---+
+                            | C |   |----+                           | C | X |
+                            +---+---+    |     Existing chain        +---+---+
+                                         |     +---+---+
+                                         +---->| N | X |
+                                               |   +---+
+                                               | C | O |
+                                               +---+---+
+                                                 ^
+                                                 |
+                                                 | End
+            To:             Johhny's                                 New neingbour added to reach chain
+                            +---+---+                                +---+---+
+                Johnny      | N |   |------------------------------->| N | X |
+                ----------->|   +---+                                |   +---+
+                            | C |   |----+                      +--->| C | O |
+                            +---+---+    |     Existing chain   |    +---+---+
+                                         |     +---+---+        |      ^
+                                         +---->| N | X |        |      |
+                                               |   +---+        |      | End
+                                               | C |   |--------+
+                                               +---+---+
+
+        Legenda:
+            N: Spot's neighbour pointer
+            C: Spot's reach_chain pointer
+
+
+
+
+
+
+
+
+    find_shortest()

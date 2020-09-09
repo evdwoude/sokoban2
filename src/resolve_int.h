@@ -1,28 +1,21 @@
 #ifndef RESOLVE_INTH
 #define RESOLVE_INTH
 
-
-
 /* General definitions */
 
 #define MAX_DEPTH 400
 #define WALKING_STACK_SIZE  (MAX_DEPTH + 2)  /* In fact "+ 1" should be enough, but hey... */
 
 
-/* We use "move" when referring to a game move. I.e. the moving
- * of the floor manager to an adjecent spot in the warehouse.
- * Whether pushing a box, or just moving: we call both just "move".
- *
- * We use "walk" when referring to traversing the move tree. I.e
+/* We use "move" when referring to a game move. I.e. the moving of Johhny,
+ * the floor manager, or the boxes, to an adjecent spot in the warehouse.
+ */
+
+/* We use "walk" when referring to traversing the move tree. I.e
  * when walking the move pointer though the move tree, simulteneously
  * moving the man and the boxes across the warehouse floor to keep
  * the transposition synchronised with the position in the move tree.
- *
- * From an abstract point of view, it would seem more logical to have an array
- * of pointers to the node's children plus a separate pointer for its parent.
- * However, for ease of automation it is more pactical to put all five of them
- * in a single array. Because this array would then contain both pointers to
- * children and a parent, just "links" seems the best name. */
+ */
 
 struct move_node
 {
