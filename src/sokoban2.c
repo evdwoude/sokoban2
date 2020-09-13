@@ -5,7 +5,6 @@
 #include "setup.h"
 #include "resolve.h"
 
-
 /* Internal protos */
 
 /* Exported data */
@@ -31,7 +30,7 @@ int main(int argc, char *argv[])
 
     start_time = time(NULL);
 
-    printf("\nSokoban2 v0.5.");
+    printf("\nSokoban2 v0.8.\n");
 
     if (setup(argc, argv) != no_error)
         return error;
@@ -41,10 +40,10 @@ int main(int argc, char *argv[])
     end_time = time(NULL);
     diff_time = (long) difftime(end_time, start_time);
 
-    printf("\nDuration: %ld:%ld:%ld.\n",
-        diff_time / 3600,
-        (diff_time / 60) % 60,
-        diff_time % 60 );
+//     printf("\nDuration: %ld:%ld:%ld.\n",
+//         diff_time / 3600,
+//         (diff_time / 60) % 60,
+//         diff_time % 60 );
 
     return 0;
 }

@@ -7,15 +7,10 @@
 
 /* Debug defs */
 
-#define PRINT_LARGE_SETUP 1
 
-#ifndef PRINT_LARGE_SETUP
-#define print_cond(...) printf(__VA_ARGS__);
-#define print_setup(...)
-#else
-#define print_cond(...)
-#endif
-
+#define PRINT_SMALL_SETUP 1
+#define PRINT_MEDIUM_SETUP 1
+//#define PRINT_LARGE_SETUP 1
 
 /* Internal protos */
 
@@ -23,10 +18,25 @@ skbn_err parse_setup(int chr, int target_game_number, int *done);
 skbn_err add_new_spot(int chr, int position, int line_number, int character_position);
 
 void set_all_pointers(void);
-char *spot_number_str(struct spot* spot, char *no_spot_str);
+
+#ifdef PRINT_SMALL_SETUP
+#define print_small_setup(...) printf(__VA_ARGS__);
+#else
+#define print_small_setup(...)
+#endif
+
+#ifdef PRINT_MEDIUM_SETUP
+void print_medium_setup(void);
+#define print_medium_setup_def() print_medium_setup();
+#else
+#define print_medium_setup_def(...)
+#endif
 
 #ifdef PRINT_LARGE_SETUP
-void print_setup(void);
+void print_large_setup(void);
+#define print_large_setup_def() print_large_setup();
+#else
+#define print_large_setup_def(...)
 #endif
 
 /* Exported data */
@@ -63,7 +73,7 @@ skbn_err setup(int argc, char *argv[])
     if (target_game_number == 0)
         return print_error(game_number_is_zero);
 
-    print_cond("\n");
+    print_small_setup("\n");
 
     /* Parse the setup file. */
     do
@@ -84,7 +94,8 @@ skbn_err setup(int argc, char *argv[])
 
     set_all_pointers();
 
-    print_setup();
+    print_medium_setup_def()
+    print_large_setup_def()
 
     /* Close the setup file. */
     if (fclose(setupfile))
@@ -153,7 +164,7 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
     case scanning_leading_spaces:
         if (' ' == chr)
         {
-            print_cond("%c", chr);
+            print_small_setup("%c", chr);
             return no_error;
         }
 
@@ -171,7 +182,7 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
         if (' ' == chr)
         {
             space_counter += 1;
-            print_cond("%c", chr);
+            print_small_setup("%c", chr);
             return no_error;
         }
 
@@ -203,7 +214,7 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
             return no_error;
         }
 
-        print_cond("%c", chr);
+        print_small_setup("%c", chr);
 
         switch (chr)
         {
@@ -244,24 +255,25 @@ skbn_err add_new_spot(int chr, int position, int line_number, int character_posi
         return print_error(not_enough_static_memory);
 
     // Initialise it.
-    game_data.pool_ptr->neighbour[up   ] = NULL;
-    game_data.pool_ptr->neighbour[down ] = NULL;
-    game_data.pool_ptr->neighbour[left ] = NULL;
-    game_data.pool_ptr->neighbour[right] = NULL;
-    game_data.pool_ptr->reach_chain      = NULL;
-    game_data.pool_ptr->has_box          = ('X' == chr) || ('H' == chr);
-    game_data.pool_ptr->is_target        = ('.' == chr) || ('H' == chr) || ('o' == chr);
-    game_data.pool_ptr->no_go            = 0;
-    game_data.pool_ptr->reach_mark       = 0;
+    game_data.pool_ptr->neighbour[up   ]   = NULL;
+    game_data.pool_ptr->neighbour[down ]   = NULL;
+    game_data.pool_ptr->neighbour[left ]   = NULL;
+    game_data.pool_ptr->neighbour[right]   = NULL;
+    game_data.pool_ptr->reach_chain        = NULL;
+    game_data.pool_ptr->transposition_list = NULL;
+    game_data.pool_ptr->has_box            = ('X' == chr) || ('H' == chr);
+    game_data.pool_ptr->is_target          = ('.' == chr) || ('H' == chr) || ('o' == chr);
+    game_data.pool_ptr->hardnogo           = 0;
+    game_data.pool_ptr->reach_mark         = 0;
 
-    game_data.pool_ptr->position         = position;       /* For setup parsing only.    */
-    game_data.pool_ptr->spot_number      = spot_number++;  /* For debug printing only.   */
+    game_data.pool_ptr->position           = position;       /* For setup parsing only.    */
+    game_data.pool_ptr->spot_number        = spot_number++;  /* For debug printing only.   */
 
     if (game_data.pool_ptr->has_box)
-        number_of_boxes++;              /* Counted for double checking the setup. */
+        number_of_boxes++;                 /* Counted for double checking the setup. */
 
     if (game_data.pool_ptr->is_target)
-        number_of_targets++;            /* Counted for double checking the setup. */
+        number_of_targets++;               /* Counted for double checking the setup. */
 
     if ('O' == chr || 'o' == chr)
     {
@@ -325,20 +337,9 @@ void set_all_pointers(void)
 }
 
 
-char *spot_number_str(struct spot* spot, char *no_spot_str)
-{
-    static char spot_numberstring[3];
 
-    if (spot)
-        sprintf(spot_numberstring, "%02d", spot->spot_number);
-    else
-        return no_spot_str;
-
-    return spot_numberstring;
-}
-
-#ifdef PRINT_LARGE_SETUP
-void print_setup(void)
+#ifdef PRINT_MEDIUM_SETUP
+void print_medium_setup(void)
 {
     struct spot* curr_spot;
     struct spot* next_spot;
@@ -371,7 +372,99 @@ void print_setup(void)
     /* Print it */
     curr_spot = &(game_data.spot_pool[0]);
     line_start = curr_spot;
-    printf("\n\n");
+    printf("\n");
+    while (curr_spot < game_data.pool_ptr)
+    {
+        while (curr_spot->position > (line_pos))
+        {
+            printf("    "); /* Empty spaces. */
+            line_pos++;
+        }
+        switch (line_rep)
+        {
+            case 1:
+                printf("  %s", curr_spot->neighbour[up] ? "| " : "  ");
+                break;
+            case 2:
+                printf("%s", curr_spot->neighbour[left] ? "-" : " ");
+                printf("%03d", curr_spot->spot_number);
+                break;
+            default /* Should not happen */:
+                printf("/n/t????\n\n");
+                break;
+        }
+        line_pos++;
+
+        next_spot = curr_spot + 1;
+        if ( next_spot >= game_data.pool_ptr ||
+            (next_spot < game_data.pool_ptr && curr_spot->position >= next_spot->position) )
+        {
+            if (line_rep++ >= 2)
+            {
+                line_rep = 1;
+                line_start = next_spot;
+            }
+            next_spot = line_start;
+
+            line_pos = 0;
+            printf("\n");
+        }
+        curr_spot = next_spot;
+    }
+}
+#endif /* PRINT_MEDIUM_SETUP */
+
+
+#ifdef PRINT_LARGE_SETUP
+char *spot_number_str(struct spot* spot, char *no_spot_str);
+
+char *spot_number_str(struct spot* spot, char *no_spot_str)
+{
+    static char spot_numberstring[3];
+
+    if (spot)
+        sprintf(spot_numberstring, "%02d", spot->spot_number);
+    else
+        return no_spot_str;
+
+    return spot_numberstring;
+}
+
+
+void print_large_setup(void)
+{
+    struct spot* curr_spot;
+    struct spot* next_spot;
+    struct spot* line_start;
+
+    int line_pos = 0;         // For printing space where there is nothing.
+    int line_rep = 1;
+
+    int left_most;
+
+    /* Find the left -most position. */
+    curr_spot = &(game_data.spot_pool[0]);
+    left_most = curr_spot->position;
+    while (curr_spot < game_data.pool_ptr)
+    {
+        if (left_most > curr_spot->position)
+            left_most = curr_spot->position;
+        curr_spot++;
+    }
+
+    /* Shift spots left in order to left-align the whole 'store'. */
+    left_most--; /* Leave a margin */
+    curr_spot = &(game_data.spot_pool[0]);
+    while (curr_spot < game_data.pool_ptr)
+    {
+        curr_spot->position -= left_most;
+        curr_spot++;
+    }
+
+    /* Print it */
+    curr_spot = &(game_data.spot_pool[0]);
+    line_start = curr_spot;
+    printf("\n");
     while (curr_spot < game_data.pool_ptr)
     {
         while (curr_spot->position > (line_pos))
@@ -416,95 +509,7 @@ void print_setup(void)
         curr_spot = next_spot;
     }
 }
-#else /* PRINT_LARGE_SETUP */
-#if 0
-void print_setup(void)
-{
-    struct spot* curr_spot;
-    struct spot* next_spot;
-    int line_pos = 0;         // For printing space where there is nothing.
-    int left_most;
-    int line_len = 0;         // line length
-    int start_of_line = 1;
-    int first_line = 1;
-
-    /* Find the left -most position. */
-    curr_spot = &(game_data.spot_pool[0]);
-    left_most = curr_spot->position;
-    while (curr_spot < game_data.pool_ptr)
-    {
-        if (left_most > curr_spot->position)
-            left_most = curr_spot->position;
-        curr_spot++;
-    }
-
-    /* Shift spots left in order to left-align the whole 'store'. */
-    curr_spot = &(game_data.spot_pool[0]);
-    while (curr_spot < game_data.pool_ptr)
-    {
-        curr_spot->position -= left_most;
-        curr_spot++;
-    }
-
-    /* Print it */
-    curr_spot = &(game_data.spot_pool[0]);
-    printf("\n\n ");
-    while (curr_spot < game_data.pool_ptr)
-    {
-        line_len++;
-        while (curr_spot->position > (line_pos))
-        {
-            if (start_of_line)
-                printf(" "); /* Empty spaces. */
-            else
-                printf("#"); /* Empty spaces. */
-            line_pos++;
-        }
-        if (start_of_line)
-            printf("#"); /* Empty spaces. */
-
-        if (first_line)
-            printf("#");
-        else if (curr_spot == game_data.johnny)
-            printf("O");
-        else if (curr_spot->has_box)
-            printf("X");
-        else if (curr_spot->is_target)
-            printf(".");
-        else
-            printf(" ");
-
-        line_pos++;
-        start_of_line = 0;
-        line_len = line_pos;
-
-        next_spot = curr_spot + 1;
-        if ( next_spot >= game_data.pool_ptr ||
-            (next_spot < game_data.pool_ptr && curr_spot->position >= next_spot->position) )
-        {
-            line_pos = 0;
-            start_of_line = 1;
-            if (first_line)
-            {
-                /* Repeat first line, but now pront content instead of hashes. */
-                next_spot = &(game_data.spot_pool[0]);
-                first_line = 0;
-            }
-            printf("#\n ");
-        }
-        curr_spot = next_spot;
-    }
-
-    /* Print last line */
-    line_len++;
-    while (line_len--)
-        printf("#");
-    printf("\n ");
-}
-#endif /* 0 */
 #endif /* PRINT_LARGE_SETUP */
-
-
 
 
 

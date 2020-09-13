@@ -28,3 +28,4 @@ struct game_data
 };
 
 #endif /* SOKOBAN2_H */
+

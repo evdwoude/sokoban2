@@ -1,7 +1,7 @@
 Definitions:
 
     Johnny:
-        The floor manager hwo is trying to move the boxes onto their target spots.
+        The floor manager who is trying to move the boxes onto their target spots.
 
     Step:
         Refers to a game move where Johhny walks to an adjecent spot in the warehouse, without
@@ -15,20 +15,47 @@ Definitions:
         This is not a legal game move, but is used in the backward search.
 
     Move:
-        Refers to either a Step, Push or Pull.
+        Refers to either a Push or Pull.
 
     Direction:
         Refers to the direction of a Move. (I.e. within the warehouse; not in a search tree.)
         Values: up (north), down (south), left (west), right (east).
 
+    Explore:
+        Find all spots Johnny can reach without moving a box (or target), within the current transposiion.
+
+    Reach:
+        The set of spots Johnny can reach without moving a box (or target), within the current transposiion.
+
+    Reach identifier:
+        The lowest spot_number of a reach. This uniquely and reproducably identifies a that reach.
+
+    Walk:
+        Refers to traversing a move tree, in depth-first fashion.
+
+    Transposition:
+        The collection of the positions of all boxes  and Johhny's current reach identifier, or
+        the collection of the positions of all tagets and Johhny's current reach identifier.
+        Moving a box (or a target) resuls in a different transposition.
+        Moving Johhny within his current reach does not result in a different transposition, but
+        repositioning Johhny into another reach does.
+
+    Hardnogo:
+        A spot can be regarded as a "no go" area (for a box, not for Johnny), when putting a box onto that
+        spot immediately results in an irreversable situation from which the game can not be resolved.
+        Spots that can be identified up front as no-go areas (so before any move has been made) can be
+        considered "static" or "hard" no-go areas and these spots are marked as "hardnogo".
+        (Note that a target can never be a hardnogo, as putting a box on it, even if creates a irreversable
+        situation, it does not necessarily mean that the game is not resolvable.)
+
+Approach:
 
 
 
-Procedure:
 
 Functions:
 
-    explore_reach()
+    explore_for_reach()
 
         Exploring the reach of johnny in the current position, meaning, find out what spots johnny can
         legally reach from his current position whithoug moving any boxes.
@@ -36,21 +63,21 @@ Functions:
         from johnny's spot, ending with a NULL pointer.
 
         Notes:
-        - The reach_chain pointers of the irrelevant spots are un touched.
+        - The reach_chain pointers of the irrelevant spots are untouched.
         - The spot's reach_mark are use to mark the found spots while searching from more.
         - New found spots are deliberately chained at the end of the chain, not the current position.
         The latter would have been equally possible for the use of this funtion and would have saved
         the use of the end poiter, but this way the chain of spots is sorted for distance to johnny.
-        This is useful for the third exploring-like function, find_shortest(), and to keep the code
+        This is useful for the third exploring-like function, ???(), and to keep the code
         similar, we choose to do that here as well.
 
         Pointer handling:
 
         I:  From:           Johhny's           New neingbour
                             +---+---+          +---+---+
-                Johnny      | N |   |--------->| N | X |
-                ----------->|   +---+          |   +---+
-                            | C | 0 |          | C | X |
+                    Johnny  |   | N |--------->|   | N |--> X
+                    ------->|   +---+          |   +---+
+                            |   | C |--> 0     |   | C |--> X
                             +---+---+          +---+---+
                               ^
                               |
@@ -58,48 +85,121 @@ Functions:
 
             To:             Johhny's           New neingbour added to reach chain
                             +---+---+          +---+---+
-                Johnny      | N |   |--------->| N | X |
-                ----------->|   +---+          |   +---+
-                            | C |   |--------->| C | O |
+                    Johnny  |   | N |--------->|   | N |--> X
+                    ------->|   +---+          |   +---+
+                            |   | C |--------->|   | C |--> 0
                             +---+---+          +---+---+
                                                  ^
+                                                 |
                                                  | End
 
         II: From:           Johhny's                                 New neingbour
                             +---+---+                                +---+---+
-                Johnny      | N |   |------------------------------->| N | X |
-                ----------->|   +---+                                |   +---+
-                            | C |   |----+                           | C | X |
+                    Johnny  |   | N |------------------------------->|   | N |--> X
+                    ------->|   +---+                                |   +---+
+                            |   | C |----+                           |   | C |--> X
                             +---+---+    |     Existing chain        +---+---+
                                          |     +---+---+
-                                         +---->| N | X |
+                                         +---->|   | N |--> X
                                                |   +---+
-                                               | C | O |
+                                               |   | C |--> 0
                                                +---+---+
                                                  ^
                                                  |
                                                  | End
             To:             Johhny's                                 New neingbour added to reach chain
                             +---+---+                                +---+---+
-                Johnny      | N |   |------------------------------->| N | X |
-                ----------->|   +---+                                |   +---+
-                            | C |   |----+                      +--->| C | O |
+                    Johnny  |   | N |------------------------------->|   | N |--> X
+                    ------->|   +---+                                |   +---+
+                            |   | C |----+                      +--->|   | C |--> 0
                             +---+---+    |     Existing chain   |    +---+---+
                                          |     +---+---+        |      ^
-                                         +---->| N | X |        |      |
+                                         +---->|   | N |--> X   |      |
                                                |   +---+        |      | End
-                                               | C |   |--------+
+                                               |   | C |--------+
                                                +---+---+
 
         Legenda:
             N: Spot's neighbour pointer
             C: Spot's reach_chain pointer
+            X: Any pointer value (either pointing to a spot or NULLL)
+            0: Pointer value NULL
+
+        In bother of the above scenarios, the assignments required to add the new neighnour to the
+        chain are the same:
+
+                end->reach_chain = neighbour;
+                end              = neighbour;
+                end->reach_chain = NULL;
+
+        Then, after Johnny advances to the next spot in the chain, the new scenario is again one of
+        the above, and the handling can be repeated util all reachable spots are chained up and the
+        chain-end is indicated with a NULL pounter
+
+    explore funtions:
+        explore_for_reach
+        explore_for_identification
+        explore_for_tranposition
+        explore_for_end_positions
+        explore_for_move_path
+
+    walk funtions:
+        walk_to_extend_depth
+        walk_to_find_move_path
 
 
+Examples sokobans:
+    setup-blue-glasses: BG
+    setup-white-brown:  WB
+    setup-hairband:     HB
 
+           N:   Me:    S:      Moves:   Time:   FW nodes:   BW nodes:    T nodes:         Memory:
 
+       BG-101
+       BG-501
+       BG-503
+       BG-511
+       BG-527
+       BG-607
+       BG-612
+       BG-614
+       BG-620
+       BG-625
+       BG-627
 
+       WB-1001         1
+       WB-1002         1
+       WB-1003         1  (6):
+       WB-1004         1  (Faulty setup no solution.):
+       WB-1005         1  (Does it easy):
+       WB-1008         1  (Easy):
+       WB-1011         1  (Easy):
+       WB-1012         1  (Easy):
+       WB-1013         1  (Easy):
+       WB-1014         1  (Super easy):
+       WB-1016         1  (Super easy):
+       WB-1017         1                    3      39,143     150,988   2,797,763      81,104,216
+       WB-1019         1  (1 sec):
+       WB-1020         1  (1 sec):
+       WB-1021         1  (228 moves, 1 sec):
+       WB-1023         1  (Easy):
+       WB-1024         1  (Easy):
 
+       HB-10099        1
 
+Hard:
+           N:   Me:    S:      Moves:   Time:   FW nodes:   BW nodes:    T nodes:         Memory:
 
-    find_shortest()
+       WB-1015         1  (7 sec):
+       WB-1007         1                   12     375,273   1,317,775  16,361,052     516,100,352
+       BG-627          1                   17     177,101     705,732   6,314,530     216,508,128
+       WB-1006         1                   31   1,666,994   6,486,704  47,530,847   1,739,692,360
+       HB-50608        1                   30   1,350,435   4,901,326  42,168,158   1,468,962,752
+       WB-1018         1                   42   2,939,196   9,308,427  75,989,196   2,709,496,272
+
+       WB-1009         1  Not solved.
+       WB-1010         1  Not solved.
+       WB-1025         1  Not solved.
+       WB-1022         1  Not solved.
+
+       HB-60008        1  Not solved.

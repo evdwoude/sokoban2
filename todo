@@ -10,7 +10,7 @@ Later:
     Tip: Separate fw and bw in separate files (Try using the same function names, with static.)
     Malloc the playing grounds (instead of static 50*50.)
 
-
+    Find more static 'nogos:". Not oly the ones beteen corners, but also between other found nogos
 
 
 
