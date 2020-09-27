@@ -28,7 +28,11 @@ void  resolve(struct game_data *p_game_data)
     p_spot johnny = p_game_data->johnny;
 
     /* First, define all "no go spots", and chain up the rest for creating transpositions. */
-    define_no_go_s(p_game_data);
+    define_hardnogos(p_game_data);
+
+    /* Then, using the defined hard nogos, create the linked list of spots that are used for the creation
+     * of the as transpositions. */
+    create_transposition_base(p_game_data);
 
     // walk_to_extend_depth(p_game_data, johnny);
 
@@ -100,7 +104,8 @@ void explore_for_reach(struct game_data *p_game_data, p_spot johnny)
                 /* Chain it: */
                 end->reach_chain = neighbour;
                 end              = neighbour;
-                end->reach_chain = NULL;
+                end->reach_chain = NULL;            /* Keep the chain end up to date, as we're
+                                                        using the chain while building it up. */
             }
         }
 

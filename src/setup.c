@@ -263,7 +263,6 @@ skbn_err add_new_spot(int chr, int position, int line_number, int character_posi
     game_data.pool_ptr->transposition_list = NULL;
     game_data.pool_ptr->has_box            = ('X' == chr) || ('H' == chr);
     game_data.pool_ptr->is_target          = ('.' == chr) || ('H' == chr) || ('o' == chr);
-    game_data.pool_ptr->hardnogo           = 0;
     game_data.pool_ptr->reach_mark         = 0;
 
     game_data.pool_ptr->position           = position;       /* For setup parsing only.    */

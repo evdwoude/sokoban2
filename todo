@@ -1,17 +1,50 @@
 Next:
-    Document the explore_reach function.
-    Define movetree and tranposisiton tree data structures.
+    Double check the conditions fo new_hardnogos in the linescanner.
 
-Dont forget:
+    Document latest new functions.
+
+    Change and ocument file structure:
+        - Create prune.c
+            Move define_hardnogos there.
+        - Create explore.c and walk.c
+        - If I choose that, then parhaps next_mark should move from util.c to explore.c
+        - Create reset_mark, and use from next_mark
+
+    Document: domain vs reach
+
+
+    Function header for explore_for_reach()
+    Create files for eplore functions and for walk functions
+
+    Define movetree and tranposisiton tree data structures.
+    Inplement add_transosition() for both search directions.
+    Implement the forward walk_to_extend_depth
+
     From the guarding of the wrapping of next marker.
     -   Remove printfs and test loop.
 
+
 Later:
-    Tip: Separate fw and bw in separate files (Try using the same function names, with static.)
+    Find blockers in run time.
+        Start with doubles:
+
+            #X      Or:     #X
+            #X              X#
+
+        Next is squares.
+
+            XX      Or:     #X
+            XX              XX
+
+    Try to generalise the code for Fw and BW search.
+    If not: Separate fw and bw in separate files (Try using the same function names, with static.)
+
+    Compile with optimisation for speed.
+
     Malloc the playing grounds (instead of static 50*50.)
 
-    Find more static 'nogos:". Not oly the ones beteen corners, but also between other found nogos
-
-
+    Add hardnogos / reduce transposition nodes:
+    Add spots that can never be populated by a box because, a: it impossible to do so when it is
+    adjecent to only walls and/or hardnogos, and b: there is no box on it as per setup.
 
 

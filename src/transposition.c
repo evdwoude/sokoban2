@@ -8,6 +8,9 @@
 #include "utility.h"
 #include "transposition.h"
 
+#define DBG_CREATE_BASE 1
+
+
 /* Local defs */
 
 // typedef enum {false = 0, true = 1} t_bool;
@@ -21,6 +24,29 @@
 /* Local data */
 
 /* Code */
+
+void create_transposition_base(struct game_data *p_game_data)
+{
+    struct spot* spot;
+    struct spot** p_end;
+
+    p_end = &(p_game_data->transposition_head);
+    for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
+        if ( ! is_hardnogo(spot))
+        {
+            *p_end = spot;
+            p_end = &(spot->transposition_list);
+        }
+    *p_end = NULL;
+
+#ifdef DBG_CREATE_BASE
+    printf("Transposition spots:\n");
+    for(spot = p_game_data->transposition_head; spot; spot = spot->transposition_list)
+        printf(" %d", spot->spot_number);
+    printf("\n\n");
+#endif /* DBG_CREATE_BASE */
+}
+
 
 #if 0
 skbn_err add_transposition(p_spot johhny)

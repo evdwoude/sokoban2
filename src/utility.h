@@ -29,6 +29,9 @@ int next_mark(struct game_data *p_game_data);
  * It excludes all dead ends that involve multiple boxes. These dead ends are much more complex to
  * define up-front and finding them on-the-go is very expensive.
  */
-void define_no_go_s(struct game_data *p_game_data);
+void define_hardnogos(struct game_data *p_game_data);
+
+
+int is_hardnogo(struct spot* spot);
 
 #endif /* UTILITYH */

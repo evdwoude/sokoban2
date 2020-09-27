@@ -21,16 +21,24 @@ struct game_data game_data;
 int main(int argc, char *argv[])
 {
     skbn_err error;
-    game_data.pool_ptr = &(game_data.spot_pool[0]);
-    game_data.johnny = NULL;
-    game_data.next_reach = 0;
+
+    game_data.pool_ptr              = &(game_data.spot_pool[0]);
+    game_data.johnny                = NULL;
+    game_data.transposition_head    = NULL;
+    game_data.next_reach            = 0;
 
     time_t start_time, end_time;
     long diff_time;
 
     start_time = time(NULL);
 
-    printf("\nSokoban2 v0.8.\n");
+    printf("\nSokoban2 v0.12.\n");
+
+    if (sizeof(int) != 4)
+    {
+        printf("\n *** Warning: Expect int to be size 4, but is %ld ***\n", sizeof(int));
+        return 0;
+    }
 
     if (setup(argc, argv) != no_error)
         return error;
