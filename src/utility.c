@@ -38,7 +38,7 @@
 
 /* Internal protos */
 
-void scan_line_for_hardnogos(struct spot* spot, int main_dir, int *new_hardnogos);
+void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int main_dir, int *new_hardnogos);
 void set_as_hardnogo(struct spot* spot);
 
 /* Exported data */
@@ -50,7 +50,7 @@ void set_as_hardnogo(struct spot* spot);
 /* Code */
 
 
-/* int next_mark(struct game_data *p_game_data)
+/*int next_mark(p_game_data_t p_game_data)
  *
  * Used for explore functions.
  *
@@ -59,7 +59,7 @@ void set_as_hardnogo(struct spot* spot);
  * required (and automatically performed) when the globla spot mark wraps. Reinitilization is also
  * required before searching for the amount of domains a backward search can start from.
  */
-int next_mark(struct game_data *p_game_data)
+int next_mark(p_game_data_t p_game_data)
 {
     p_spot spot;
 
@@ -72,7 +72,7 @@ int next_mark(struct game_data *p_game_data)
         for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
         {
             spot->reach_mark = 0;
-            printf_mark(" %d", spot->spot_number)
+            printf_mark(" %ld", SPOT_NUMBER(spot))
         }
         printf_mark("\n")
 
@@ -83,15 +83,8 @@ int next_mark(struct game_data *p_game_data)
     return p_game_data->next_reach;
 }
 
-/* TODO: Document. */
-int is_hardnogo(struct spot* spot)
-{
-    return spot->transposition_list == HARDNOGO;
-}
 
-
-
-/* void  define_hardnogos(struct game_data *p_game_data)
+/* void define_hardnogos(p_game_data_t p_game_data);
  *
  * Find and mark all spots where placing a box would always and immediately result in a dead end.
  * This includes the dead ends that result from individual boxes put on specific, spots, identifiable
@@ -99,13 +92,12 @@ int is_hardnogo(struct spot* spot)
  * It excludes all dead ends that involve multiple boxes. These dead ends are more complex to find and
  * can't be idenfified up-front (staticallly), but only on-the-go, which is quite expensive.
  */
-void define_hardnogos(struct game_data *p_game_data)
+void define_hardnogos(p_game_data_t p_game_data)
 {
     struct spot* spot;
-    int new_hardnogos = 1;  /* The setup is scanned multiple times because new found hard nogos can trigger
-                             * the finding of more hard nogos. Therefore, we keep re-scanning until no new
-                            * hard nogos are found. */
+    int new_hardnogos = 1;
 
+    /* First find all spots that are adjent to minimal two non-oppsing walls. */
     printf_hardnogo("\n\nCorners:\n")
     for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
     {
@@ -117,10 +109,14 @@ void define_hardnogos(struct game_data *p_game_data)
         {
             set_as_hardnogo(spot);
 
-            printf_hardnogo(" %d", spot->spot_number)
+            printf_hardnogo(" %ld", SPOT_NUMBER(spot))
         }
     }
 
+    /* TODO: find what here ?
+     * Scan the setup multiple times: new found hard nogos can trigger the finding of more hard nogos.
+     * Keep re-scanning until no new hard nogos are found. (The only indication that another round will
+     * not find more hard no gos is when the previous round did not find any) */
     printf_hardnogo("\nIn betweens:")
     while (new_hardnogos)
     {
@@ -131,14 +127,21 @@ void define_hardnogos(struct game_data *p_game_data)
         for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
             if (is_hardnogo(spot))
             {
-                scan_line_for_hardnogos(spot, right, &new_hardnogos); /* Horizontal line scan. */
-                scan_line_for_hardnogos(spot,  down, &new_hardnogos); /* Vertical line scan.   */
+                scan_line_for_hardnogos(p_game_data, spot, right, &new_hardnogos); /* Horizontal line scan. */
+                scan_line_for_hardnogos(p_game_data, spot,  down, &new_hardnogos); /* Vertical line scan.   */
             }
     }
 }
 
 
-void scan_line_for_hardnogos(struct spot* spot, int main_dir, int *new_hardnogos)
+/* TODO: Document. */
+int is_hardnogo(struct spot* spot)
+{
+    return spot->transposition_list == HARDNOGO;
+}
+
+
+void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int main_dir, int *new_hardnogos)
 {
     struct spot* scan;
 
@@ -151,18 +154,18 @@ void scan_line_for_hardnogos(struct spot* spot, int main_dir, int *new_hardnogos
         sub_dir_b = down;
     }
 
-    /* Scan line for any spot that can not (yet) be regarded as a nogo */
+    /* Scan line for any spot that can not (yet) be regarded as a hard no go */
     for (scan = spot->neighbour[main_dir]; scan && ! is_hardnogo(scan); scan = scan->neighbour[main_dir])
         if (scan->is_target || (scan->neighbour[sub_dir_a] != NULL && scan->neighbour[sub_dir_b] != NULL))
             return;
 
-    /* Apparently, there is a new hard nogos on this line, so just mark them all. (Except when the line is
-     * just two spots long, in which case the for loop below will not enter once and correcrly omitting
-     * the marking of new_hardnogos. */
+    /* Apparently, there is (at least one) new hard no go on this line, so just mark them all. (Except when
+     * the line length is zero (exluding start/end), in which case the for loop below will not enter and
+     * thus correctly omitting the marking of new_hardnogos. */
     for (scan = spot->neighbour[main_dir]; scan && ! is_hardnogo(scan); scan = scan->neighbour[main_dir])
     {
         dbg_hardnogo_if( ! is_hardnogo(scan))
-            printf_hardnogo(" %d", scan->spot_number)
+            printf_hardnogo(" %ld", SPOT_NUMBER(scan))
 
         set_as_hardnogo(scan);
         *new_hardnogos  = 1;

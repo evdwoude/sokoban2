@@ -23,7 +23,7 @@
 
 /* Code */
 
-void  resolve(struct game_data *p_game_data)
+void  resolve(p_game_data_t p_game_data)
 {
     p_spot johnny = p_game_data->johnny;
 
@@ -71,7 +71,7 @@ void  resolve(struct game_data *p_game_data)
 //             add move
 // }
 
-void explore_for_reach(struct game_data *p_game_data, p_spot johnny)
+void explore_for_reach(p_game_data_t p_game_data, p_spot johnny)
 {
     skbn_err error = no_error;
     t_direction dir = right;

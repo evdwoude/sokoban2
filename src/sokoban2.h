@@ -1,6 +1,9 @@
 #ifndef SOKOBAN2_H
 #define SOKOBAN2_H
 
+#include <stdint.h>
+
+
 typedef enum {right=0, up=1, left=2, down=3} t_direction;
 
 struct spot
@@ -12,7 +15,6 @@ struct spot
     int has_box;
     int is_target;
     int reach_mark;     /* For exploring johnny's current reach. */
-    int spot_number;    /* For identifying reaches and for debug printing. */
     int position;       /* For setup parsing only.  */
 };
 
@@ -21,6 +23,7 @@ typedef struct spot *p_spot;
 #define HARDNOGO ((p_spot) -1)
 
 #define NR_OF_SPOTS (50*50)
+#define SPOT_NUMBER(p_spot) ((p_spot) - p_game_data->spot_pool)
 
 struct game_data
 {
@@ -37,5 +40,15 @@ struct game_data
     int next_reach;   /* For exploring johnny's current reach. */
 };
 
+typedef struct game_data *p_game_data_t;
+
+
 #endif /* SOKOBAN2_H */
+
+
+
+
+
+
+
 

@@ -42,7 +42,7 @@ void create_transposition_base(struct game_data *p_game_data)
 #ifdef DBG_CREATE_BASE
     printf("Transposition spots:\n");
     for(spot = p_game_data->transposition_head; spot; spot = spot->transposition_list)
-        printf(" %d", spot->spot_number);
+        printf(" %ld", SPOT_NUMBER(spot));
     printf("\n\n");
 #endif /* DBG_CREATE_BASE */
 }

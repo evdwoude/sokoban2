@@ -40,7 +40,9 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    if (setup(argc, argv) != no_error)
+    printf("\nSpots size: %ld.\n", sizeof(struct spot));
+
+    if (setup(&game_data, argc, argv) != no_error)
         return error;
 
     resolve(&game_data);

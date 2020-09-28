@@ -3,7 +3,9 @@ Next:
 
     Document latest new functions.
 
-    Change and ocument file structure:
+    Document why this impl uses indexed arrays and not pointers. (Violating type safety.)
+
+    Change and document file structure:
         - Create prune.c
             Move define_hardnogos there.
         - Create explore.c and walk.c
@@ -12,6 +14,7 @@ Next:
 
     Document: domain vs reach
 
+    Print large setup: change to 3-digit numbers; similar to medium setup
 
     Function header for explore_for_reach()
     Create files for eplore functions and for walk functions

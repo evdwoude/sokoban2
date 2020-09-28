@@ -14,10 +14,10 @@
 
 /* Internal protos */
 
-skbn_err parse_setup(int chr, int target_game_number, int *done);
-skbn_err add_new_spot(int chr, int position, int line_number, int character_position);
+skbn_err parse_setup(p_game_data_t p_game_data, int chr, int target_game_number, int *done);
+skbn_err add_new_spot(p_game_data_t p_game_data, int chr, int position, int line_number, int char_position);
 
-void set_all_pointers(void);
+void set_all_pointers(p_game_data_t p_game_data);
 
 #ifdef PRINT_SMALL_SETUP
 #define print_small_setup(...) printf(__VA_ARGS__);
@@ -26,15 +26,15 @@ void set_all_pointers(void);
 #endif
 
 #ifdef PRINT_MEDIUM_SETUP
-void print_medium_setup(void);
-#define print_medium_setup_def() print_medium_setup();
+void print_medium_setup(p_game_data_t p_game_data);
+#define print_medium_setup_def(x) print_medium_setup(x);
 #else
 #define print_medium_setup_def(...)
 #endif
 
 #ifdef PRINT_LARGE_SETUP
-void print_large_setup(void);
-#define print_large_setup_def() print_large_setup();
+void print_large_setup(p_game_data_t p_game_data);
+#define print_large_setup_def(x) print_large_setup(x);
 #else
 #define print_large_setup_def(...)
 #endif
@@ -43,16 +43,15 @@ void print_large_setup(void);
 
 /* Imported data */
 
-extern struct game_data game_data; // TODO: Make this a parameter:
-
 /* Local data */
+
 
 int number_of_boxes   = 0;
 int number_of_targets = 0;
 
 /* Code */
 
-skbn_err setup(int argc, char *argv[])
+skbn_err setup(p_game_data_t p_game_data, int argc, char *argv[])
 {
     FILE *setupfile;
 
@@ -79,7 +78,7 @@ skbn_err setup(int argc, char *argv[])
     do
     {
         chr = fgetc(setupfile);
-        error = parse_setup(chr, target_game_number, &done);
+        error = parse_setup(p_game_data, chr, target_game_number, &done);
     }
     while (error == no_error && !done);
 
@@ -89,13 +88,13 @@ skbn_err setup(int argc, char *argv[])
     if (number_of_boxes != number_of_targets)
         return print_error(boxes_unequal_targets);
 
-    if (!game_data.johnny)
+    if ( ! p_game_data->johnny)
         return print_error(no_man);
 
-    set_all_pointers();
+    set_all_pointers(p_game_data);
 
-    print_medium_setup_def()
-    print_large_setup_def()
+    print_medium_setup_def(p_game_data)
+    print_large_setup_def(p_game_data)
 
     /* Close the setup file. */
     if (fclose(setupfile))
@@ -104,7 +103,7 @@ skbn_err setup(int argc, char *argv[])
     return error;
 }
 
-skbn_err parse_setup(int chr, int target_game_number, int *done)
+skbn_err parse_setup(p_game_data_t p_game_data, int chr, int target_game_number, int *done)
 {
     static enum {
         scanning_game_number,
@@ -196,7 +195,8 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
         {
             while (space_counter)
             {
-                error = add_new_spot(' ', character_position-space_counter, line_number, character_position);
+                error = add_new_spot(p_game_data, ' ', character_position-space_counter,
+                                     line_number, character_position);
                 if (error)
                     return error;
                 space_counter--;
@@ -234,7 +234,7 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
         case 'H':
         case 'O':
         case 'o':
-            error = add_new_spot(chr, character_position, line_number, character_position);
+            error = add_new_spot(p_game_data, chr, character_position, line_number, character_position);
             if (error)
                 return error;
             return no_error;
@@ -246,48 +246,44 @@ skbn_err parse_setup(int chr, int target_game_number, int *done)
 }
 
 
-skbn_err add_new_spot(int chr, int position, int line_number, int character_position)
+skbn_err add_new_spot(p_game_data_t p_game_data, int chr, int position, int line_number, int char_position)
 {
-    static int spot_number = 1;
-
     // Fetch a new spot from the pool.
-    if (game_data.pool_ptr >= &(game_data.spot_pool[NR_OF_SPOTS]))
+    if (p_game_data->pool_ptr >= &(p_game_data->spot_pool[NR_OF_SPOTS]))
         return print_error(not_enough_static_memory);
 
     // Initialise it.
-    game_data.pool_ptr->neighbour[up   ]   = NULL;
-    game_data.pool_ptr->neighbour[down ]   = NULL;
-    game_data.pool_ptr->neighbour[left ]   = NULL;
-    game_data.pool_ptr->neighbour[right]   = NULL;
-    game_data.pool_ptr->reach_chain        = NULL;
-    game_data.pool_ptr->transposition_list = NULL;
-    game_data.pool_ptr->has_box            = ('X' == chr) || ('H' == chr);
-    game_data.pool_ptr->is_target          = ('.' == chr) || ('H' == chr) || ('o' == chr);
-    game_data.pool_ptr->reach_mark         = 0;
+    p_game_data->pool_ptr->neighbour[up   ]   = NULL;
+    p_game_data->pool_ptr->neighbour[down ]   = NULL;
+    p_game_data->pool_ptr->neighbour[left ]   = NULL;
+    p_game_data->pool_ptr->neighbour[right]   = NULL;
+    p_game_data->pool_ptr->reach_chain        = NULL;
+    p_game_data->pool_ptr->transposition_list = NULL;
+    p_game_data->pool_ptr->has_box            = ('X' == chr) || ('H' == chr);
+    p_game_data->pool_ptr->is_target          = ('.' == chr) || ('H' == chr) || ('o' == chr);
+    p_game_data->pool_ptr->reach_mark         = 0;
+    p_game_data->pool_ptr->position           = position;
 
-    game_data.pool_ptr->position           = position;       /* For setup parsing only.    */
-    game_data.pool_ptr->spot_number        = spot_number++;  /* For debug printing only.   */
-
-    if (game_data.pool_ptr->has_box)
+    if (p_game_data->pool_ptr->has_box)
         number_of_boxes++;                 /* Counted for double checking the setup. */
 
-    if (game_data.pool_ptr->is_target)
+    if (p_game_data->pool_ptr->is_target)
         number_of_targets++;               /* Counted for double checking the setup. */
 
     if ('O' == chr || 'o' == chr)
     {
-        if (game_data.johnny)
-            return print_error(second_man, line_number, character_position);
+        if (p_game_data->johnny)
+            return print_error(second_man, line_number, char_position);
         else
-            game_data.johnny = game_data.pool_ptr;
+            p_game_data->johnny = p_game_data->pool_ptr;
     }
 
-    game_data.pool_ptr++;                 // Advance to the new spot on the pool.
+    p_game_data->pool_ptr++;                 // Advance to the new spot on the pool.
     return no_error;
 }
 
 
-void set_all_pointers(void)
+void set_all_pointers(p_game_data_t p_game_data)
 {
     struct spot* curr_spot;
     struct spot* next_spot;
@@ -298,19 +294,19 @@ void set_all_pointers(void)
 
     line_no = 0;
     next_line_no = 0;
-    next_line = &(game_data.spot_pool[0]);
-    for (curr_spot = &(game_data.spot_pool[0]); curr_spot < game_data.pool_ptr; curr_spot++)
+    next_line = &(p_game_data->spot_pool[0]);
+    for (curr_spot = &(p_game_data->spot_pool[0]); curr_spot < p_game_data->pool_ptr; curr_spot++)
     {
         /* Vertical chaining */
-        while ( next_line < game_data.pool_ptr &&
+        while ( next_line < p_game_data->pool_ptr &&
                 ( next_line_no <= line_no ||
                   ( line_no + 1 == next_line_no  && next_line->position < curr_spot->position)))
         {
-            if (next_line+1 < game_data.pool_ptr && next_line->position >= (next_line+1)->position)
+            if (next_line+1 < p_game_data->pool_ptr && next_line->position >= (next_line+1)->position)
                 next_line_no++; /* line wrap. */
             next_line++;
         }
-        if (next_line < game_data.pool_ptr &&
+        if (next_line < p_game_data->pool_ptr &&
             line_no + 1 == next_line_no &&
             curr_spot->position == next_line->position)
         {
@@ -321,7 +317,7 @@ void set_all_pointers(void)
 
         /* Horizontal chaining. */
         next_spot = curr_spot + 1;
-        if (next_spot < game_data.pool_ptr)
+        if (next_spot < p_game_data->pool_ptr)
         {
             if (curr_spot->position + 1 == next_spot->position)
             {
@@ -338,7 +334,7 @@ void set_all_pointers(void)
 
 
 #ifdef PRINT_MEDIUM_SETUP
-void print_medium_setup(void)
+void print_medium_setup(p_game_data_t p_game_data)
 {
     struct spot* curr_spot;
     struct spot* next_spot;
@@ -350,9 +346,9 @@ void print_medium_setup(void)
     int left_most;
 
     /* Find the left -most position. */
-    curr_spot = &(game_data.spot_pool[0]);
+    curr_spot = &(p_game_data->spot_pool[0]);
     left_most = curr_spot->position;
-    while (curr_spot < game_data.pool_ptr)
+    while (curr_spot < p_game_data->pool_ptr)
     {
         if (left_most > curr_spot->position)
             left_most = curr_spot->position;
@@ -361,18 +357,18 @@ void print_medium_setup(void)
 
     /* Shift spots left in order to left-align the whole 'store'. */
     left_most--; /* Leave a margin */
-    curr_spot = &(game_data.spot_pool[0]);
-    while (curr_spot < game_data.pool_ptr)
+    curr_spot = &(p_game_data->spot_pool[0]);
+    while (curr_spot < p_game_data->pool_ptr)
     {
         curr_spot->position -= left_most;
         curr_spot++;
     }
 
     /* Print it */
-    curr_spot = &(game_data.spot_pool[0]);
+    curr_spot = &(p_game_data->spot_pool[0]);
     line_start = curr_spot;
     printf("\n");
-    while (curr_spot < game_data.pool_ptr)
+    while (curr_spot < p_game_data->pool_ptr)
     {
         while (curr_spot->position > (line_pos))
         {
@@ -386,7 +382,7 @@ void print_medium_setup(void)
                 break;
             case 2:
                 printf("%s", curr_spot->neighbour[left] ? "-" : " ");
-                printf("%03d", curr_spot->spot_number);
+                printf("%03ld", SPOT_NUMBER(curr_spot));
                 break;
             default /* Should not happen */:
                 printf("/n/t????\n\n");
@@ -395,8 +391,8 @@ void print_medium_setup(void)
         line_pos++;
 
         next_spot = curr_spot + 1;
-        if ( next_spot >= game_data.pool_ptr ||
-            (next_spot < game_data.pool_ptr && curr_spot->position >= next_spot->position) )
+        if ( next_spot >= p_game_data->pool_ptr ||
+            (next_spot < p_game_data->pool_ptr && curr_spot->position >= next_spot->position) )
         {
             if (line_rep++ >= 2)
             {
@@ -415,14 +411,14 @@ void print_medium_setup(void)
 
 
 #ifdef PRINT_LARGE_SETUP
-char *spot_number_str(struct spot* spot, char *no_spot_str);
+char *spot_number_str(p_game_data_t p_game_data, struct spot* spot, char *no_spot_str);
 
-char *spot_number_str(struct spot* spot, char *no_spot_str)
+char *spot_number_str(p_game_data_t p_game_data, struct spot* spot, char *no_spot_str)
 {
     static char spot_numberstring[3];
 
     if (spot)
-        sprintf(spot_numberstring, "%02d", spot->spot_number);
+        sprintf(spot_numberstring, "%02ld", SPOT_NUMBER(spot));
     else
         return no_spot_str;
 
@@ -430,7 +426,7 @@ char *spot_number_str(struct spot* spot, char *no_spot_str)
 }
 
 
-void print_large_setup(void)
+void print_large_setup(p_game_data_t p_game_data)
 {
     struct spot* curr_spot;
     struct spot* next_spot;
@@ -442,9 +438,9 @@ void print_large_setup(void)
     int left_most;
 
     /* Find the left -most position. */
-    curr_spot = &(game_data.spot_pool[0]);
+    curr_spot = &(p_game_data->spot_pool[0]);
     left_most = curr_spot->position;
-    while (curr_spot < game_data.pool_ptr)
+    while (curr_spot < p_game_data->pool_ptr)
     {
         if (left_most > curr_spot->position)
             left_most = curr_spot->position;
@@ -453,18 +449,18 @@ void print_large_setup(void)
 
     /* Shift spots left in order to left-align the whole 'store'. */
     left_most--; /* Leave a margin */
-    curr_spot = &(game_data.spot_pool[0]);
-    while (curr_spot < game_data.pool_ptr)
+    curr_spot = &(p_game_data->spot_pool[0]);
+    while (curr_spot < p_game_data->pool_ptr)
     {
         curr_spot->position -= left_most;
         curr_spot++;
     }
 
     /* Print it */
-    curr_spot = &(game_data.spot_pool[0]);
+    curr_spot = &(p_game_data->spot_pool[0]);
     line_start = curr_spot;
     printf("\n");
-    while (curr_spot < game_data.pool_ptr)
+    while (curr_spot < p_game_data->pool_ptr)
     {
         while (curr_spot->position > (line_pos))
         {
@@ -474,15 +470,15 @@ void print_large_setup(void)
         switch (line_rep)
         {
             case 1:
-                printf("    %s   ", spot_number_str(curr_spot->neighbour[up], "||"));
+                printf("    %s   ", spot_number_str(p_game_data, curr_spot->neighbour[up], "||"));
                 break;
             case 2:
-                printf(" %s", spot_number_str(curr_spot->neighbour[left], "  "));
-                printf("=%02d=", curr_spot->spot_number);
-                printf("%s", spot_number_str(curr_spot->neighbour[right], "  "));
+                printf(" %s", spot_number_str(p_game_data, curr_spot->neighbour[left], "  "));
+                printf("=%02ld=", SPOT_NUMBER(curr_spot));
+                printf("%s", spot_number_str(p_game_data, curr_spot->neighbour[right], "  "));
                 break;
             case 3:
-                printf("    %s   ", spot_number_str(curr_spot->neighbour[down], "||"));
+                printf("    %s   ", spot_number_str(p_game_data, curr_spot->neighbour[down], "||"));
                 break;
             default /* Should not happen */:
                 printf("/n/t????\n\n");
@@ -491,8 +487,8 @@ void print_large_setup(void)
         line_pos++;
 
         next_spot = curr_spot + 1;
-        if ( next_spot >= game_data.pool_ptr ||
-            (next_spot < game_data.pool_ptr && curr_spot->position >= next_spot->position) )
+        if ( next_spot >= p_game_data->pool_ptr ||
+            (next_spot < p_game_data->pool_ptr && curr_spot->position >= next_spot->position) )
         {
             if (line_rep++ >= 3)
             {
