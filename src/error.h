@@ -18,12 +18,16 @@ typedef enum
     no_man,
     move_stack_is_full,
     cant_allocate_memory,
+    memory_not_aligned,
+    transposition_node_size,
+    transposition_leaf_size,
+    no_tree_memory,
+    out_of_tree_memory,
 
     /* Programming errors: */
     unexpected_existing_child_node,
     unexpected_direction_parent,
     no_parent_move,
-//    not_enough_allocated_memory
 } skbn_err;
 
 skbn_err print_error(skbn_err error, ...);

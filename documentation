@@ -51,6 +51,23 @@ Definitions:
 Approach:
 
 
+    General
+
+    The move tree:
+
+    The transposition tree
+
+        How the lookup tree works:
+
+    Consider this setup:    ######
+                            #.XO #
+                            ######   (Spots are numbered from left to right: 0, 1, 2, 3).
+
+        ... then ....
+
+
+    (Later, we'll implement the store of transpostion as a hash, instead of a look-up binary tree)
+
 
 
 Functions:
@@ -146,6 +163,8 @@ Functions:
     walk funtions:
         walk_to_extend_depth
         walk_to_find_move_path
+
+    add_transposition
 
 
 Examples sokobans:

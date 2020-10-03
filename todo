@@ -1,4 +1,16 @@
 Next:
+    Todo:
+        Document latest changes
+        Test for the maximum value of the index before returning a new tree memblock.
+        Double check the dependencies.
+
+    Implement
+        utility.c
+            struct transposition_node *new_transposition_node(p_game_data_t p_game_data);
+
+        transposition.c
+            skbn_err add_transposition(p_game_data_t p_game_data, p_spot johnny)
+
     Double check the conditions fo new_hardnogos in the linescanner.
 
     Document latest new functions.

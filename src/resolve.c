@@ -23,20 +23,30 @@
 
 /* Code */
 
-void  resolve(p_game_data_t p_game_data)
+
+skbn_err resolve(p_game_data_t p_game_data)
 {
     p_spot johnny = p_game_data->johnny;
 
     /* First, define all "no go spots", and chain up the rest for creating transpositions. */
     define_hardnogos(p_game_data);
 
-    /* Then, using the defined hard nogos, create the linked list of spots that are used for the creation
-     * of the as transpositions. */
+    /* Then, using the defined hard nogos, create the linked list of spots that are included in the
+     * transpositions. */
     create_transposition_base(p_game_data);
 
-    // walk_to_extend_depth(p_game_data, johnny);
+    /* Create a root node for the forward transposition tree */
+    p_game_data->forward_transposition_root = new_transposition_node(p_game_data);
+    if ( !  p_game_data->forward_transposition_root)
+        return print_error(no_tree_memory);
 
-    return;
+    printf("\n\nForward transposition root node: %d\n\n", p_game_data->forward_transposition_root);
+
+    /* Add the setup transposition to the transposition tree. */
+    add_transposition(p_game_data);
+
+    // walk_to_extend_depth(p_game_data, johnny);
+    return no_error;
 }
 
 // t_got_it walk_to_extend_depth(struct game_data *p_game_data, p_spot johnny, move_stack)

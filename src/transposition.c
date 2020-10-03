@@ -8,10 +8,24 @@
 #include "utility.h"
 #include "transposition.h"
 
-#define DBG_CREATE_BASE 1
-
 
 /* Local defs */
+
+/* Conditional compile switches  */
+
+#define DBG_CREATE_BASE 1       /* Debug prints on creating the trasnposition base. */
+#define DBG_ADD_TP 1            /* Prints on add_transpostion function              */
+
+/* Conditional compile 'fabric' */
+
+#ifdef DBG_ADD_TP
+#define printf_add_tp(...) printf(__VA_ARGS__);
+#define dbg_else_add_tp else
+#else
+#define printf_add_tp(...)
+#define dbg_else_add_tp
+#endif
+
 
 // typedef enum {false = 0, true = 1} t_bool;
 
@@ -25,7 +39,7 @@
 
 /* Code */
 
-void create_transposition_base(struct game_data *p_game_data)
+void create_transposition_base(p_game_data_t p_game_data)
 {
     struct spot* spot;
     struct spot** p_end;
@@ -47,62 +61,64 @@ void create_transposition_base(struct game_data *p_game_data)
 #endif /* DBG_CREATE_BASE */
 }
 
-
-#if 0
-skbn_err add_transposition(p_spot johhny)
+skbn_err add_transposition(p_game_data_t p_game_data)
 {
-    p_transposition_node  node = &first_node;
-    p_transposition_node  *next;
-    p_transposition_node  new_node;
-    p_spot  spot;
+    /* Current node index. Start at the root of the forward transpoition tree. */
+    uint32_t node = p_game_data->forward_transposition_root;
+
+    uint32_t *next;         /* Reference of the current node's child index. */
+    uint32_t new_node = 0;  /* New node index. */
+
+    p_spot  spot;           /* Iterates over the tranposition base. */
     skbn_err  error;
 
     int new_transposition = 0;
 
-    for (spot = &(game_data.spot_pool[0]); spot < game_data.pool_ptr; spot++)
+    for(spot = p_game_data->transposition_head; spot; spot = spot->transposition_list)
     {
-        if (man == spot)
-            next = &(node->node.spot_has_man);
-        else if (spot->has_box )
-            next = &(node->node.spot_has_box);
+        if (spot->has_box)
+            next = &(P_TPN(node)->spot_has_box);
         else
-            next = &(node->node.spot_is_empty);
+            next = &(P_TPN(node)->spot_is_empty);
 
-        dbg_printf_a( man == spot ? "M" : spot->has_box ? "B" : "E" )
+        printf_add_tp( spot->has_box ? "B" : "E" )
 
-        if (!*next)
+        if ( ! *next)
         {
-            /* There is no next node for this 'next' pointer.    */
-            /* By definition, this means this is a new transpostion. */
+            /* So there is no next node. This means this is a new transpostion. */
 
             new_transposition = 1;
 
-            error = get_new_node((void **) &new_node, sizeof(union transposition_node));
-            if (error)
-                return error;
-            transposition_nodes++;
+            /* Allocate a new node or leaf. (Note: the new node is already zero-initialised.) */
+            if (spot->transposition_list)
+                new_node = new_transposition_node(p_game_data);
+            else
+            {
+                new_node = new_transposition_leaf(p_game_data);
+                printf_add_tp("L");
+            }
 
-            /* Initialise members. */
-            new_node->node.spot_has_box  = NULL;
-            new_node->node.spot_has_man  = NULL;
-            new_node->node.spot_is_empty = NULL;
+            if (!new_node)
+                return print_error(out_of_tree_memory);
 
-            /* Hook the new node up to the current node's 'next' pointer, whichever that is. */
+            /* Hook the new node up to the current node's 'next'; either spot_has_box or spot_is_empty. */
             *next = new_node;
 
             /* Indicate that this transposition is new. */
             /* We do not break up the loop here, because we need to make the complete transposition known. */
-            dbg_printf_a("+ ")
+            printf_add_tp("+ ")
         }
-        dbg_else_a
-            dbg_printf_a("- ")
+        dbg_else_add_tp
+            printf_add_tp("- ")
 
-        node = *next;   /* Goto the next node. (If there was no next node, we just created one.) */
+        node = *next;   /* Goto the next node. If there was no next node yet, we've just created one. */
     }
-
+#if 0
     if (new_transposition || node->move_path.backward_path)
         *new_tp_node = node;
 
     return none;
-}
 #endif
+}
+
+

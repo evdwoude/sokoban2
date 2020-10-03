@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "sokoban2.h"
@@ -81,6 +81,62 @@ int next_mark(p_game_data_t p_game_data)
     }
 
     return p_game_data->next_reach;
+}
+
+
+skbn_err allocate_memory(p_game_data_t p_game_data)
+{
+    /* Sanity checks for the way we'er goona use the tree memory. */
+    if (sizeof(struct transposition_node) != MEMBLOCK_SIZE)
+        return print_error(transposition_node_size, MEMBLOCK_SIZE);
+
+    if (sizeof(struct transposition_leaf) != 2*MEMBLOCK_SIZE)
+        return print_error(transposition_leaf_size, 2*MEMBLOCK_SIZE);
+
+    /* Allocate space for the trees. */
+    p_game_data->p_memory_start = calloc(MEMBLOCK_COUNT, MEMBLOCK_SIZE);
+
+    if ( ! p_game_data->p_memory_start)
+        return print_error(cant_allocate_memory);
+
+    if ((long int) p_game_data->p_memory_start & MEMBLOCK_SIZE-1) /* MEMBLOCK_SIZE is a power of 2. */
+    {
+        free(p_game_data->p_memory_start);
+        return print_error(memory_not_aligned, MEMBLOCK_SIZE);
+    }
+    p_game_data->p_memory_bottom = p_game_data->p_memory_start;
+    p_game_data->p_memory_top  =   p_game_data->p_memory_start + MEMBLOCK_COUNT * MEMBLOCK_SIZE;
+
+    return no_error;
+}
+
+
+uint32_t new_transposition_node(p_game_data_t p_game_data)
+{
+    uint32_t index;
+
+    if (p_game_data->p_memory_bottom + MEMBLOCK_SIZE > p_game_data->p_memory_top)
+        return 0;
+
+    index = 1 + (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
+    printf("[%d]", index);
+
+    p_game_data->p_memory_bottom += MEMBLOCK_SIZE;
+    return index;
+}
+
+uint32_t new_transposition_leaf(p_game_data_t p_game_data)
+{
+    uint32_t index;
+
+    if (p_game_data->p_memory_bottom + 2 * MEMBLOCK_SIZE > p_game_data->p_memory_top)
+        return 0;
+
+    index = 1 + (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
+    printf("[[%d]]", index);
+
+    p_game_data->p_memory_bottom += 2 * MEMBLOCK_SIZE;
+    return index;
 }
 
 

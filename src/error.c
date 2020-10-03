@@ -92,6 +92,24 @@ skbn_err print_error(skbn_err error, ...)
 //         case not_enough_allocated_memory:
 //             printf("\nThere is not enough allocated memory.\n");
 //             break;
+    case memory_not_aligned:
+        int_1 = va_arg(ap, int);
+        printf("\nMemory not aligned on %d bytes boundary.\n", int_1);
+        break;
+    case transposition_node_size:
+        int_1 = va_arg(ap, int);
+        printf("\nSize of transposition_node is not %d.\n", int_1);
+        break;
+    case transposition_leaf_size:
+        int_1 = va_arg(ap, int);
+        printf("\nSize of transposition_leaf is not %d.\n", int_1);
+        break;
+    case no_tree_memory:
+        printf("\nNo tree memory.\n");
+        break;
+    case out_of_tree_memory:
+        printf("\nOut of tree memory.\n");
+        break;
     case unexpected_existing_child_node:
         int_1 = va_arg(ap, int);
         printf("\nUnexpected pre-existing child node in move tree. Walking depth %d.\n", int_1);
