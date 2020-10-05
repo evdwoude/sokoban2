@@ -9,6 +9,8 @@
 
 /* Internal protos */
 
+void exit_function(int status, void *arg);
+
 /* Exported data */
 
 /* Imported data */
@@ -45,6 +47,9 @@ int main(int argc, char *argv[])
 
     printf("\nSokoban2 v0.12.\n");
 
+    if (on_exit(&exit_function, (void *) &game_data))
+        return print_error(cant_register_exit_function);
+
     error = setup(&game_data, argc, argv);
     if (error)
         return error;
@@ -79,8 +84,6 @@ int main(int argc, char *argv[])
 
     resolve(&game_data);
 
-    free(game_data.p_memory_start);
-
     end_time = time(NULL);
     diff_time = (long) difftime(end_time, start_time);
 
@@ -90,4 +93,15 @@ int main(int argc, char *argv[])
 //         diff_time % 60 );
 
     return 0;
+}
+
+/* So for the only thing to worry about is the memort allocation, as for now setup() does not use exit()
+ * and will take care of closing the setup file by its own.*/
+void exit_function(int status, void *arg)
+{
+    if (arg && ((struct game_data *) arg)->p_memory_start)
+    {
+//         printf("\nExit: freeing momory. %d, %ld", status, (long int) (((struct game_data *) arg)->p_memory_start));
+        free( ((struct game_data *) arg)->p_memory_start );
+    }
 }

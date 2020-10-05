@@ -5,6 +5,7 @@ typedef enum
 {
     no_error = 0,
     usage,
+    cant_register_exit_function,
     cant_open_setupfile,
     cant_close_setupfile,
     game_number_is_zero,

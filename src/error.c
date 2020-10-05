@@ -34,6 +34,9 @@ skbn_err print_error(skbn_err error, ...)
     case usage:
         printf("\nUsage: soko <setupfile> <game number>.\n");
         break;
+    case cant_register_exit_function:
+        printf("\nCan't register exit function\n.");
+        break;
     case cant_open_setupfile:
         printf("\nCan't open setupfile: \"%s\".\n", va_arg(ap, char *));
         break;
@@ -89,9 +92,6 @@ skbn_err print_error(skbn_err error, ...)
     case cant_allocate_memory:
         printf("\nCannot allocate memory.\n");
         break;
-//         case not_enough_allocated_memory:
-//             printf("\nThere is not enough allocated memory.\n");
-//             break;
     case memory_not_aligned:
         int_1 = va_arg(ap, int);
         printf("\nMemory not aligned on %d bytes boundary.\n", int_1);
