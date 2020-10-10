@@ -22,13 +22,10 @@ typedef enum
     memory_not_aligned,
     transposition_node_size,
     transposition_leaf_size,
-    no_tree_memory,
     out_of_tree_memory,
+    both_forward_and_backward_moves,
+    no_forward_nor_backward_move,
 
-    /* Programming errors: */
-    unexpected_existing_child_node,
-    unexpected_direction_parent,
-    no_parent_move,
 } skbn_err;
 
 skbn_err print_error(skbn_err error, ...);

@@ -11,8 +11,6 @@
 
 /* Local defs */
 
-// typedef enum {false = 0, true = 1} t_bool;
-
 /* Internal protos */
 
 /* Exported data */
@@ -27,6 +25,8 @@
 skbn_err resolve(p_game_data_t p_game_data)
 {
     p_spot johnny = p_game_data->johnny;
+    int32_t tmp_move_index; // TODO remove.
+    int32_t *move_index = &tmp_move_index;
 
     /* First, define all "no go spots", and chain up the rest for creating transpositions. */
     define_hardnogos(p_game_data);
@@ -36,14 +36,76 @@ skbn_err resolve(p_game_data_t p_game_data)
     create_transposition_base(p_game_data);
 
     /* Create a root node for the forward transposition tree */
-    p_game_data->forward_transposition_root = new_transposition_node(p_game_data);
-    if ( !  p_game_data->forward_transposition_root)
-        return print_error(no_tree_memory);
+    p_game_data->transposition_root = new_transposition_node(p_game_data);
 
-    printf("\n\nForward transposition root node: %d\n\n", p_game_data->forward_transposition_root);
+    // TODO Remmove:
+    printf("\n\nTransposition root node: %d\n\n", p_game_data->transposition_root);
 
     /* Add the setup transposition to the transposition tree. */
-    add_transposition(p_game_data);
+        printf("\n0: ");
+    find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n1: ");
+        p_game_data->spot_pool[9].has_box = 1;
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n2: ");
+        p_game_data->spot_pool[39].has_box = 1;
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n2: ");
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+
+        /* Now changing the reach . . .  */
+
+        printf("\n\n3: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[1]);
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n3: ");
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n4: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[2]);
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n5: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[3]);
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n5: ");
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        /* New box and two . . .  */
+
+        printf("\n\n6: ");
+        p_game_data->spot_pool[14].has_box = 1;
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n7: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[6]);
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n8: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[7]);
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n9: ");
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
 
     // walk_to_extend_depth(p_game_data, johnny);
     return no_error;

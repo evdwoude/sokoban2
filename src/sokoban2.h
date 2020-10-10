@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 #define MEMBLOCK_SIZE   8    /* Code relies on MEMBLOCK_SIZE being a power of 2. */
-//#define MEMBLOCK_COUNT  (2^30) /* 1G */
-#define MEMBLOCK_COUNT  (20)
+//#define MEMBLOCK_COUNT  (2^30) /* 1G blocks, i.e. 8GB */
+#define MEMBLOCK_COUNT  (200)
 
 #define HARDNOGO ((p_spot) -1)
 
@@ -13,7 +13,7 @@
 #define SPOT_NUMBER(p_spot) ((p_spot) - p_game_data->spot_pool)
 
 
-
+typedef enum {false = 0, true = 1} t_bool;
 typedef enum {right=0, up=1, left=2, down=3} t_direction;
 
 struct spot
@@ -41,11 +41,11 @@ struct game_data
      *      Head of linked list: the sub set of spots that are relevant for the transpositions.
      *      Consists of all spots that are nog marked as hardnogo.
      */
-    struct spot *transposition_head;                /* Head of the transposition base list.        */
+    struct spot *transposition_head; /* Head of the transposition base list. */
 
-    uint32_t forward_transposition_root;            /* Root node of the forward transpoition tree. */
+    uint32_t transposition_root;     /* Root node of the transpoition tree. */
 
-    int next_reach; /* For exploring johnny's current reach. */
+    int next_reach;         /* For exploring johnny's current reach. */
 
     void *p_memory_start;   /* Pointer to the memory allocated for the move trees and transposition tree. */
     void *p_memory_bottom;  /* Pointer to free tree memory, from the bottom up.                           */
@@ -53,11 +53,11 @@ struct game_data
                             /* Note: p_memory_bottom points to the first free location while p_memory_top */
                             /* points to the first non-free location after the free space.                */
 
-    /* Statitics: */
-    int fw_move_count;  /* Amount of forward move  nodes used. */
-    int bw_move_count;  /* Amount of backward move nodes used. */
-    int tp_node_count;  /* Amount of transposition nodes used. */
-    int tp_leaf_count;  /* Amount of transposition leafs used. */
+    /* Statistics: */
+    int fw_move_count;      /* Amount of forward move  nodes used. */
+    int bw_move_count;      /* Amount of backward move nodes used. */
+    int tp_node_count;      /* Amount of transposition nodes used. */
+    int tp_leaf_count;      /* Amount of transposition leafs used. */
 
 };
 

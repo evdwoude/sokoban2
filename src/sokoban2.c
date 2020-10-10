@@ -25,14 +25,14 @@ int main(int argc, char *argv[])
 {
     skbn_err error;
 
-    game_data.pool_ptr                   = &(game_data.spot_pool[0]);
-    game_data.johnny                     = NULL;
-    game_data.transposition_head         = NULL;
-    game_data.forward_transposition_root = 0;
-    game_data.next_reach                 = 0;
-    game_data.p_memory_start             = NULL;
-    game_data.p_memory_bottom            = NULL;
-    game_data.p_memory_top               = NULL;
+    game_data.pool_ptr           = &(game_data.spot_pool[0]);
+    game_data.johnny             = NULL;
+    game_data.transposition_head = NULL;
+    game_data.transposition_root = 0;
+    game_data.next_reach         = 0;
+    game_data.p_memory_start     = NULL;
+    game_data.p_memory_bottom    = NULL;
+    game_data.p_memory_top       = NULL;
 
 
     time_t start_time, end_time;
@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
 //         printf("\ntest leaf: %d.", test_leaf);
 //         printf("\nptr:       %lX\n", (long int) P_TPL(test_leaf));
 //
+
 
     resolve(&game_data);
 

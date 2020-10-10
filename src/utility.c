@@ -116,10 +116,10 @@ uint32_t new_transposition_node(p_game_data_t p_game_data)
     uint32_t index;
 
     if (p_game_data->p_memory_bottom + MEMBLOCK_SIZE > p_game_data->p_memory_top)
-        return 0;
+        exit( print_error(out_of_tree_memory) );
 
-    index = 1 + (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
-    printf("[%d]", index);
+    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
+//     printf("[%d]", index);
 
     p_game_data->p_memory_bottom += MEMBLOCK_SIZE;
     return index;
@@ -130,10 +130,10 @@ uint32_t new_transposition_leaf(p_game_data_t p_game_data)
     uint32_t index;
 
     if (p_game_data->p_memory_bottom + 2 * MEMBLOCK_SIZE > p_game_data->p_memory_top)
-        return 0;
+        exit( print_error(out_of_tree_memory) );
 
-    index = 1 + (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
-    printf("[[%d]]", index);
+    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
+//     printf("[[%d]]", index);
 
     p_game_data->p_memory_bottom += 2 * MEMBLOCK_SIZE;
     return index;

@@ -6,28 +6,10 @@ skbn_err print_error(skbn_err error, ...)
 {
     va_list ap;
 
-//      char *str_1;
-//     char *str_2;
-//     char *str_3;
     int int_1;
     int int_2;
-//     int int_3;
-
 
     va_start(ap, error);
-
-    /* Pre-parse source code file name and source code line number for the relevant error cases. */
-    /*
-    switch (error)
-    {
-        case A:
-        case B:
-            filename = va_arg(ap, int);
-            linenr =   va_arg(ap, int);
-        default:
-            break;
-    }
-    */
 
     switch (error)
     {
@@ -68,18 +50,6 @@ skbn_err print_error(skbn_err error, ...)
     case not_enough_static_memory:
         printf("\nNot enough static memory defined to read the game setup.\n");
         break;
-//         case game_pool_max:
-//             int_1 = va_arg(ap, int);
-//             str_1 = va_arg(ap, char *);
-//             int_2 = va_arg(ap, int);
-//             printf("\nNumber of games exceeds the maximum of %d, file: \"%s\", line: %d\n", int_1, str_1, int_2);
-//             break;
-//         case game_buf_max:
-//             str_1 = va_arg(ap, char *);
-//             int_1 = va_arg(ap, int);
-//             int_2 = va_arg(ap, int);
-//             printf("\nRequired memory exceeds the reserved maximum, file: \"%s\", line: %d\n(src line nr: %d)\n", str_1, int_1, int_2);
-//             break;
     case boxes_unequal_targets:
         printf("\nThe amount of boxes does not match the amount of targets.\n");
         break;
@@ -104,23 +74,14 @@ skbn_err print_error(skbn_err error, ...)
         int_1 = va_arg(ap, int);
         printf("\nSize of transposition_leaf is not %d.\n", int_1);
         break;
-    case no_tree_memory:
-        printf("\nNo tree memory.\n");
-        break;
     case out_of_tree_memory:
         printf("\nOut of tree memory.\n");
         break;
-    case unexpected_existing_child_node:
-        int_1 = va_arg(ap, int);
-        printf("\nUnexpected pre-existing child node in move tree. Walking depth %d.\n", int_1);
+    case both_forward_and_backward_moves:
+        printf("\nBoth forward and backward moves are set.\n");
         break;
-    case unexpected_direction_parent:
-        int_1 = va_arg(ap, int);
-        printf("\nUnexpected direction \"parent\". Walking depth %d.\n", int_1);
-        break;
-    case no_parent_move:
-        int_1 = va_arg(ap, int);
-        printf("\nNo parent move pointer populated. Walking depth %d.\n", int_1);
+    case no_forward_nor_backward_move:
+        printf("\nNo forward nor backward move set.\n");
         break;
     default:
         printf("\nError in error handling (undefined error).\n");

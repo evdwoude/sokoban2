@@ -33,9 +33,14 @@ Definitions:
     Walk:
         Refers to traversing a move tree, in depth-first fashion.
 
+    Box positioning
+        The collection of the momentary positions of all boxes, or the collection of the momentary
+        positions of all targets. The latter is used for backward search. (In backward search we're
+        moving the targets.)
+
     Transposition:
-        The collection of the positions of all boxes  and Johhny's current reach identifier, or
-        the collection of the positions of all tagets and Johhny's current reach identifier.
+        A transpositon is the momantary state of the wharehouse i.e. including the Box positioning as
+        well as the momentary reach of Johnny. (The reach of Johnny is identied by a Reach identifier.)
         Moving a box (or a target) resuls in a different transposition.
         Moving Johhny within his current reach does not result in a different transposition, but
         repositioning Johhny into another reach does.
@@ -155,7 +160,7 @@ Functions:
 
     explore funtions:
         explore_for_reach
-        explore_for_identification
+        explore_for_reach_identifier
         explore_for_tranposition
         explore_for_end_positions
         explore_for_move_path
@@ -164,7 +169,7 @@ Functions:
         walk_to_extend_depth
         walk_to_find_move_path
 
-    add_transposition
+    find_or_add_transposition
 
 
 Examples sokobans:

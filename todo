@@ -1,14 +1,33 @@
 Next:
+
+    Use one move_path for both forward and backward.
+    Indicate which by a single bit.
+
+    Test find_or_add_transposition with johnny maniplations.
+
+    Buld explore_for_reach_identifier()
+        test the above again.
+
+    Use more exit() calls and clean up code.
+
     Todo:
         Document latest changes
         Test for the maximum value of the index before returning a new tree memblock.
         Double check the dependencies.
+
+    Return values of functions:
+            A function primarily returns the intrinsic result.
+            If an error conditon is a potential outcome:
+                - Embed the errror condition in the function result
+                - Where ever that is not feasible, use a sepate return variable for the error.
 
     Implement
         utility.c
             struct transposition_node *new_transposition_node(p_game_data_t p_game_data);
 
         transposition.c
+            explore for identifier
+
             skbn_err add_transposition(p_game_data_t p_game_data, p_spot johnny)
 
     Double check the conditions fo new_hardnogos in the linescanner.
