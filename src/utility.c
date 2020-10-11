@@ -86,26 +86,30 @@ int next_mark(p_game_data_t p_game_data)
 
 skbn_err allocate_memory(p_game_data_t p_game_data)
 {
-    /* Sanity checks for the way we'er goona use the tree memory. */
-    if (sizeof(struct transposition_node) != MEMBLOCK_SIZE)
-        return print_error(transposition_node_size, MEMBLOCK_SIZE);
+     /* Sanity checks for the way we'er gonna use the tree memory. */
+     if (sizeof(struct move_node) != MV_NODE_SIZE)
+         return print_error(move_node_size, MV_NODE_SIZE);
 
-    if (sizeof(struct transposition_leaf) != 2*MEMBLOCK_SIZE)
-        return print_error(transposition_leaf_size, 2*MEMBLOCK_SIZE);
+     if (sizeof(struct transposition_node) != TP_NODE_SIZE)
+         return print_error(transposition_node_size, TP_NODE_SIZE);
+
+     if (sizeof(struct transposition_leaf) != TP_LEAF_SIZE)
+         return print_error(transposition_leaf_size, TP_LEAF_SIZE);
 
     /* Allocate space for the trees. */
-    p_game_data->p_memory_start = calloc(MEMBLOCK_COUNT, MEMBLOCK_SIZE);
+    p_game_data->p_memory_start = calloc(MEM_UNIT_COUNT, MEM_REF_UNIT);
 
     if ( ! p_game_data->p_memory_start)
         return print_error(cant_allocate_memory);
 
-    if ((long int) p_game_data->p_memory_start & MEMBLOCK_SIZE-1) /* MEMBLOCK_SIZE is a power of 2. */
+    /* Check whether the base of the memory is MEM_REF_UNIT aligned. */
+    if ((long int) p_game_data->p_memory_start & MEM_REF_UNIT-1) /* (MEM_REF_UNIT is a power of 2.) */
     {
         free(p_game_data->p_memory_start);
-        return print_error(memory_not_aligned, MEMBLOCK_SIZE);
+        return print_error(memory_not_aligned, MEM_REF_UNIT);
     }
     p_game_data->p_memory_bottom = p_game_data->p_memory_start;
-    p_game_data->p_memory_top  =   p_game_data->p_memory_start + MEMBLOCK_COUNT * MEMBLOCK_SIZE;
+    p_game_data->p_memory_top  =   p_game_data->p_memory_start + MEM_UNIT_COUNT * MEM_REF_UNIT;
 
     return no_error;
 }
@@ -115,13 +119,13 @@ uint32_t new_transposition_node(p_game_data_t p_game_data)
 {
     uint32_t index;
 
-    if (p_game_data->p_memory_bottom + MEMBLOCK_SIZE > p_game_data->p_memory_top)
+    if (p_game_data->p_memory_bottom + TP_NODE_SIZE > p_game_data->p_memory_top)
         exit( print_error(out_of_tree_memory) );
 
-    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
-//     printf("[%d]", index);
+    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
+//         printf("{%d}", index);
 
-    p_game_data->p_memory_bottom += MEMBLOCK_SIZE;
+    p_game_data->p_memory_bottom += TP_NODE_SIZE;
     return index;
 }
 
@@ -129,13 +133,13 @@ uint32_t new_transposition_leaf(p_game_data_t p_game_data)
 {
     uint32_t index;
 
-    if (p_game_data->p_memory_bottom + 2 * MEMBLOCK_SIZE > p_game_data->p_memory_top)
+    if (p_game_data->p_memory_bottom + TP_LEAF_SIZE > p_game_data->p_memory_top)
         exit( print_error(out_of_tree_memory) );
 
-    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEMBLOCK_SIZE);
-//     printf("[[%d]]", index);
+    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
+//         printf("{{%d}}", index);
 
-    p_game_data->p_memory_bottom += 2 * MEMBLOCK_SIZE;
+    p_game_data->p_memory_bottom += TP_LEAF_SIZE;
     return index;
 }
 

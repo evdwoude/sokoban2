@@ -66,6 +66,10 @@ skbn_err print_error(skbn_err error, ...)
         int_1 = va_arg(ap, int);
         printf("\nMemory not aligned on %d bytes boundary.\n", int_1);
         break;
+    case move_node_size:
+        int_1 = va_arg(ap, int);
+        printf("\nSize of move_node is not %d.\n", int_1);
+        break;
     case transposition_node_size:
         int_1 = va_arg(ap, int);
         printf("\nSize of transposition_node is not %d.\n", int_1);
@@ -77,11 +81,11 @@ skbn_err print_error(skbn_err error, ...)
     case out_of_tree_memory:
         printf("\nOut of tree memory.\n");
         break;
-    case both_forward_and_backward_moves:
-        printf("\nBoth forward and backward moves are set.\n");
+    case move_path_not_polulated:
+        printf("\nMove path not polulated.\n");
         break;
-    case no_forward_nor_backward_move:
-        printf("\nNo forward nor backward move set.\n");
+    case no_move_path_ref_ref_given:
+        printf("\nNo reference to the move path reference given.\n");
         break;
     default:
         printf("\nError in error handling (undefined error).\n");

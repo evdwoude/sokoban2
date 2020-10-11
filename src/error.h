@@ -20,11 +20,12 @@ typedef enum
     move_stack_is_full,
     cant_allocate_memory,
     memory_not_aligned,
+    move_node_size,
     transposition_node_size,
     transposition_leaf_size,
     out_of_tree_memory,
-    both_forward_and_backward_moves,
-    no_forward_nor_backward_move,
+    move_path_not_polulated,
+    no_move_path_ref_ref_given,
 
 } skbn_err;
 

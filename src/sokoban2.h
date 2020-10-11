@@ -3,15 +3,15 @@
 
 #include <stdint.h>
 
-#define MEMBLOCK_SIZE   8    /* Code relies on MEMBLOCK_SIZE being a power of 2. */
-//#define MEMBLOCK_COUNT  (2^30) /* 1G blocks, i.e. 8GB */
-#define MEMBLOCK_COUNT  (200)
+/* The amout of memory to allocate for the move tree and transposition tree: */
+// #define TREE_MEMORY (2^30) /* 1 Gbytes. */
+// #define TREE_MEMORY (2^32) /* 4 Gbytes. */
+#define TREE_MEMORY (2048)
 
 #define HARDNOGO ((p_spot) -1)
 
 #define NR_OF_SPOTS (50*50)
 #define SPOT_NUMBER(p_spot) ((p_spot) - p_game_data->spot_pool)
-
 
 typedef enum {false = 0, true = 1} t_bool;
 typedef enum {right=0, up=1, left=2, down=3} t_direction;

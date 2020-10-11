@@ -107,6 +107,9 @@ skbn_err resolve(p_game_data_t p_game_data)
         find_or_add_transposition(p_game_data, FORWARD , &move_index);
         *move_index = 1;
 
+        printf("\n9: ");
+        find_or_add_transposition(p_game_data, FORWARD , &move_index);
+
     // walk_to_extend_depth(p_game_data, johnny);
     return no_error;
 }

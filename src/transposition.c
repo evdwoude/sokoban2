@@ -82,54 +82,58 @@ t_outcome_add_tp find_or_add_transposition(p_game_data_t p_game_data, int search
 
     reach = SPOT_NUMBER(p_game_data->johnny); /* TODO: Call explore_for_reach_indent. */
 
+    /* Sanity check: Do not accept this pointer to be not populated. */
+    if ( ! move_index)
+        exit( print_error(no_move_path_ref_ref_given) );
 
     /* Figure out whether this is new box positioning. If so, add it to the tree. */
     outcome =  find_or_add_box_positioning(p_game_data, search_dir, &leaf);
 
     /* Here, leaf refers to a tranposition leaf, either new or pre-existing. */
-    printf("   >  ");
+    printf_add_tp("  >  ");
     if (outcome != transposition_is_new)
     {
-        /* So the box positioning is not new. Now figure out whether this is new reach.
-         * If so, add it to the list. */
+        /* Box positioning is known.
+         * Now figure out whether this is a new reach. If so, add it to the list. */
         outcome =  find_or_add_reach(p_game_data, search_dir, reach, &leaf);
-
         if (outcome != transposition_is_new)
-            return outcome; /* Transpisition is known. So bingo or consider as dead end. */
+        {
+            printf(" <2> ");
+            /* So the whole transposition is known. Either bingo or dead end. */
+            *move_index = &(P_TPL(leaf)->move_path); /* Return the move_path in case of bingo. */
+            return outcome;                          /* Return the outcome. */
+        }
     }
-
-
     /* Here the transpisition is new, either due to boxes or reaches. Leaf refers to a new leaf. */
-    printf("  __%d__", leaf);
-    P_TPL(leaf)->reach_ident = reach; /* Populate the new leaf with its reach identifier */
 
-    /* Return the reference of the leaf's move index for later population by the calling context. */
-    if (move_index)
-        *move_index = &(P_TPL(leaf)->move_path[search_dir]);
+    /* Populate the new leaf with reach identifier and seacrh direction */
+    P_TPL(leaf)->leaf_data = reach | (search_dir ? TPL_BACKWARD : TPL_FORWARD);
+    printf_add_tp(" N_%03d_%d", leaf, P_TPL(leaf)->leaf_data);
 
-    return transposition_is_new;
+    *move_index = &(P_TPL(leaf)->move_path); /* Return ref for later population of move_path by caller. */
+    return transposition_is_new;             /* Return the outcome. */
 }
-
 
 
 t_outcome_add_tp find_or_add_box_positioning(p_game_data_t p_game_data, int search_dir, uint32_t *p_leaf)
 {
     t_outcome_add_tp outcome = transposition_exists_on_same_direction; /* First assume not new. */
 
-    uint32_t node_and_leaf = p_game_data->transposition_root; /* Walks down te tree. */
+    uint32_t node_and_leaf = p_game_data->transposition_root; /* Walks down the tree. */
 
     uint32_t *next;             /* Reference of the current node's child index. */
     p_spot  spot;               /* Iterates over the tranposition base. */
 
     for(spot = p_game_data->transposition_head; spot; spot = spot->transposition_list)
     {
-        if (spot->has_box)         /* TODO add a bit of code for backward search; */
+        /* Check whether the spot is populated or not and follow/populate the right next pointer.
+         * Check for boxes of targets depending on the search direction. Forward: check for boxes. */
+        if (search_dir ? spot->is_target : spot->has_box)
             next = &(P_TPN(node_and_leaf)->spot_has_box);
         else
             next = &(P_TPN(node_and_leaf)->spot_is_empty);
 
-        printf_add_tp( spot->has_box ? "X" : "Z" )
-        printf("[%02d]", *next);
+        printf_add_tp("%c_%03d", spot->has_box ? 'X' : 'Z' , node_and_leaf);
 
         if ( ! *next)
         {
@@ -154,39 +158,44 @@ t_outcome_add_tp find_or_add_box_positioning(p_game_data_t p_game_data, int sear
 }
 
 
-
 t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, int search_dir, uint32_t reach, uint32_t *p_leaf)
 {
-    uint32_t leaf = *p_leaf; /* Walks down the leaf list. */
-    uint32_t last_leaf = 0;  /* Remind the leaf in order to add a new leaf it (if applicable). */
+    uint32_t leaf = *p_leaf; /* Walks down the leaf list, starting at the given leaf. */
+    uint32_t last_leaf = 0;  /* Remind the leaf in order to add a new leaf to it (if applicable). */
 
-    while (leaf) /* The box positioning was existing, so look for the reach identifier now. */
+    /* Walk down the leaf list until we find a matching reach identifier. */
+    while (leaf)
     {
-        printf(" L[%02d]", leaf);
+        printf_add_tp(" L_%03d", leaf);
 
-        if (P_TPL(leaf)->reach_ident == reach)  /* if "known transposition" ... */
+        if (TPL_REACH( (P_TPL(leaf)->leaf_data) ) == reach)  /* if "known transposition" ... */
         {
-            /* Sanity checks: both or none of the pointers populated is a programmong error. */
-            if (P_TPL(leaf)->move_path[FORWARD] && P_TPL(leaf)->move_path[BACKWARD]) /* TODO: remove. */
-                exit( print_error(both_forward_and_backward_moves) );
-            if (!P_TPL(leaf)->move_path[FORWARD] && !P_TPL(leaf)->move_path[BACKWARD]) /* TODO: remove. */
-                exit( print_error(no_forward_nor_backward_move) );
+            /* Sanity check: if move_path is not populated, it is a programmong error. */
+            if ( ! P_TPL(leaf)->move_path)
+                exit( print_error(move_path_not_polulated) );
 
+            *p_leaf = leaf; /* Return the found leaf (in case of bingo. */
 
-            if (P_TPL(leaf)->move_path[search_dir])
-                {printf("  --"); return transposition_exists_on_same_direction;}
+            if ( search_dir != TPL_SEARCH_DIR(P_TPL(leaf)->leaf_data) )
+            {
+                printf_add_tp("  !!!");
+                return bingo;
+            }
             else
-                {printf("  !!"); return bingo;}
+            {
+                printf_add_tp("--");
+                return transposition_exists_on_same_direction;
+            }
         }
         last_leaf = leaf;
         leaf = P_TPL(leaf)->next_leaf;  /* Go to the next leaf. */
     }
-    printf(" ++");
+    printf_add_tp("++");
 
     /* The reach identifier appears to be new, create a new leaf and hook up to the previous. */
     P_TPL(last_leaf)->next_leaf = new_transposition_leaf(p_game_data);
 
-    *p_leaf = P_TPL(last_leaf)->next_leaf; /* Return the new leaf for further polulation */
+    *p_leaf = P_TPL(last_leaf)->next_leaf; /* Return the new leaf for further polulation. */
     return transposition_is_new;           /* Return the outcome. */
 }
 

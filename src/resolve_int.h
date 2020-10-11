@@ -39,11 +39,11 @@ struct move_node
 
     /* unt32_t move_data is a packed set of data fields:
      *  spot,           29 bits: The spot where Johnny is right before the Move (either backward or forward).
-     *  move_direction,  2 bits: The diretion of the move: Right, Up, Left or Down.
+     *  move_direction,  2 bits: The direction of the move: Right, Up, Left or Down.
      *  has_sibbling,    1 bit:  Tells us whether next refers to the next sibbling ot the parent;
      *
-     *  We're not using a it to indicate whether the child of NULl indicates a dead end or is just undiscovered
-     * due to the current search depth; We use a separate, global depth indicator for that/
+     *  We're not indicating whether the a child value of 0 indicates a dead end or undiscovered moves due to
+     *  the current search depth; We use a separate, global depth indicator for that.
      */
     uint32_t move_data;
 };
@@ -57,10 +57,26 @@ struct transposition_node
 
 struct transposition_leaf
 {
-    uint32_t reach_ident;  /* Completes the identification of the this transposition. */
-    uint32_t next_leaf;    /* Linked list of different transposition for the sae box positioning. */
-    uint32_t move_path[2]; /* Refer back to the move nodes for forward- and backward search. */
+    /* unt32_t leaf_data is a packed set of data fields:
+     *  reach_ident,      31 bits: Completes the identification of the this transposition.
+     *  search_direction,  1 bits: The search direction on with this transposition has been found, so it
+     *                             indicates whether move_path refers to a forward move node or a backward
+     *                             mode node. Values: 0: FORWARD, 1: BACKWARD.
+     */
+    uint32_t leaf_data;  /* Completes the identification of the this transposition.              */
+    uint32_t next_leaf;    /* Linked list of different transposition for the same box positioning. */
+    uint32_t move_path;    /* Refer back the move node for either forward- or backward search.     */
 };
+
+#define TPL_REACH_MASK      0x7FFFFFFF             /* Mask to read the reach identifier.           */
+#define TPL_SEARCH_DIR_MASK 0x80000000             /* Mask to read the search direction.           */
+#define TPL_FORWARD         0                      /* Mask to write the search direction forward.  */
+#define TPL_BACKWARD        TPL_SEARCH_DIR_MASK    /* Mask to write the search direction backward. */
+
+#define TPL_REACH(data)         ((data) & TPL_REACH_MASK)
+#define TPL_SEARCH_DIR(data)    ((data) & TPL_SEARCH_DIR_MASK ? BACKWARD : FORWARD)
+
+
 
 #endif /* RESOLVE_INTH */
 
