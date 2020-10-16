@@ -90,11 +90,11 @@ skbn_err allocate_memory(p_game_data_t p_game_data)
      if (sizeof(struct move_node) != MV_NODE_SIZE)
          return print_error(move_node_size, MV_NODE_SIZE);
 
-     if (sizeof(struct transposition_node) != TP_NODE_SIZE)
-         return print_error(transposition_node_size, TP_NODE_SIZE);
+     if (sizeof(struct position_node) != TP_NODE_SIZE)
+         return print_error(position_node_size, TP_NODE_SIZE);
 
-     if (sizeof(struct transposition_leaf) != TP_LEAF_SIZE)
-         return print_error(transposition_leaf_size, TP_LEAF_SIZE);
+     if (sizeof(struct position_leaf) != TP_LEAF_SIZE)
+         return print_error(position_leaf_size, TP_LEAF_SIZE);
 
     /* Allocate space for the trees. */
     p_game_data->p_memory_start = calloc(MEM_UNIT_COUNT, MEM_REF_UNIT);
@@ -115,7 +115,7 @@ skbn_err allocate_memory(p_game_data_t p_game_data)
 }
 
 
-uint32_t new_transposition_node(p_game_data_t p_game_data)
+uint32_t new_position_node(p_game_data_t p_game_data)
 {
     uint32_t index;
 
@@ -126,10 +126,11 @@ uint32_t new_transposition_node(p_game_data_t p_game_data)
 //         printf("{%d}", index);
 
     p_game_data->p_memory_bottom += TP_NODE_SIZE;
+    p_game_data->tp_node_count++;
     return index;
 }
 
-uint32_t new_transposition_leaf(p_game_data_t p_game_data)
+uint32_t new_position_leaf(p_game_data_t p_game_data)
 {
     uint32_t index;
 
@@ -140,6 +141,7 @@ uint32_t new_transposition_leaf(p_game_data_t p_game_data)
 //         printf("{{%d}}", index);
 
     p_game_data->p_memory_bottom += TP_LEAF_SIZE;
+    p_game_data->tp_leaf_count++;
     return index;
 }
 
@@ -197,7 +199,7 @@ void define_hardnogos(p_game_data_t p_game_data)
 /* TODO: Document. */
 int is_hardnogo(struct spot* spot)
 {
-    return spot->transposition_list == HARDNOGO;
+    return spot->position_list == HARDNOGO;
 }
 
 
@@ -235,7 +237,7 @@ void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int m
 
 void set_as_hardnogo(struct spot* spot)
 {
-    spot->transposition_list = HARDNOGO;
+    spot->position_list = HARDNOGO;
     return;
 }
 

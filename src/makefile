@@ -7,7 +7,7 @@ SHELL = /bin/bash
 
 CC = gcc
 
-objects = sokoban2.o error.o setup.o resolve.o transposition.o utility.o
+objects = sokoban2.o error.o setup.o resolve.o position.o utility.o
 
 ~/bin/soko2 : $(objects)
 	gcc -o ~/bin/soko2 -Wall -Wextra $(objects)
@@ -15,6 +15,6 @@ objects = sokoban2.o error.o setup.o resolve.o transposition.o utility.o
 sokoban2.o: sokoban2.h error.h setup.h utility.h
 error.o: error.h
 setup.o: sokoban2.h error.h setup.h utility.h
-resolve.o: sokoban2.h error.h resolve_int.h transposition.h utility.h resolve.h
-transposition.o: sokoban2.h error.h resolve_int.h utility.h transposition.h
+resolve.o: sokoban2.h error.h resolve_int.h position.h utility.h resolve.h
+position.o: sokoban2.h error.h resolve_int.h utility.h position.h
 utility.o: sokoban2.h error.h resolve_int.h utility.h

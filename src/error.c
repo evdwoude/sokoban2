@@ -70,13 +70,13 @@ skbn_err print_error(skbn_err error, ...)
         int_1 = va_arg(ap, int);
         printf("\nSize of move_node is not %d.\n", int_1);
         break;
-    case transposition_node_size:
+    case position_node_size:
         int_1 = va_arg(ap, int);
-        printf("\nSize of transposition_node is not %d.\n", int_1);
+        printf("\nSize of position_node is not %d.\n", int_1);
         break;
-    case transposition_leaf_size:
+    case position_leaf_size:
         int_1 = va_arg(ap, int);
-        printf("\nSize of transposition_leaf is not %d.\n", int_1);
+        printf("\nSize of position_leaf is not %d.\n", int_1);
         break;
     case out_of_tree_memory:
         printf("\nOut of tree memory.\n");

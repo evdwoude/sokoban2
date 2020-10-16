@@ -1,12 +1,17 @@
 Next:
+    Build explore_for_reach_identifier()
+        test the above again.
+
+    Remove and branch off the positon test code in resolve.c
+
+
+
+    Document headers for functions in position.c. Might decrease heavy comments.
 
     Use one move_path for both forward and backward.
     Indicate which by a single bit.
 
-    Test find_or_add_transposition with johnny maniplations.
-
-    Buld explore_for_reach_identifier()
-        test the above again.
+    Test find_or_add_position with johnny maniplations.
 
     Use more exit() calls and clean up code.
 
@@ -23,12 +28,12 @@ Next:
 
     Implement
         utility.c
-            struct transposition_node *new_transposition_node(p_game_data_t p_game_data);
+            struct position_node *new_position_node(p_game_data_t p_game_data);
 
-        transposition.c
+        position.c
             explore for identifier
 
-            skbn_err add_transposition(p_game_data_t p_game_data, p_spot johnny)
+            skbn_err add_position(p_game_data_t p_game_data, p_spot johnny)
 
     Double check the conditions fo new_hardnogos in the linescanner.
 
@@ -51,7 +56,7 @@ Next:
     Create files for eplore functions and for walk functions
 
     Define movetree and tranposisiton tree data structures.
-    Inplement add_transosition() for both search directions.
+    Inplement add_osition() for both search directions.
     Implement the forward walk_to_extend_depth
 
     From the guarding of the wrapping of next marker.
@@ -77,7 +82,7 @@ Later:
 
     Malloc the playing grounds (instead of static 50*50.)
 
-    Add hardnogos / reduce transposition nodes:
+    Add hardnogos / reduce position nodes:
     Add spots that can never be populated by a box because, a: it impossible to do so when it is
     adjecent to only walls and/or hardnogos, and b: there is no box on it as per setup.
 

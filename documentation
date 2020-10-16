@@ -22,10 +22,10 @@ Definitions:
         Values: up (north), down (south), left (west), right (east).
 
     Explore:
-        Find all spots Johnny can reach without moving a box (or target), within the current transposiion.
+        Find all spots Johnny can reach without moving a box (or target), within the current posiion.
 
     Reach:
-        The set of spots Johnny can reach without moving a box (or target), within the current transposiion.
+        The set of spots Johnny can reach without moving a box (or target), within the current posiion.
 
     Reach identifier:
         The lowest spot_number of a reach. This uniquely and reproducably identifies a that reach.
@@ -38,11 +38,11 @@ Definitions:
         positions of all targets. The latter is used for backward search. (In backward search we're
         moving the targets.)
 
-    Transposition:
-        A transpositon is the momantary state of the wharehouse i.e. including the Box positioning as
+    Position:
+        A positon is the momantary state of the wharehouse i.e. including the Box positioning as
         well as the momentary reach of Johnny. (The reach of Johnny is identied by a Reach identifier.)
-        Moving a box (or a target) resuls in a different transposition.
-        Moving Johhny within his current reach does not result in a different transposition, but
+        Moving a box (or a target) resuls in a different position.
+        Moving Johhny within his current reach does not result in a different position, but
         repositioning Johhny into another reach does.
 
     Hardnogo:
@@ -60,7 +60,7 @@ Approach:
 
     The move tree:
 
-    The transposition tree
+    The position tree
 
         How the lookup tree works:
 
@@ -71,7 +71,7 @@ Approach:
         ... then ....
 
 
-    (Later, we'll implement the store of transpostion as a hash, instead of a look-up binary tree)
+    (Later, we'll implement the store of postion as a hash, instead of a look-up binary tree)
 
 
 
@@ -161,7 +161,7 @@ Functions:
     explore funtions:
         explore_for_reach
         explore_for_reach_identifier
-        explore_for_tranposition
+        explore_for_position
         explore_for_end_positions
         explore_for_move_path
 
@@ -169,7 +169,7 @@ Functions:
         walk_to_extend_depth
         walk_to_find_move_path
 
-    find_or_add_transposition
+    find_or_add_position
 
 
 Examples sokobans:

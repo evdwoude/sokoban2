@@ -253,16 +253,16 @@ skbn_err add_new_spot(p_game_data_t p_game_data, int chr, int position, int line
         return print_error(not_enough_static_memory);
 
     // Initialise it.
-    p_game_data->pool_ptr->neighbour[up   ]   = NULL;
-    p_game_data->pool_ptr->neighbour[down ]   = NULL;
-    p_game_data->pool_ptr->neighbour[left ]   = NULL;
-    p_game_data->pool_ptr->neighbour[right]   = NULL;
-    p_game_data->pool_ptr->reach_chain        = NULL;
-    p_game_data->pool_ptr->transposition_list = NULL;
-    p_game_data->pool_ptr->has_box            = ('X' == chr) || ('H' == chr);
-    p_game_data->pool_ptr->is_target          = ('.' == chr) || ('H' == chr) || ('o' == chr);
-    p_game_data->pool_ptr->reach_mark         = 0;
-    p_game_data->pool_ptr->position           = position;
+    p_game_data->pool_ptr->neighbour[up   ] = NULL;
+    p_game_data->pool_ptr->neighbour[down ] = NULL;
+    p_game_data->pool_ptr->neighbour[left ] = NULL;
+    p_game_data->pool_ptr->neighbour[right] = NULL;
+    p_game_data->pool_ptr->reach_chain      = NULL;
+    p_game_data->pool_ptr->position_list    = NULL;
+    p_game_data->pool_ptr->has_box          = ('X' == chr) || ('H' == chr);
+    p_game_data->pool_ptr->is_target        = ('.' == chr) || ('H' == chr) || ('o' == chr);
+    p_game_data->pool_ptr->reach_mark       = 0;
+    p_game_data->pool_ptr->position         = position;
 
     if (p_game_data->pool_ptr->has_box)
         number_of_boxes++;                 /* Counted for double checking the setup. */

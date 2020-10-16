@@ -25,14 +25,14 @@ int main(int argc, char *argv[])
 {
     skbn_err error;
 
-    game_data.pool_ptr           = &(game_data.spot_pool[0]);
-    game_data.johnny             = NULL;
-    game_data.transposition_head = NULL;
-    game_data.transposition_root = 0;
-    game_data.next_reach         = 0;
-    game_data.p_memory_start     = NULL;
-    game_data.p_memory_bottom    = NULL;
-    game_data.p_memory_top       = NULL;
+    game_data.pool_ptr        = &(game_data.spot_pool[0]);
+    game_data.johnny          = NULL;
+    game_data.position_head   = NULL;
+    game_data.position_root   = 0;
+    game_data.next_reach      = 0;
+    game_data.p_memory_start  = NULL;
+    game_data.p_memory_bottom = NULL;
+    game_data.p_memory_top    = NULL;
 
 
     time_t start_time, end_time;
@@ -65,19 +65,19 @@ int main(int argc, char *argv[])
 //
 //         printf("\n\ntest:      %lX\n", (long int) P_TPL(1) );
 //
-//         test_node = new_transposition_node(&game_data);
+//         test_node = new_position_node(&game_data);
 //         printf("\ntest node: %d.", test_node);
 //         printf("\nptr:       %lX\n", (long int) P_TPN(test_node));
 //
-//         test_leaf = new_transposition_leaf(&game_data);
+//         test_leaf = new_position_leaf(&game_data);
 //         printf("\ntest leaf: %d.", test_leaf);
 //         printf("\nptr:       %lX\n", (long int) P_TPL(test_leaf));
 //
-//         test_node = new_transposition_node(&game_data);
+//         test_node = new_position_node(&game_data);
 //         printf("\ntest node: %d.", test_node);
 //         printf("\nptr:       %lX\n", (long int) P_TPN(test_node));
 //
-//         test_leaf = new_transposition_leaf(&game_data);
+//         test_leaf = new_position_leaf(&game_data);
 //         printf("\ntest leaf: %d.", test_leaf);
 //         printf("\nptr:       %lX\n", (long int) P_TPL(test_leaf));
 //

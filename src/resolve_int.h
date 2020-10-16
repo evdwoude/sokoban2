@@ -26,7 +26,7 @@
 /* We use "walk" when referring to traversing the move tree. I.e
  * when walking the move pointer though the move tree, simulteneously
  * moving the man and the boxes across the warehouse floor to keep
- * the transposition synchronised with the position in the move tree.
+ * the position synchronised with the position in the move tree.
  */
 
 struct move_node
@@ -49,33 +49,32 @@ struct move_node
 };
 
 
-struct transposition_node
+struct position_node
 {
     uint32_t spot_has_box;
     uint32_t spot_is_empty;
 };
 
-struct transposition_leaf
+struct position_leaf
 {
     /* unt32_t leaf_data is a packed set of data fields:
-     *  reach_ident,      31 bits: Completes the identification of the this transposition.
-     *  search_direction,  1 bits: The search direction on with this transposition has been found, so it
+     *  reach_ident,      31 bits: Completes the identification of the this position.
+     *  search_direction,  1 bits: The search direction on with this position has been found, so it
      *                             indicates whether move_path refers to a forward move node or a backward
      *                             mode node. Values: 0: FORWARD, 1: BACKWARD.
      */
-    uint32_t leaf_data;  /* Completes the identification of the this transposition.              */
-    uint32_t next_leaf;    /* Linked list of different transposition for the same box positioning. */
-    uint32_t move_path;    /* Refer back the move node for either forward- or backward search.     */
+    uint32_t leaf_data;  /* Completes the identification of the this position.                              */
+    uint32_t next_leaf;  /* Linked list of different position for the same box arrangement.                 */
+    uint32_t move_path;  /* Refer back to the originating move node for either forward- or backward search. */
 };
 
-#define TPL_REACH_MASK      0x7FFFFFFF             /* Mask to read the reach identifier.           */
-#define TPL_SEARCH_DIR_MASK 0x80000000             /* Mask to read the search direction.           */
-#define TPL_FORWARD         0                      /* Mask to write the search direction forward.  */
-#define TPL_BACKWARD        TPL_SEARCH_DIR_MASK    /* Mask to write the search direction backward. */
-
-#define TPL_REACH(data)         ((data) & TPL_REACH_MASK)
-#define TPL_SEARCH_DIR(data)    ((data) & TPL_SEARCH_DIR_MASK ? BACKWARD : FORWARD)
-
+/* Defines for leaf_data manipulations: */
+#define TPL_REACH_MASK          0x7FFFFFFF             /* Mask to read the reach identifier.            */
+#define TPL_SEARCH_DIR_MASK     0x80000000             /* Mask to read the search direction.            */
+#define TPL_FORWARD             0                      /* Mask to write the search direction forward.   */
+#define TPL_BACKWARD            TPL_SEARCH_DIR_MASK    /* Mask to write the search direction backward.  */
+#define TPL_REACH(data)         ((data) & TPL_REACH_MASK)                            /* Get reach ident */
+#define TPL_SEARCH_DIR(data)    ((data) & TPL_SEARCH_DIR_MASK ? BACKWARD : FORWARD)  /* Get search dir  */
 
 
 #endif /* RESOLVE_INTH */
