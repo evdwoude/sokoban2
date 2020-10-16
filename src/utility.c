@@ -9,6 +9,8 @@
 
 /* Local defs */
 
+#define HARDNOGO ((p_spot) -1)  /* Indicates that a spot is a hard no go: Never put a box on it. */
+
 /* Conditional compile switches  */
 
 #define DBG_MARK 1          // Prints marker wrappings
@@ -64,8 +66,10 @@ int next_mark(p_game_data_t p_game_data)
     p_spot spot;
 
     p_game_data->next_reach++;
-    if (p_game_data->next_reach > 3)
+    if (p_game_data->next_reach > 3000)
     {
+        /* TODO: Create init_mark function() */
+
         printf_mark("\nReinit marks...")
 
         /* If next_reach wrapped, reinitiae all spots. */
@@ -159,7 +163,7 @@ void define_hardnogos(p_game_data_t p_game_data)
     struct spot* spot;
     int new_hardnogos = 1;
 
-    /* First find all spots that are adjent to minimal two non-oppsing walls. */
+    /* First find all spots that are adjecent to at least two non-opposing walls, i.e. corners. */
     printf_hardnogo("\n\nCorners:\n")
     for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
     {
@@ -175,17 +179,17 @@ void define_hardnogos(p_game_data_t p_game_data)
         }
     }
 
-    /* TODO: find what here ?
+    /* TODO: Document: find what here ?
      * Scan the setup multiple times: new found hard nogos can trigger the finding of more hard nogos.
-     * Keep re-scanning until no new hard nogos are found. (The only indication that another round will
-     * not find more hard no gos is when the previous round did not find any) */
+     * Keep re-scanning until no new hard nogos are found anymore. (The only indication that another
+     * round will not find more hard no gos is when the previous round didn't find any.) */
     printf_hardnogo("\nIn betweens:")
     while (new_hardnogos)
     {
         new_hardnogos = 0;
         printf_hardnogo("\n")
 
-        /* From every spot that is marked as hard nogo, do a horizontal and vertical line scan. */
+        /* From every spot that is marked as hard no go, do a horizontal and vertical line scan. */
         for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
             if (is_hardnogo(spot))
             {
@@ -203,6 +207,7 @@ int is_hardnogo(struct spot* spot)
 }
 
 
+/* TODO: Document. */
 void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int main_dir, int *new_hardnogos)
 {
     struct spot* scan;

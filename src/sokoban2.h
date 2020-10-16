@@ -8,8 +8,6 @@
 // #define TREE_MEMORY (2^32) /* 4 Gbytes. */
 #define TREE_MEMORY (2048)
 
-#define HARDNOGO ((p_spot) -1)
-
 #define NR_OF_SPOTS (50*50)
 #define SPOT_NUMBER(p_spot) ((p_spot) - p_game_data->spot_pool)
 
@@ -19,12 +17,13 @@ typedef enum {right=0, up=1, left=2, down=3} t_direction;
 struct spot
 {
     struct spot *neighbour[4];
-    struct spot *reach_chain;
-    struct spot *position_list; /* Link to next spot in the position base list. A value of HARDNOGO
-                                 * indicates this is a hard no-go spot. */
+    struct spot *explore_reach_list; /* For exploring johnny's current reach, when searching moves. */
+    struct spot *other_reach_list;   /* For exploring johnny's current reach, all other purposes.    */
+    struct spot *position_list;      /* Link to next spot in the position base list. A value
+                                      * of HARDNOGO indicates this is a hard no-go spot. */
     int has_box;
     int is_target;
-    int reach_mark;     /* For exploring johnny's current reach. */
+    int reach_mark;     /* For exploring johnny's current reach, all purposes. */
     int position;       /* For setup parsing only.  */
 };
 
@@ -57,7 +56,7 @@ struct game_data
     int fw_move_count;      /* Amount of forward move  nodes used. */
     int bw_move_count;      /* Amount of backward move nodes used. */
     int tp_node_count;      /* Amount of position nodes used.      */
-    int tp_leaf_coun;       /* Amount of position leafs used.      */
+    int tp_leaf_count;      /* Amount of position leafs used.      */
 
 };
 

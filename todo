@@ -1,10 +1,11 @@
 Next:
     Build explore_for_reach_identifier()
+        Make it search_dir dependant
+        do the wrapper thing.
         test the above again.
 
     Remove and branch off the positon test code in resolve.c
-
-
+        Scan TODOs
 
     Document headers for functions in position.c. Might decrease heavy comments.
 

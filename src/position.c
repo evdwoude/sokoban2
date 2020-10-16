@@ -32,6 +32,7 @@ t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, int sear
 
 t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, int search_dir, uint32_t reach, uint32_t *p_leaf);
 
+int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_dir);
 
 /* Exported data */
 
@@ -78,7 +79,7 @@ t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, int search_dir,
     uint32_t leaf = 0;    /* The new leaf. Polulate with reach and move_path. */
     uint32_t reach = 0;   /* Reach_identifier of the currents posiiton. */
 
-    reach = SPOT_NUMBER(p_game_data->johnny); /* TODO: Call explore_for_reach_indent. */
+    reach = find_reach_identifier(p_game_data, p_game_data->johnny, search_dir);
 
     if ( ! move_path ) /* Sanity check: Do not accept this pointer to be not populated. */
         exit( print_error(no_move_path_ref_ref_given) );
@@ -96,7 +97,7 @@ t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, int search_dir,
         if (outcome != position_is_new)
         {
             /* The whole position is known. Either bingo or known (in same direction). */
-            printf_add_tp(outcome == bingo ? "!!" : "--");
+            printf_add_tp(outcome == bingo ? "  !!" : "  --");
             *move_path = &(P_TPL(leaf)->move_path); /* Return the (opposite) move_path in case of bingo. */
             return outcome;
         }
@@ -128,7 +129,9 @@ t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, int sear
         else
             next = &(P_TPN(node_or_leaf)->spot_is_empty);
 
-        printf_add_tp("%c_%03d%c ", spot->has_box ? 'X' : 'Z' , node_or_leaf, *next ? '-' : '+');
+        printf_add_tp("%c_%03d%c ",
+                spot->has_box ?  (spot->is_target ? 'H' : 'X') : (spot->is_target ? '.' : 'Z'),
+                node_or_leaf, *next ? '-' : '+');
 
         if ( ! *next )
         {
@@ -171,17 +174,63 @@ t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, int search_dir, ui
                 return position_exists_on_same_direction;
         }
         last_leaf = leaf;
-        leaf = P_TPL(leaf)->next_leaf;  /* Go to the next leaf. */
+        leaf = P_TPL(leaf)->next_leaf; /* Go to the next leaf. */
     }
     /* The reach appears to be new: create a new leaf for this reach and hook it up to the list. */
     P_TPL(last_leaf)->next_leaf = new_position_leaf(p_game_data);
-    printf_add_tp("++");
 
     *p_leaf = P_TPL(last_leaf)->next_leaf; /* Return the new leaf for further polulation. */
     return position_is_new;
 }
 
 
+int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_dir)
+{
+    t_direction dir = right;
+    int reach_identifier;
+    int mark;
+    struct spot *neighbour;
+    struct spot *end;
+
+    if (!johnny)
+        return 0;
+
+    reach_identifier = SPOT_NUMBER(johnny);
+    mark = next_mark(p_game_data);
+    johnny->reach_mark  = mark;
+    johnny->other_reach_list = NULL;
+    end = johnny;
+
+    /* Build up a list of spots to visit, while at the same time walk down that list. */
+    while (johnny)
+    {
+        /* Insert all applicable neighbours into the list: */
+        for (dir=right; dir<=down; dir++)
+        {
+            neighbour = johnny->neighbour[dir];
+
+            if (    neighbour                                                 /* Neighbour spot exists? */
+                &&  !(search_dir ? neighbour->is_target : neighbour->has_box) /* Is that spot empty?    */
+                &&  neighbour->reach_mark < mark )                            /* Not yet explored?      */
+            {
+                /* Mind the lowest spot number we found so far. */
+                if (SPOT_NUMBER(neighbour) < reach_identifier)
+                    reach_identifier = SPOT_NUMBER(neighbour);
+
+                /* Mark it: */
+                neighbour->reach_mark  = mark;
+
+                /* Add it to end of list: */
+                end->other_reach_list = neighbour;
+                end                   = neighbour;
+                end->other_reach_list = NULL;
+            }
+        }
+        /* Move down the list until done: */
+        johnny = johnny->other_reach_list;
+    }
+    return reach_identifier;
+}
 
 
 

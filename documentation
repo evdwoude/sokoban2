@@ -81,11 +81,11 @@ Functions:
 
         Exploring the reach of johnny in the current position, meaning, find out what spots johnny can
         legally reach from his current position whithoug moving any boxes.
-        The resulting spots are chained througt the reach_chain pointers that all spots have, starting
+        The resulting spots are chained througt the eplore_reach_chain pointers that all spots have, starting
         from johnny's spot, ending with a NULL pointer.
 
         Notes:
-        - The reach_chain pointers of the irrelevant spots are untouched.
+        - The eplore_reach_chain pointers of the irrelevant spots are untouched.
         - The spot's reach_mark are use to mark the found spots while searching from more.
         - New found spots are deliberately chained at the end of the chain, not the current position.
         The latter would have been equally possible for the use of this funtion and would have saved
@@ -143,31 +143,42 @@ Functions:
 
         Legenda:
             N: Spot's neighbour pointer
-            C: Spot's reach_chain pointer
+            C: Spot's eplore_reach_chain pointer
             X: Any pointer value (either pointing to a spot or NULLL)
             0: Pointer value NULL
 
         In bother of the above scenarios, the assignments required to add the new neighnour to the
         chain are the same:
 
-                end->reach_chain = neighbour;
-                end              = neighbour;
-                end->reach_chain = NULL;
+                end->eplore_reach_chain = neighbour;
+                end                     = neighbour;
+                end->eplore_reach_chain = NULL;
 
         Then, after Johnny advances to the next spot in the chain, the new scenario is again one of
         the above, and the handling can be repeated util all reachable spots are chained up and the
         chain-end is indicated with a NULL pounter
 
     explore funtions:
-        explore_for_reach
-        explore_for_reach_identifier
-        explore_for_position
-        explore_for_end_positions
-        explore_for_move_path
+
+        explore_for_reach           Explore Johnny current reach and start trying to move boxes from there.
+
+        find_reach_identifier       Find the lowest spot number within a reach, to be used as its identifier.
+                                    It is used for two distict purposes:
+                                    1. Together with the box arrangements, to uniquely identify positions.
+                                    2. To identify different starting positions for backward search.
+                                       We don't know where Johnny will end up in the final solution, so
+                                       for every reach in the final solution's box arrangement, we have
+                                       a different position from which to start a separate backward search.
+
+        for_position                ???
+
+        find_steps_between_moves    When bingo, we need to find the steps beteen the moves.
 
     walk funtions:
+
         walk_to_extend_depth
-        walk_to_find_move_path
+
+        find_move_path
 
     find_or_add_position
 
