@@ -26,6 +26,10 @@ typedef enum
     out_of_tree_memory,
     move_path_not_polulated,
     no_move_path_ref_ref_given,
+    no_child,
+    no_parent,
+    no_sibbling,
+    move_obj_err
 
 } skbn_err;
 

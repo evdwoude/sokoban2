@@ -11,21 +11,31 @@
 // #define TREE_MEMORY (0x200000000) /* 8 Gbytes. */
 #define TREE_MEMORY (2048)
 
+#define DBG_SANITY
+
 #define NR_OF_SPOTS (50*50)
-#define SPOT_NUMBER(p_spot) ((p_spot) - p_game_data->spot_pool)
+#define SPOT_NO(p_spot) ((p_spot) - p_game_data->spot_pool)
+
+#define FORWARD  0
+#define BACKWARD 1
 
 typedef enum {false = 0, true = 1} t_bool;
 typedef enum {right=0, up=1, left=2, down=3} t_direction;
+typedef enum {make_move=0, take_back=1} t_mv_action;
 
 struct spot
 {
-    struct spot *neighbour[4];
+    struct spot *neighbour[4];       /* Connects to the neighbours, right, up, left and down. */
+
     struct spot *explore_reach_list; /* For exploring johnny's current reach, when searching moves. */
     struct spot *other_reach_list;   /* For exploring johnny's current reach, all other purposes.    */
     struct spot *position_list;      /* Link to next spot in the position base list. A value
                                       * of HARDNOGO indicates this is a hard no-go spot. */
+
+                                     /* indicates whether the spot is populated with box or target or both */
     int has_box;
     int is_target;
+
     int reach_mark;     /* For exploring johnny's current reach, all purposes. */
     int position;       /* For setup parsing only.  */
 };
@@ -35,17 +45,19 @@ typedef struct spot *p_spot;
 
 struct game_data
 {
-    struct spot spot_pool[NR_OF_SPOTS];
-    struct spot *pool_ptr;
+    struct spot spot_pool[NR_OF_SPOTS]; /* The pool of spots. Statically allocated. */
+    struct spot *pool_ptr;              /* Points just behind the last spot in use. */
     struct spot *johnny;
 
     /* struct spot *position_list;
      *      Head of linked list: the sub set of spots that are relevant for the positions.
      *      Consists of all spots that are nog marked as hardnogo.
      */
-    struct spot *position_head; /* Head of the position base list.   */
+    struct spot *position_head;  /* Head of the position base list.          */
 
-    uint32_t position_root;     /* Root node of the poition tree.    */
+    uint32_t position_root;      /* Root node of the position tree.          */
+    uint32_t forward_move_root;  /* Root node of the forward move tree.      */
+    uint32_t backward_move_base; /* Base of the list of backward move trees. */
 
     int next_reach;         /* For exploring johnny's current reach. */
 
@@ -64,6 +76,15 @@ struct game_data
 };
 
 typedef struct game_data *p_game_data_t;
+
+#ifdef DBG_SANITY
+#define san_if(condition) if(condition)
+#define san_exit(value) exit(value);
+#else
+#define san_if(condition)
+#define san_exit(value)
+#endif
+
 
 #endif /* SOKOBAN2_H */
 

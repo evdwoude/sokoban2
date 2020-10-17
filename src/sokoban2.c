@@ -25,20 +25,22 @@ int main(int argc, char *argv[])
 {
     skbn_err error;
 
-    game_data.pool_ptr        = &(game_data.spot_pool[0]);
-    game_data.johnny          = NULL;
-    game_data.position_head   = NULL;
-    game_data.position_root   = 0;
-    game_data.next_reach      = 0;
-    game_data.p_memory_start  = NULL;
-    game_data.p_memory_bottom = NULL;
-    game_data.p_memory_top    = NULL;
+    game_data.pool_ptr           = &(game_data.spot_pool[0]);
+    game_data.johnny             = NULL;
+    game_data.position_head      = NULL;
+    game_data.position_root      = 0;
+    game_data.forward_move_root  = 0;
+    game_data.backward_move_base = 0;
+    game_data.next_reach         = 0;
+    game_data.p_memory_start     = NULL;
+    game_data.p_memory_bottom    = NULL;
+    game_data.p_memory_top       = NULL;
 
 
     time_t start_time, end_time;
     long diff_time;
 
-    struct game_data *p_game_data = &game_data;
+    p_game_data_t p_game_data = &game_data;
 
     start_time = time(NULL);
 
@@ -58,6 +60,7 @@ int main(int argc, char *argv[])
 
     resolve(&game_data);
 
+    /* TOO: move the below into the exit function. */
     end_time = time(NULL);
     diff_time = (long) difftime(end_time, start_time);
 
@@ -73,9 +76,13 @@ int main(int argc, char *argv[])
  * and will take care of closing the setup file by its own.*/
 void exit_function(int status, void *arg)
 {
-    if (arg && ((struct game_data *) arg)->p_memory_start)
+    if (arg && ((p_game_data_t)arg)->p_memory_start)
     {
-//         printf("\nExit: freeing momory. %d, %ld", status, (long int) (((struct game_data *) arg)->p_memory_start));
-        free( ((struct game_data *) arg)->p_memory_start );
+//         printf("\nExit: freeing momory. %d, %ld", status, (long int) (((p_game_data_t)arg)->p_memory_start));
+        free( ((p_game_data_t)arg)->p_memory_start );
     }
 }
+
+
+
+

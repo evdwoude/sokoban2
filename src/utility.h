@@ -23,9 +23,10 @@
 #define P_TPN(i) ((struct position_node *) (p_game_data->p_memory_start + (i) * MEM_REF_UNIT))
 
 /* Get the reference (address i.e. pointer value) of a position leaf. */
-/* Note that, although the leafs are twice as big as te nodes, their indices are  both based on the */
-/* original blocksize: the leaf nodes are guaranteed to be 8 bytes aligned, not 16.                 */
 #define P_TPL(i) ((struct position_leaf *) (p_game_data->p_memory_start + (i) * MEM_REF_UNIT))
+
+/* Get the reference (address i.e. pointer value) of a move node. */
+#define P_MN(i) ((struct move_node *) (p_game_data->p_memory_start + (i) * MEM_REF_UNIT))
 
 void reinit_mark(p_game_data_t p_game_data);
 
@@ -37,8 +38,15 @@ uint32_t new_position_node(p_game_data_t p_game_data);
 
 uint32_t new_position_leaf(p_game_data_t p_game_data);
 
+uint32_t new_move_node(p_game_data_t p_game_data, int search_dir);
+
 void define_hardnogos(p_game_data_t p_game_data);
 
 int is_hardnogo(struct spot* spot);
+
+char mv_dir_name(t_direction move_direction);
+
+void dbg_print_setup(p_game_data_t p_game_data);
+
 
 #endif /* UTILITYH */

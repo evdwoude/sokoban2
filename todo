@@ -1,7 +1,55 @@
 Next:
+
+    Change from defines to enum for FORWARD and BACKWARD.
+
+    Compile and test
+
+    Finish move_object and test with setup and tree (for forward only).
+
+    Change members has_box and is_target into object[2] or box_and_target[2]
+        Also: spot_has_box -> spot_has_object.
+        Retest position.c
+        Test move_object with setup and tree (for forward only).
+
+
+    depth as parameter of ascend and descend?
+
+    Reconsider OPPOSITE_SDIR() macro.
+
+    move(): F/B seacrch vs. F/B move. FsBm pulls a box while BsFm pull a target.
+        Extra parameter "action" (make_move / take_back)
+        Put OPPOSITE() inside the function rather than on the caller's parameter list.
+
+        Double check make dependencies
+
+    Create move.c and put in there:
+        move_object()
+        try_move()
+        extend_depth()
+        explore_for_reach()
+        ...
+
+    Consider: make Johnny a paramter to find_or_add_position(), instead of taking johnny from game_data.
+
+    Global:
+
+        For walk_to_extend_depth():
+            Add parameter search_dir to  descend, ascend, move_lateral & extend_depth.
+            Update the warehouse from  decend, ascend, move_lateral & extend_depth.
+            Write extend_depth
+                Uses explore_for_reach
+                Write add_moves
+
+        Test by have a fisrt backward posiion tree available.
+
+        Build backward
+
     Document headers for functions in position.c. Might decrease heavy comments.
 
     Use more exit() calls and clean up code.
+        At least do it for allocate_memory()
+
+    Rename bingo back to gotcha.
 
     Todo:
         Document latest changes
@@ -14,33 +62,17 @@ Next:
                 - Embed the errror condition in the function result
                 - Where ever that is not feasible, use a sepate return variable for the error.
 
-    Implement
-        utility.c
-            struct position_node *new_position_node(p_game_data_t p_game_data);
 
-        position.c
-            explore for identifier
-
-            skbn_err add_position(p_game_data_t p_game_data, p_spot johnny)
 
     Double check the conditions for new_hardnogos in the linescanner.
 
-    Document why this impl uses indexed arrays and not pointers. (Violating type safety.)
+    Document why this impl uses indexed arrays and not pointers. (Jeopardising type safety.)
 
     Change and document file structure:
         - Create blockers.c
             Move define_hardnogos there.
 
     Print large setup: change to 3-digit numbers; similar to medium setup
-
-    Create defined for move_data manipulations.
-
-    Implement the forward walk_to_extend_depth
-
-
-
-
-
 
 Later:
     Find blockers in run time.
@@ -54,15 +86,8 @@ Later:
             XX      Or:     #X
             XX              XX
 
-    Try to generalise the code for Fw and BW search.
-    If not: Separate fw and bw in separate files (Try using the same function names, with static.)
-
     Compile with optimisation for speed.
 
-    Malloc the playing grounds (instead of static 50*50.)
-
-    Add hardnogos / reduce position nodes:
-    Add spots that can never be populated by a box because, a: it impossible to do so when it is
-    adjecent to only walls and/or hardnogos, and b: there is no box on it as per setup.
+    Malloc the playing grounds (instead of static 50*50.) ?
 
 

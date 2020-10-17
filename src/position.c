@@ -14,7 +14,7 @@
 /* Conditional compile switches  */
 
 #define DBG_CREATE_BASE 1       /* Debug prints on creating the trasnposition base. */
-#define DBG_ADD_TP 1            /* Prints on add_postion function                   */
+//#define DBG_ADD_TP 1            /* Prints on add_postion function                   */
 
 /* Conditional compile 'fabric' */
 
@@ -59,7 +59,7 @@ void create_position_base(p_game_data_t p_game_data)
 #ifdef DBG_CREATE_BASE
     printf("Position spots:\n");
     for(spot = p_game_data->position_head; spot; spot = spot->position_list)
-        printf(" %ld", SPOT_NUMBER(spot));
+        printf(" %ld", SPOT_NO(spot));
     printf("\n\n");
 #endif /* DBG_CREATE_BASE */
 }
@@ -192,10 +192,10 @@ int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_d
     struct spot *neighbour;
     struct spot *end;
 
-    if (!johnny)
+    if (!johnny) /* TODO: Maker this a sanity checker, with proper error. */
         return 0;
 
-    reach_identifier = SPOT_NUMBER(johnny);
+    reach_identifier = SPOT_NO(johnny);
     mark = next_mark(p_game_data);
     johnny->reach_mark  = mark;
     johnny->other_reach_list = NULL;
@@ -214,8 +214,8 @@ int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_d
                 &&  neighbour->reach_mark < mark )                            /* Not yet explored?      */
             {
                 /* Mind the lowest spot number we found so far. */
-                if (SPOT_NUMBER(neighbour) < reach_identifier)
-                    reach_identifier = SPOT_NUMBER(neighbour);
+                if (SPOT_NO(neighbour) < reach_identifier)
+                    reach_identifier = SPOT_NO(neighbour);
 
                 /* Mark it: */
                 neighbour->reach_mark  = mark;

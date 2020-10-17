@@ -8,6 +8,10 @@ skbn_err print_error(skbn_err error, ...)
 
     int int_1;
     int int_2;
+    int int_3;
+    int int_4;
+
+    char * char_1;
 
     va_start(ap, error);
 
@@ -86,6 +90,23 @@ skbn_err print_error(skbn_err error, ...)
         break;
     case no_move_path_ref_ref_given:
         printf("\nNo reference to the move path reference given.\n");
+        break;
+    case no_child:
+        printf("\nNo child reference in this move node.\n");
+        break;
+    case no_parent:
+        printf("\nNo parent reference in this move node.\n");
+        break;
+    case no_sibbling:
+        printf("\nNo sibbling reference in this move node.\n");
+        break;
+    case move_obj_err:
+        int_1 = va_arg(ap, int);
+        int_2 = va_arg(ap, int);
+        int_3 = va_arg(ap, int);
+        int_4 = va_arg(ap, int);
+        printf("\nMake move error %d, %s. Spot no: %d. Move dir: %c.\n",
+               int_1, int_2 ? "backward" : "forward", int_3, (char) int_4);
         break;
     default:
         printf("\nError in error handling (undefined error).\n");

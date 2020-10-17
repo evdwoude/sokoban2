@@ -381,7 +381,7 @@ void print_medium_setup(p_game_data_t p_game_data)
                 break;
             case 2:
                 printf("%s", curr_spot->neighbour[left] ? "-" : " ");
-                printf("%03ld", SPOT_NUMBER(curr_spot));
+                printf("%03ld", SPOT_NO(curr_spot));
                 break;
             default /* Should not happen */:
                 printf("/n/t????\n\n");
@@ -417,7 +417,7 @@ char *spot_number_str(p_game_data_t p_game_data, struct spot* spot, char *no_spo
     static char spot_numberstring[3];
 
     if (spot)
-        sprintf(spot_numberstring, "%02ld", SPOT_NUMBER(spot));
+        sprintf(spot_numberstring, "%02ld", SPOT_NO(spot));
     else
         return no_spot_str;
 
@@ -473,7 +473,7 @@ void print_large_setup(p_game_data_t p_game_data)
                 break;
             case 2:
                 printf(" %s", spot_number_str(p_game_data, curr_spot->neighbour[left], "  "));
-                printf("=%02ld=", SPOT_NUMBER(curr_spot));
+                printf("=%02ld=", SPOT_NO(curr_spot));
                 printf("%s", spot_number_str(p_game_data, curr_spot->neighbour[right], "  "));
                 break;
             case 3:

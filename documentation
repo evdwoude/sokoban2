@@ -166,17 +166,46 @@ Functions:
                                     It is used for two distict purposes:
                                     1. Together with the box arrangements, to uniquely identify positions.
                                     2. To identify different starting positions for backward search.
-                                       We don't know where Johnny will end up in the final solution, so
-                                       for every reach in the final solution's box arrangement, we have
+                                       We don't know where Johnny will end up in the final solution.
+                                       So for every reach in the final solution's box arrangement, we need
                                        a different position from which to start a separate backward search.
 
         for_position                ???
 
         find_steps_between_moves    When bingo, we need to find the steps beteen the moves.
 
+    find_or_add_position
+
+
+
+
+
+
     walk funtions:
 
         walk_to_extend_depth
+
+            Pseudo code:
+
+            walk_to_extend_depth()
+            {
+                while( 1 )
+                {
+                    while ( child )
+                        descend()
+
+                    if ( at max depth )
+                        extend_depth_by one()
+
+                    while ( not sibbling )
+                        if ( not back at root )
+                            ascend()
+                        else
+                            return;
+
+                    move_lateral()
+                }
+            }
 
         find_move_path
 

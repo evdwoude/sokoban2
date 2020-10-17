@@ -151,6 +151,38 @@
     #  .  #
     #######
 
+18 Test reach identifier:
+
+    #######
+    # . . #
+    #X X X#
+    # . . #
+    #X X X#
+    # . .O#
+    #######
+
+19 dbg_print_setup:
+
+       #####
+    ####   ###
+    #.    .  #
+    ##    ####
+     #  O #
+     #    ###
+    ## X    #
+    #  H   X#
+    ###  ####
+      ####
+
+20 test move():
+
+    ########
+    #  X  .#
+    # #### #
+    #   O X#
+    #### . #
+    #X X ..#
+    ########
 
 2007 Test setup file for space scanning:
 

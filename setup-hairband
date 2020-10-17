@@ -7,7 +7,7 @@
     ## .O##
      #####
 
-40034 Level "General", number 034":
+40034 Level "General", number 034:
 
     ##### #####
     #   ###   #
@@ -20,6 +20,39 @@
     # #  # .# #
     #   ###   #
     ##### #####
+
+40083 Level "General", number 083:
+
+      ####
+      # .###
+    ###    #
+    #  XXH #
+    # X.O ##
+    ### . #
+      #####
+
+40086 Level "General", number 086:
+
+    ########
+    #  .#  ##
+    #   X   #
+    ##X #   #
+     #. H #.#
+     ### X###
+       # O#
+       ####
+
+40092 Level "General", number 092:
+
+    #######
+    #     #
+    # # # ###
+    #  X  X #
+    #  X ##.#
+    # X#X#..#
+    ##   o. #
+     #####  #
+         ####
 
 50604 Level "Difficult", number 604:
 

@@ -14,8 +14,8 @@
 /* Conditional compile switches  */
 
 //#define DBG_MARK 1        // Prints marker and marker wrappings
-// #define DBG_MEM  1       // Prints memory allocations
-#define DBG_HARDNOGOS 1     // Prints the search resul for hard no-go's.
+// #define DBG_MEM  1        // Prints memory allocations
+#define DBG_HARDNOGOS 1   // Prints the search result for hard no-go's.
 //#define DBG_C 1           // Prints
 //#define DBG_D 1           // Prints
 
@@ -67,7 +67,7 @@ void reinit_mark(p_game_data_t p_game_data)
     for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
     {
         spot->reach_mark = 0;
-        printf_mark(" %ld", SPOT_NUMBER(spot))
+        printf_mark(" %ld", SPOT_NO(spot))
     }
     printf_mark("\n")
 }
@@ -102,14 +102,14 @@ int next_mark(p_game_data_t p_game_data)
 skbn_err allocate_memory(p_game_data_t p_game_data)
 {
      /* Sanity checks for the way we'er gonna use the tree memory. */
-     if (sizeof(struct move_node) != MV_NODE_SIZE)
-         return print_error(move_node_size, MV_NODE_SIZE);
-
      if (sizeof(struct position_node) != TP_NODE_SIZE)
          return print_error(position_node_size, TP_NODE_SIZE);
 
      if (sizeof(struct position_leaf) != TP_LEAF_SIZE)
          return print_error(position_leaf_size, TP_LEAF_SIZE);
+
+     if (sizeof(struct move_node) != MV_NODE_SIZE)
+         return print_error(move_node_size, MV_NODE_SIZE);
 
     /* Allocate space for the trees. */
     p_game_data->p_memory_start = calloc(MEM_UNIT_COUNT, MEM_REF_UNIT);
@@ -138,7 +138,7 @@ uint32_t new_position_node(p_game_data_t p_game_data)
         exit( print_error(out_of_tree_memory) );
 
     index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-        printf_mem("{%d}", index)
+        printf_mem("{N%d}", index)
 
     p_game_data->p_memory_bottom += TP_NODE_SIZE;
     p_game_data->tp_node_count++;
@@ -153,10 +153,29 @@ uint32_t new_position_leaf(p_game_data_t p_game_data)
         exit( print_error(out_of_tree_memory) );
 
     index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-        printf_mem("{{%d}}", index)
+        printf_mem("{L%d}", index)
 
     p_game_data->p_memory_bottom += TP_LEAF_SIZE;
     p_game_data->tp_leaf_count++;
+    return index;
+}
+
+
+uint32_t new_move_node(p_game_data_t p_game_data, int search_dir)
+{
+    uint32_t index;
+
+    if (p_game_data->p_memory_bottom + MV_NODE_SIZE > p_game_data->p_memory_top)
+        exit( print_error(out_of_tree_memory) );
+
+    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
+        printf_mem("{M%d}", index)
+
+    p_game_data->p_memory_bottom += MV_NODE_SIZE;
+    if (search_dir == FORWARD)
+        p_game_data->fw_move_count++;
+    else
+        p_game_data->bw_move_count++;
     return index;
 }
 
@@ -186,7 +205,7 @@ void define_hardnogos(p_game_data_t p_game_data)
         {
             set_as_hardnogo(spot);
 
-            printf_hardnogo(" %ld", SPOT_NUMBER(spot))
+            printf_hardnogo(" %ld", SPOT_NO(spot))
         }
     }
 
@@ -243,7 +262,7 @@ void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int m
     for (scan = spot->neighbour[main_dir]; scan && ! is_hardnogo(scan); scan = scan->neighbour[main_dir])
     {
         dbg_hardnogo_if( ! is_hardnogo(scan))
-            printf_hardnogo(" %ld", SPOT_NUMBER(scan))
+            printf_hardnogo(" %ld", SPOT_NO(scan))
 
         set_as_hardnogo(scan);
         *new_hardnogos  = 1;
@@ -258,7 +277,94 @@ void set_as_hardnogo(struct spot* spot)
 }
 
 
+char mv_dir_name(t_direction move_direction)
+{
+    switch (move_direction)
+    {
+    case 0:  return 'R';
+    case 1:  return 'U';
+    case 2:  return 'L';
+    case 3:  return 'D';
+    default: return '?';
+    }
+}
 
 
+void dbg_print_setup(p_game_data_t p_game_data)
+{
+    struct spot* curr_spot;
+    struct spot* next_spot;
+    struct spot* line_start;
+
+    int line_pos = 0;         // For printing space where there is nothing.
+    int c;
+
+    int left_most;
+    int right_most;
+
+    /* Find the left -most position. */
+    curr_spot  = &(p_game_data->spot_pool[0]);
+    left_most  = curr_spot->position;
+    right_most = curr_spot->position;
+    while (curr_spot < p_game_data->pool_ptr)
+    {
+        if (left_most > curr_spot->position)
+            left_most = curr_spot->position;
+        if (right_most < curr_spot->position)
+            right_most = curr_spot->position;
+        curr_spot++;
+    }
+
+    /* Print it */
+    curr_spot = &(p_game_data->spot_pool[0]);
+    line_start = curr_spot;
+
+    printf("\n    #");
+    for (c=left_most; c<=right_most; c++)
+        printf("#");
+
+    printf("#\n    ");
+    while (curr_spot < p_game_data->pool_ptr)
+    {
+        while (curr_spot->position > (line_pos))
+        {
+            printf("#");
+            line_pos++;
+        }
+
+        if (curr_spot->has_box && curr_spot->is_target)
+            printf("H");
+        else if (curr_spot->has_box)
+            printf("X");
+        else if (curr_spot->is_target && curr_spot == p_game_data->johnny )
+            printf("o");
+        else if (curr_spot->is_target)
+            printf(".");
+        else if (curr_spot == p_game_data->johnny )
+            printf("O");
+        else
+            printf(" ");
+
+        line_pos++;
+
+        next_spot = curr_spot + 1;
+        if ( next_spot >= p_game_data->pool_ptr ||
+            (next_spot < p_game_data->pool_ptr && curr_spot->position >= next_spot->position) )
+        {
+            while (line_pos++ <= right_most)
+                printf("#");
+            printf("#\n    ");
+
+            line_pos = 0;
+        }
+        curr_spot = next_spot;
+    }
+
+    printf("#");
+    for (c=left_most; c<=right_most; c++)
+        printf("#");
+
+    printf("#");
+}
 
 
