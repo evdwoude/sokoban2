@@ -1,18 +1,5 @@
 Next:
-    Build explore_for_reach_identifier()
-        Make it search_dir dependant
-        do the wrapper thing.
-        test the above again.
-
-    Remove and branch off the positon test code in resolve.c
-        Scan TODOs
-
     Document headers for functions in position.c. Might decrease heavy comments.
-
-    Use one move_path for both forward and backward.
-    Indicate which by a single bit.
-
-    Test find_or_add_position with johnny maniplations.
 
     Use more exit() calls and clean up code.
 
@@ -36,32 +23,23 @@ Next:
 
             skbn_err add_position(p_game_data_t p_game_data, p_spot johnny)
 
-    Double check the conditions fo new_hardnogos in the linescanner.
-
-    Document latest new functions.
+    Double check the conditions for new_hardnogos in the linescanner.
 
     Document why this impl uses indexed arrays and not pointers. (Violating type safety.)
 
     Change and document file structure:
-        - Create prune.c
+        - Create blockers.c
             Move define_hardnogos there.
-        - Create explore.c and walk.c
-        - If I choose that, then parhaps next_mark should move from util.c to explore.c
-        - Create reset_mark, and use from next_mark
-
-    Document: domain vs reach
 
     Print large setup: change to 3-digit numbers; similar to medium setup
 
-    Function header for explore_for_reach()
-    Create files for eplore functions and for walk functions
+    Create defined for move_data manipulations.
 
-    Define movetree and tranposisiton tree data structures.
-    Inplement add_osition() for both search directions.
     Implement the forward walk_to_extend_depth
 
-    From the guarding of the wrapping of next marker.
-    -   Remove printfs and test loop.
+
+
+
 
 
 Later:

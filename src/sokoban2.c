@@ -38,14 +38,11 @@ int main(int argc, char *argv[])
     time_t start_time, end_time;
     long diff_time;
 
-    // int test; // TODO remove.
-    uint32_t test_node = 0;
-    uint32_t test_leaf = 0;
     struct game_data *p_game_data = &game_data;
 
     start_time = time(NULL);
 
-    printf("\nSokoban2 v0.12.\n");
+    printf("\nSokoban2 v0.12.");
 
     if (on_exit(&exit_function, (void *) &game_data))
         return print_error(cant_register_exit_function);
@@ -57,30 +54,6 @@ int main(int argc, char *argv[])
     error = allocate_memory(&game_data);
     if (error)
         return error;
-
-//         /* Temp: */
-//         printf("\nstart:     %lX.",   (long int) game_data.p_memory_start );
-//         printf("\nbottom:    %lX.",   (long int) game_data.p_memory_bottom);
-//         printf("\ntop:       %lX.\n", (long int) game_data.p_memory_top   );
-//
-//         printf("\n\ntest:      %lX\n", (long int) P_TPL(1) );
-//
-//         test_node = new_position_node(&game_data);
-//         printf("\ntest node: %d.", test_node);
-//         printf("\nptr:       %lX\n", (long int) P_TPN(test_node));
-//
-//         test_leaf = new_position_leaf(&game_data);
-//         printf("\ntest leaf: %d.", test_leaf);
-//         printf("\nptr:       %lX\n", (long int) P_TPL(test_leaf));
-//
-//         test_node = new_position_node(&game_data);
-//         printf("\ntest node: %d.", test_node);
-//         printf("\nptr:       %lX\n", (long int) P_TPN(test_node));
-//
-//         test_leaf = new_position_leaf(&game_data);
-//         printf("\ntest leaf: %d.", test_leaf);
-//         printf("\nptr:       %lX\n", (long int) P_TPL(test_leaf));
-//
 
 
     resolve(&game_data);

@@ -4,7 +4,7 @@
 
 /* In order to intermix 8- and 12-byte memory blocks and address them with a unified index, we using unified a
  * reference unit for indxing of 4 bytes.
- * With 32-bit wide indexes, this gives a total af 16 Gbyte addressability.  (2^32 * 4).
+ * With 32-bit wide indexes, this gives a total af 16 Gbyte addressability.  (2^32 * 4,  "^": power.)
  * This seems enough for now.
  *
  * (Should we want to expand, we could move away from intermixing different sizes and use larger units of
@@ -27,6 +27,7 @@
 /* original blocksize: the leaf nodes are guaranteed to be 8 bytes aligned, not 16.                 */
 #define P_TPL(i) ((struct position_leaf *) (p_game_data->p_memory_start + (i) * MEM_REF_UNIT))
 
+void reinit_mark(p_game_data_t p_game_data);
 
 int next_mark(p_game_data_t p_game_data);
 

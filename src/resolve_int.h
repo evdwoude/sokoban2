@@ -16,7 +16,7 @@
 #define HAS_SIBBLING    0x80000000
 
 
-/* TODO:
+/* TODO (Document):
  *
  * Remove the below text and merge into documentation
 /* We use "move" when referring to a game move. I.e. the moving of Johhny,

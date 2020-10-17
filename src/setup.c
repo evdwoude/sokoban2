@@ -72,8 +72,6 @@ skbn_err setup(p_game_data_t p_game_data, int argc, char *argv[])
     if (target_game_number == 0)
         return print_error(game_number_is_zero);
 
-    print_small_setup("\n");
-
     /* Parse the setup file. */
     do
     {
@@ -368,7 +366,7 @@ void print_medium_setup(p_game_data_t p_game_data)
     /* Print it */
     curr_spot = &(p_game_data->spot_pool[0]);
     line_start = curr_spot;
-    printf("\n");
+
     while (curr_spot < p_game_data->pool_ptr)
     {
         while (curr_spot->position > (line_pos))

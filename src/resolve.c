@@ -21,14 +21,12 @@
 
 /* Code */
 
-// TODO Remove:
-int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_dir);
-
 
 skbn_err resolve(p_game_data_t p_game_data)
 {
     p_spot johnny = p_game_data->johnny;
-    int32_t tmp_move_index; // TODO remove.
+
+    int32_t tmp_move_index; // TODO: Remove this ? Check out what to initiale the first move_path to.
     int32_t *move_index = &tmp_move_index;
 
     /* Define all hard no go spots. Spots that we never should put a box on. */

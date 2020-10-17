@@ -4,8 +4,11 @@
 #include <stdint.h>
 
 /* The amout of memory to allocate for the move tree and position tree: */
-// #define TREE_MEMORY (2^30) /* 1 Gbytes. */
-// #define TREE_MEMORY (2^32) /* 4 Gbytes. */
+// #define TREE_MEMORY (0x040000000) /* 1 Gbytes. */
+// #define TREE_MEMORY (0x080000000) /* 2 Gbytes. */
+// #define TREE_MEMORY (0x100000000) /* 4 Gbytes. */
+// #define TREE_MEMORY (0x180000000) /* 6 Gbytes. */
+// #define TREE_MEMORY (0x200000000) /* 8 Gbytes. */
 #define TREE_MEMORY (2048)
 
 #define NR_OF_SPOTS (50*50)

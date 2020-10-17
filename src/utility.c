@@ -13,7 +13,8 @@
 
 /* Conditional compile switches  */
 
-#define DBG_MARK 1          // Prints marker wrappings
+//#define DBG_MARK 1        // Prints marker and marker wrappings
+// #define DBG_MEM  1       // Prints memory allocations
 #define DBG_HARDNOGOS 1     // Prints the search resul for hard no-go's.
 //#define DBG_C 1           // Prints
 //#define DBG_D 1           // Prints
@@ -25,6 +26,12 @@
 #define printf_mark(...) printf(__VA_ARGS__);
 #else
 #define printf_mark(...)
+#endif
+
+#ifdef DBG_MEM
+#define printf_mem(...) printf(__VA_ARGS__);
+#else
+#define printf_mem(...)
 #endif
 
 #ifdef DBG_HARDNOGOS
@@ -51,6 +58,20 @@ void set_as_hardnogo(struct spot* spot);
 
 /* Code */
 
+void reinit_mark(p_game_data_t p_game_data)
+{
+    p_spot spot;
+
+    printf_mark("\nReinit marks...")
+
+    for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
+    {
+        spot->reach_mark = 0;
+        printf_mark(" %ld", SPOT_NUMBER(spot))
+    }
+    printf_mark("\n")
+}
+
 
 /*int next_mark(p_game_data_t p_game_data)
  *
@@ -59,31 +80,21 @@ void set_as_hardnogo(struct spot* spot);
  * Increments the global spot mark to mark spot as newly found during a current eploration. This way,
  * the spot marks do not need to be re-initialized every new eploration. The reinitilization is still
  * required (and automatically performed) when the globla spot mark wraps. Reinitilization is also
- * required before searching for the amount of domains a backward search can start from.
+ * required before searching for the amount of reaches a backward search can start from.
  */
 int next_mark(p_game_data_t p_game_data)
 {
-    p_spot spot;
-
     p_game_data->next_reach++;
-    if (p_game_data->next_reach > 3000)
+    if (p_game_data->next_reach > 0x10000)
     {
-        /* TODO: Create init_mark function() */
-
-        printf_mark("\nReinit marks...")
-
-        /* If next_reach wrapped, reinitiae all spots. */
-        for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
-        {
-            spot->reach_mark = 0;
-            printf_mark(" %ld", SPOT_NUMBER(spot))
-        }
-        printf_mark("\n")
+        /* If next_reach wrapped, reiniatise all spots. */
+        reinit_mark(p_game_data);
 
         /* And reinitialize next_reach as zero + 1. */
         p_game_data->next_reach = 1;
     }
 
+    printf_mark("\nMark: %d",  p_game_data->next_reach)
     return p_game_data->next_reach;
 }
 
@@ -127,7 +138,7 @@ uint32_t new_position_node(p_game_data_t p_game_data)
         exit( print_error(out_of_tree_memory) );
 
     index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-//         printf("{%d}", index);
+        printf_mem("{%d}", index)
 
     p_game_data->p_memory_bottom += TP_NODE_SIZE;
     p_game_data->tp_node_count++;
@@ -142,7 +153,7 @@ uint32_t new_position_leaf(p_game_data_t p_game_data)
         exit( print_error(out_of_tree_memory) );
 
     index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-//         printf("{{%d}}", index);
+        printf_mem("{{%d}}", index)
 
     p_game_data->p_memory_bottom += TP_LEAF_SIZE;
     p_game_data->tp_leaf_count++;
