@@ -40,8 +40,113 @@ skbn_err resolve(p_game_data_t p_game_data)
     /* Create a root node for the forward position tree */
     p_game_data->position_root = new_position_node(p_game_data);
 
+    // TODO Remmove:
+    printf("\n\nPosition root node: %d\n\n", p_game_data->position_root);
+
+    /* The below two test lines are to be used with setup-test 17 */
+
+
+    printf("\n\n[[%d]]\n", find_reach_identifier(p_game_data, p_game_data->johnny,  FORWARD));
+    printf("\n\n[[%d]]\n", find_reach_identifier(p_game_data, p_game_data->johnny, BACKWARD));
+
+
     /* Add the setup position to the position tree. */
+        printf("\n0: ");
     find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        /* The below test code is to be used with  setup-test 15 */
+
+        printf("\n1: ");
+        p_game_data->spot_pool[9].has_box = 1;
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n1: ");
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+
+        printf("\n2: ");
+        p_game_data->spot_pool[39].has_box = 1;
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n2: ");
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+
+        /* Now changing the reach . . .  */
+
+        printf("\n\n3: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[1]);
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n3: ");
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n4: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[2]);
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n5: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[3]);
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n5: ");
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n5: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[0]);
+        find_or_add_position(p_game_data, BACKWARD , &move_index);
+
+        /* New box and two . . .  */
+
+        printf("\n\n6: ");
+        p_game_data->spot_pool[14].has_box = 1;
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n7: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[6]);
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n8: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[7]);
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        printf("\n8: ");
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+        *move_index = 1;
+
+        /* Bingo for case 7. */
+        printf("\n\n9: ");
+        p_game_data->spot_pool[ 9].is_target = 1;
+        p_game_data->spot_pool[39].is_target = 1;
+        p_game_data->spot_pool[14].is_target = 1;
+        p_game_data->johnny = &(p_game_data->spot_pool[6]);
+        find_or_add_position(p_game_data, BACKWARD , &move_index);
+        *move_index = 1;
+
+        /* Bingo for case 6. */
+        printf("\nA: ");
+        p_game_data->johnny = &(p_game_data->spot_pool[0]);
+        find_or_add_position(p_game_data, BACKWARD , &move_index);
+        *move_index = 1;
+
+        /* Check move path return */
+        printf("\n\nB: ");
+        p_game_data->spot_pool[38].has_box = 1;
+        find_or_add_position(p_game_data, FORWARD , &move_index);
+
+        printf("\nC: ");
+        find_or_add_position(p_game_data, FORWARD , &move_index);
 
     // walk_to_extend_depth(p_game_data, johnny);
     return no_error;

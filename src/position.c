@@ -79,7 +79,8 @@ t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, int search_dir,
     uint32_t leaf = 0;    /* The new leaf. Polulate with reach and move_path. */
     uint32_t reach = 0;   /* Reach_identifier of the currents posiiton. */
 
-    reach = find_reach_identifier(p_game_data, p_game_data->johnny, search_dir);
+//     reach = find_reach_identifier(p_game_data, p_game_data->johnny, search_dir);
+    reach = SPOT_NUMBER(p_game_data->johnny); /* TODO: Call explore_for_reach_indent. */
 
     if ( ! move_path ) /* Sanity check: Do not accept this pointer to be not populated. */
         exit( print_error(no_move_path_ref_ref_given) );
