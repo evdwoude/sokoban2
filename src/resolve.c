@@ -70,9 +70,65 @@ skbn_err resolve(p_game_data_t p_game_data)
     p_game_data->forward_move_root = new_move_node(p_game_data, forward);
 
     /* Add the setup position to the position tree. */
+        printf("\n 0: ");
     find_or_add_position(p_game_data, forward , &move_index);
+        *move_index = 1;
 
-    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, 3, forward);
+        /* The below test code is to be used with setup-test 18 */
+        int   n = 1;
+        char *c;
+        char  type = 'x';
+        int   dir  = forward;
+        char  vector[] =
+        {
+            /*  0 */                  1,  2, 13,             'n',
+            /*  5 */     'j',         4,  0, 22,             'n',
+            /*  9 */     'b', '.',    1, 16,  7,             'n',
+            /* 13 */     '.',        17, 18,  8,             'n',
+            /* 17 */     'j',        12,  9,  8, 24, 20,     'n',
+            /* 23 */     'x',         3,  8, 18, 23, 11, 16, 21, 'n',
+            /* 31 */     '.',         2,  5,  9, 15, 19,     'n',
+            /* 37 */     'f',                                'n',
+            -1
+        };
+
+        c = vector;
+        while (*c != -1)
+        {
+            switch (*c)
+            {
+                case 'x':
+                case '.':
+                case 'j':
+                    type = *c;
+                    break;
+                case 'f':
+                    dir = forward;
+                    break;
+                case 'b':
+                    dir = backward;
+                    break;
+                case 'n':
+                    type = *c;
+                    /* Omit the break here so we need no number to do nothing; */
+                default:
+                    printf("\n%2d: ", n++);
+                    if (type == 'x')
+                        p_game_data->spot_pool[(int) (*c)].object[box] = 1;
+                    if (type == '.')
+                        p_game_data->spot_pool[(int) (*c)].object[target] = 1;
+                    if (type == 'j')
+                        p_game_data->johnny = &(p_game_data->spot_pool[(int) (*c)]);
+                    find_or_add_position(p_game_data, dir , &move_index);
+                    *move_index = 1;
+                     if (type == 'n')
+                         printf("\n");
+                    break;
+            }
+            c++;
+        }
+
+    // walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, 3, forward);
 
     dbg_print_setup(p_game_data);
 

@@ -14,7 +14,7 @@
 /* Conditional compile switches  */
 
 #define DBG_CREATE_BASE 1       /* Debug prints on creating the trasnposition base. */
-//#define DBG_ADD_TP 1            /* Prints on add_postion function                   */
+#define DBG_ADD_TP 1            /* Prints on add_postion function                   */
 
 /* Conditional compile 'fabric' */
 
