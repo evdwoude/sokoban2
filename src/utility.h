@@ -38,7 +38,7 @@ uint32_t new_position_node(p_game_data_t p_game_data);
 
 uint32_t new_position_leaf(p_game_data_t p_game_data);
 
-uint32_t new_move_node(p_game_data_t p_game_data, int search_dir);
+uint32_t new_move_node(p_game_data_t p_game_data, t_s_dir search_dir);
 
 void define_hardnogos(p_game_data_t p_game_data);
 

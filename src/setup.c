@@ -258,15 +258,15 @@ skbn_err add_new_spot(p_game_data_t p_game_data, int chr, int position, int line
     p_game_data->pool_ptr->explore_reach_list = NULL;
     p_game_data->pool_ptr->other_reach_list   = NULL;
     p_game_data->pool_ptr->position_list      = NULL;
-    p_game_data->pool_ptr->has_box            = ('X' == chr) || ('H' == chr);
-    p_game_data->pool_ptr->is_target          = ('.' == chr) || ('H' == chr) || ('o' == chr);
+    p_game_data->pool_ptr->object[box]        = ('X' == chr) || ('H' == chr) ? present : not_present;
+    p_game_data->pool_ptr->object[target]     = ('.' == chr) || ('H' == chr) || ('o' == chr) ? present : not_present;
     p_game_data->pool_ptr->reach_mark         = 0;
     p_game_data->pool_ptr->position           = position;
 
-    if (p_game_data->pool_ptr->has_box)
+    if (p_game_data->pool_ptr->object[box] == present)
         number_of_boxes++;                 /* Counted for double checking the setup. */
 
-    if (p_game_data->pool_ptr->is_target)
+    if (p_game_data->pool_ptr->object[target] == present)
         number_of_targets++;               /* Counted for double checking the setup. */
 
     if ('O' == chr || 'o' == chr)

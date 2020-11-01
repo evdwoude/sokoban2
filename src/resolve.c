@@ -27,17 +27,17 @@
 
 /* Internal protos */
 
-void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, int search_dir);
+void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir);
 
-void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, int search_dir);
-void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, int search_dir);
-void walk_lateral(p_game_data_t p_game_data, uint32_t *move, int search_dir);
+void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
+void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
+void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir);
 
-void move_object(p_game_data_t p_game_data, uint32_t move, t_mv_action action, int search_dir);
+void move_object(p_game_data_t p_game_data, uint32_t move, t_mv_action action, t_s_dir search_dir);
 
-void extend_depth(p_game_data_t p_game_data, uint32_t move, int search_dir);
+void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir);
 
-void explore_for_reach(p_game_data_t p_game_data, p_spot spot, int search_dir);
+void explore_for_reach(p_game_data_t p_game_data, p_spot spot, t_s_dir search_dir);
 
 
 /* Exported data */
@@ -67,12 +67,12 @@ skbn_err resolve(p_game_data_t p_game_data)
     p_game_data->position_root = new_position_node(p_game_data);
 
     /* Create a root node for the forward move tree */
-    p_game_data->forward_move_root = new_move_node(p_game_data, FORWARD);
+    p_game_data->forward_move_root = new_move_node(p_game_data, forward);
 
     /* Add the setup position to the position tree. */
-    find_or_add_position(p_game_data, FORWARD , &move_index);
+    find_or_add_position(p_game_data, forward , &move_index);
 
-    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, 3, FORWARD);
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, 3, forward);
 
     dbg_print_setup(p_game_data);
 
@@ -80,7 +80,7 @@ skbn_err resolve(p_game_data_t p_game_data)
 }
 
 
-void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, int search_dir)
+void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir)
 {
     uint32_t move;
     int depth = 0;
@@ -107,7 +107,7 @@ void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_a
 }
 
 
-void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, int search_dir)
+void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir)
 {
     san_if ( ! P_MN(*move)->child ) /* Sanity check: Do we have a child to descend to? */
         san_exit( print_error(no_child) )
@@ -122,7 +122,7 @@ void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, int search_d
 }
 
 
-void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, int search_dir)
+void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir)
 {
     san_if ( ! P_MN(*move)->next.parent) /* Sanity check: Do we have a parent to ascend to? */
         san_exit( print_error(no_parent) )
@@ -139,7 +139,7 @@ void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, int search_di
 }
 
 
-void walk_lateral(p_game_data_t p_game_data, uint32_t *move, int search_dir)
+void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 {
     san_if ( ! P_MN(*move)->next.sibbling) /* Sanity check: Do we have a sibbling to move to? */
         san_exit( print_error(no_sibbling) )
@@ -157,7 +157,7 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, int search_dir)
     move_object(p_game_data, *move, make_move, search_dir);
 }
 
-void move_object(p_game_data_t p_game_data, uint32_t move, t_mv_action action, int search_dir)
+void move_object(p_game_data_t p_game_data, uint32_t move, t_mv_action action, t_s_dir search_dir)
 {
     p_spot spot, src, dst;
 
@@ -177,24 +177,24 @@ void move_object(p_game_data_t p_game_data, uint32_t move, t_mv_action action, i
     san_if ( ! src) /* Does the source spot (neighbour) exist? */
         san_exit( print_error(move_obj_err, 3, search_dir, SPOT_NO(spot), (int) mv_dir_name(mv_dir)) )
 
-    if (search_dir == FORWARD)
+    if (search_dir == forward)
         dst  = spot->neighbour[mv_dir]->neighbour[mv_dir];
     else
         dst  = spot;
 
-    san_if ( ! dst ) /* Error if no destination. */
+    san_if ( ! dst ) /* Error if destination. */
         san_exit( print_error(move_obj_err, 4, search_dir, SPOT_NO(spot), (int) mv_dir_name(mv_dir)) )
-    san_if ( src->has_box == 0 ) /* Error if source has has bo object.  */
+    san_if ( src->object[search_dir] == 0 ) /* Error if source has has bo object.  */
         san_exit( print_error(move_obj_err, 5, search_dir, SPOT_NO(spot), (int) mv_dir_name(mv_dir)) )
-    san_if ( dst->has_box == 1 ) /* Error if destination is empty. */
+    san_if ( dst->object[search_dir] == 1 ) /* Error if destination is empty. */
         san_exit( print_error(move_obj_err, 6, search_dir, SPOT_NO(spot), (int) mv_dir_name(mv_dir)) )
 
-    src->has_box = 0; /* Move the box from here ...   */
-    dst->has_box = 1; /* ... to here.                 */
+    src->object[search_dir] = 0; /* Move the box from here ...   */
+    dst->object[search_dir] = 1; /* ... to here.                 */
 }
 
 
-void extend_depth(p_game_data_t p_game_data, uint32_t move, int search_dir)
+void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
 {
 //     Pseudo:
 //     explore_for_reach()
@@ -208,7 +208,7 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, int search_dir)
 }
 
 
-void explore_for_reach(p_game_data_t p_game_data, p_spot spot, int search_dir)
+void explore_for_reach(p_game_data_t p_game_data, p_spot spot, t_s_dir search_dir)
 {
     t_direction dir = right;
     int mark;
@@ -228,9 +228,9 @@ void explore_for_reach(p_game_data_t p_game_data, p_spot spot, int search_dir)
         {
             neighbour = spot->neighbour[dir];
 
-            if (    neighbour                                                 /* Neighbour spot exists? */
-                &&  !(search_dir ? neighbour->is_target : neighbour->has_box) /* Is that spot empty?    */
-                &&  neighbour->reach_mark < mark )                            /* Not yet explored?      */
+            if (    neighbour                       /* Neighbour spot exists? */
+                &&  !neighbour->object[search_dir]  /* Is that spot empty?    */
+                &&  neighbour->reach_mark < mark )  /* Not yet explored?      */
             {
                 /* Mark it: */
                 neighbour->reach_mark  = mark;

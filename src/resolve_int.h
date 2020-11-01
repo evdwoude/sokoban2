@@ -33,21 +33,22 @@
  */
 
 
-
+//  TODO: Document
 struct position_node
 {
-    uint32_t spot_has_box;
+    uint32_t spot_has_object;
     uint32_t spot_is_empty;
 };
 
 
+//  TODO: Document
 struct position_leaf
 {
     /* unt32_t leaf_data is a packed set of data fields:
      *  reach_ident,      31 bits: Completes the identification of the this position.
      *  search_direction,  1 bits: The search direction on with this position has been found, so it
      *                             indicates whether move_path refers to a forward move node or a backward
-     *                             mode node. Values: 0: FORWARD, 1: BACKWARD.
+     *                             mode node. Values: forward, backward.
      */
     uint32_t leaf_data;  /* Completes the identification of the this position.                              */
     uint32_t next_leaf;  /* Linked list of different position for the same box arrangement.                 */
@@ -63,7 +64,7 @@ struct position_leaf
 #define TPL_BACKWARD            TPL_SEARCH_DIR_MASK    /* Value to write the search direction backward. */
 /* To Read: */
 #define TPL_REACH(data)         ((data)&TPL_REACH_MASK)                            /* Get reach ident   */
-#define TPL_SEARCH_DIR(data)    ((data)&TPL_SEARCH_DIR_MASK ? BACKWARD : FORWARD)  /* Get search dir    */
+#define TPL_SEARCH_DIR(data)    ((data)&TPL_SEARCH_DIR_MASK ? backward : forward)  /* Get search dir    */
 
 
 struct move_node

@@ -28,11 +28,11 @@
 /* Internal protos */
 
 
-t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, int search_dir, uint32_t *p_leaf);
+t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, t_s_dir search_dir, uint32_t *p_leaf);
 
-t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, int search_dir, uint32_t reach, uint32_t *p_leaf);
+t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, t_s_dir search_dir, uint32_t reach, uint32_t *p_leaf);
 
-int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_dir);
+int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_dir);
 
 /* Exported data */
 
@@ -72,7 +72,7 @@ void create_position_base(p_game_data_t p_game_data)
  *  - Error finding a new memory block for a position node or leaf.
  */
 
-t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, int search_dir, int32_t **move_path)
+t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, t_s_dir search_dir, int32_t **move_path)
 {
     t_outcome_add_tp outcome = position_exists_on_same_direction; /* The outcome of this function. */
 
@@ -112,7 +112,7 @@ t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, int search_dir,
 }
 
 
-t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, int search_dir, uint32_t *p_leaf)
+t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, t_s_dir search_dir, uint32_t *p_leaf)
 {
     t_outcome_add_tp outcome = position_exists_on_same_direction; /* First assume not new. */
     uint32_t node_or_leaf    = p_game_data->position_root;        /* Walks down the tree. */
@@ -122,15 +122,15 @@ t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, int sear
 
     for(spot = p_game_data->position_head; spot; spot = spot->position_list)
     {
-        /* Check whether the spot is populated or not and follow/populate the related next pointer.
-         * Check for boxes of targets depending on the search direction. Forward: check for boxes. */
-        if (search_dir ? spot->is_target : spot->has_box)
-            next = &(P_TPN(node_or_leaf)->spot_has_box);
+        /* Check whether the spot is populated or not and follow/create the related next pointer.
+         * Check for boxes or targets depending on the search direction. Forward: check for boxes. */
+        if (spot->object[search_dir])
+            next = &(P_TPN(node_or_leaf)->spot_has_object);
         else
             next = &(P_TPN(node_or_leaf)->spot_is_empty);
 
         printf_add_tp("%c_%03d%c ",
-                spot->has_box ?  (spot->is_target ? 'H' : 'X') : (spot->is_target ? '.' : 'Z'),
+                spot->object[box] ?  (spot->object[target] ? 'H' : 'X') : (spot->object[target] ? '.' : 'Z'),
                 node_or_leaf, *next ? '-' : '+');
 
         if ( ! *next )
@@ -151,7 +151,7 @@ t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, int sear
 }
 
 
-t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, int search_dir, uint32_t reach, uint32_t *p_leaf)
+t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, t_s_dir search_dir, uint32_t reach, uint32_t *p_leaf)
 {
     uint32_t leaf = *p_leaf;   /* Walks down the leaf list, starting at the given leaf. */
     uint32_t last_leaf = leaf; /* Remind the last leaf for adding a new leaf (if applicable). */
@@ -184,7 +184,7 @@ t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, int search_dir, ui
 }
 
 
-int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_dir)
+int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_dir)
 {
     t_direction dir = right;
     int reach_identifier;
@@ -209,9 +209,9 @@ int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, int search_d
         {
             neighbour = johnny->neighbour[dir];
 
-            if (    neighbour                                                 /* Neighbour spot exists? */
-                &&  !(search_dir ? neighbour->is_target : neighbour->has_box) /* Is that spot empty?    */
-                &&  neighbour->reach_mark < mark )                            /* Not yet explored?      */
+            if (    neighbour                       /* Neighbour spot exists? */
+                &&  !neighbour->object[search_dir]  /* Is that spot empty?    */
+                &&  neighbour->reach_mark < mark )  /* Not yet explored?      */
             {
                 /* Mind the lowest spot number we found so far. */
                 if (SPOT_NO(neighbour) < reach_identifier)

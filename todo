@@ -1,16 +1,8 @@
 Next:
 
-    Change from defines to enum for FORWARD and BACKWARD.
-
-    Compile and test
+    Test move_object with setup and tree (for forward only).
 
     Finish move_object and test with setup and tree (for forward only).
-
-    Change members has_box and is_target into object[2] or box_and_target[2]
-        Also: spot_has_box -> spot_has_object.
-        Retest position.c
-        Test move_object with setup and tree (for forward only).
-
 
     depth as parameter of ascend and descend?
 

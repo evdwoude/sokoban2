@@ -16,12 +16,11 @@
 #define NR_OF_SPOTS (50*50)
 #define SPOT_NO(p_spot) ((p_spot) - p_game_data->spot_pool)
 
-#define FORWARD  0
-#define BACKWARD 1
-
 typedef enum {false = 0, true = 1} t_bool;
 typedef enum {right=0, up=1, left=2, down=3} t_direction;
-typedef enum {make_move=0, take_back=1} t_mv_action;
+typedef enum {box=0, forward=0, target=1, backward=1} t_s_dir; /* Object type and search direction, tied. */
+typedef enum {not_present=0, present=1} t_object;  /* These are fixed and tied to t_mv_action.   */
+typedef enum {make_move=not_present, take_back=present} t_mv_action; /* Tied to t_object values. */
 
 struct spot
 {
@@ -32,9 +31,7 @@ struct spot
     struct spot *position_list;      /* Link to next spot in the position base list. A value
                                       * of HARDNOGO indicates this is a hard no-go spot. */
 
-                                     /* indicates whether the spot is populated with box or target or both */
-    int has_box;
-    int is_target;
+    t_object object[2]; /* [0]: Indicates whether spot has a box.  [1]: Indicates whether spot is a target. */
 
     int reach_mark;     /* For exploring johnny's current reach, all purposes. */
     int position;       /* For setup parsing only.  */

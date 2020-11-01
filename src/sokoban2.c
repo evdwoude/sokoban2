@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     start_time = time(NULL);
 
-    printf("\nSokoban2 v0.12.");
+    printf("\nSokoban2 v0.13.");
 
     if (on_exit(&exit_function, (void *) &game_data))
         return print_error(cant_register_exit_function);

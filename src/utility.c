@@ -160,8 +160,7 @@ uint32_t new_position_leaf(p_game_data_t p_game_data)
     return index;
 }
 
-
-uint32_t new_move_node(p_game_data_t p_game_data, int search_dir)
+uint32_t new_move_node(p_game_data_t p_game_data, t_s_dir search_dir)
 {
     uint32_t index;
 
@@ -172,7 +171,7 @@ uint32_t new_move_node(p_game_data_t p_game_data, int search_dir)
         printf_mem("{M%d}", index)
 
     p_game_data->p_memory_bottom += MV_NODE_SIZE;
-    if (search_dir == FORWARD)
+    if (search_dir == forward)
         p_game_data->fw_move_count++;
     else
         p_game_data->bw_move_count++;
@@ -197,7 +196,7 @@ void define_hardnogos(p_game_data_t p_game_data)
     printf_hardnogo("\n\nCorners:\n")
     for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
     {
-        if (    !spot->is_target
+        if (    !spot->object[target]
             && (    (spot->neighbour[right] == NULL  &&  spot->neighbour[up   ] == NULL)
                 ||  (spot->neighbour[up   ] == NULL  &&  spot->neighbour[left ] == NULL)
                 ||  (spot->neighbour[left ] == NULL  &&  spot->neighbour[down ] == NULL)
@@ -253,7 +252,7 @@ void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int m
 
     /* Scan line for any spot that can not (yet) be regarded as a hard no go */
     for (scan = spot->neighbour[main_dir]; scan && ! is_hardnogo(scan); scan = scan->neighbour[main_dir])
-        if (scan->is_target || (scan->neighbour[sub_dir_a] != NULL && scan->neighbour[sub_dir_b] != NULL))
+        if (scan->object[target] || (scan->neighbour[sub_dir_a] != NULL && scan->neighbour[sub_dir_b] != NULL))
             return;
 
     /* Apparently, there is (at least one) new hard no go on this line, so just mark them all. (Except when
@@ -332,13 +331,13 @@ void dbg_print_setup(p_game_data_t p_game_data)
             line_pos++;
         }
 
-        if (curr_spot->has_box && curr_spot->is_target)
+        if (curr_spot->object[box] && curr_spot->object[target])
             printf("H");
-        else if (curr_spot->has_box)
+        else if (curr_spot->object[box])
             printf("X");
-        else if (curr_spot->is_target && curr_spot == p_game_data->johnny )
+        else if (curr_spot->object[target] && curr_spot == p_game_data->johnny )
             printf("o");
-        else if (curr_spot->is_target)
+        else if (curr_spot->object[target])
             printf(".");
         else if (curr_spot == p_game_data->johnny )
             printf("O");
