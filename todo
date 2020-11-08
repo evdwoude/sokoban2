@@ -1,8 +1,10 @@
 Next:
+    Keep Johnny up to date while walking the move tree?
+    Pro: Know where Johnny is for extend_depth()
+    Con: Does not match with take_back. . .
+        Consider: Johnny a paramter to find_or_add_position(), instead of taking johnny from game_data.
 
-    depth as parameter of ascend and descend?
-
-    Consider: make Johnny a paramter to find_or_add_position(), instead of taking johnny from game_data.
+    Change  t_direction  into  t_mv_dir
 
     Double check make dependencies
 

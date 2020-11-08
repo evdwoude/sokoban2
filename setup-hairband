@@ -54,6 +54,18 @@
      #####  #
          ####
 
+40095 Level "General", number 095:
+
+      ####
+      #  #
+    ###  ##
+    #  XH ##
+    #  .H  #
+    ### .  #
+      #X  ##
+      #O###
+      ###
+
 50604 Level "Difficult", number 604:
 
     #########
@@ -77,7 +89,7 @@
     #.  ##.#
     ########
 
-60008 Level "Very difficult", number 8:
+60008 Level "Very difficult", number 008:
 
     ###########
     ####  #####

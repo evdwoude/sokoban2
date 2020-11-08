@@ -7,11 +7,6 @@
 #define MAX_DEPTH 400
 #define WALKING_STACK_SIZE  (MAX_DEPTH + 2)  /* In fact "+ 1" should be enough, but hey... */
 
-/* Bit fields for move node's member move_data: */
-#define SPOT_INDEX      0x1FFFFFFF
-#define MOVE_DIR        0x60000000
-#define HAS_SIBBLING    0x80000000
-
 
 /* Change the search direction to the opposite. I.e, forward becomes backward v.v. */
 // #define OPPOSITE_SDIR(search_dir) (1 - (search_dir))
@@ -103,6 +98,9 @@ struct move_node
 #define MV_GET_SPOT_NO(data)    (((data)&MV_SPOT_NO_MASK) >> MV_SPOT_NO_SHIFT) /* Get the spot number.    */
 #define MV_GET_HAS_SIBB(data)    ((data)&MV_HAS_SIBB_MASK ? 1 : 0)             /* Has a sibbling?         */
 
+/* More direct access, from a move index: */
+// #define  MOVE_DIR(move)    (MV_GET_MOVE_DIR(P_MN(move)->move_data))         /* The move's move direction. */
+// #define  MOVE_SPOTNO(move) (MV_GET_SPOT_NO(P_MN(move)->move_data))          /* The move's spot no.        */
 
 #endif /* RESOLVE_INTH */
 

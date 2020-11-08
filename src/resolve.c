@@ -149,18 +149,32 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 
 void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
 {
-//     Pseudo:
-//     explore_for_reach()
-//     for all spots in reach list:
-//         for all directions:
-//             if (test_move())
-//             {
-//                 move object(make_move)
-//                 consider_move()
-//                 move object(take_back)
-//             }
-//
-    printf_walk_mv("              Extend depth");
+    p_spot johnny;
+    t_direction mv_dir;
+
+    printf_walk_mv("\nExtend depth: ");
+
+    johnny = p_game_data->johnny;
+
+    explore_for_reach(p_game_data, johnny, search_dir);
+
+    printf_walk_mv("\nResult: ");
+
+    while (johnny) /* for all spots in reach list: */
+    {
+        for (mv_dir=right; mv_dir<=down; mv_dir++) /* for all move directions: */
+        {
+            if (test_move(p_game_data, johnny, mv_dir, search_dir))
+            {
+                printf_walk_mv("\nspot: %ld,  direction: %c",  SPOT_NO(johnny), mv_dir_name(mv_dir));
+
+                // move object(make_move)
+                // consider_move()
+                // move object(take_back)
+            }
+        }
+        johnny = johnny->explore_reach_list;
+    }
 
     return;
 }

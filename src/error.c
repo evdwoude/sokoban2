@@ -108,6 +108,13 @@ skbn_err print_error(skbn_err error, ...)
         printf("\nMake move error %d, %s. Spot no: %d. Move dir: %c.\n",
                int_1, int_2 ? "backward" : "forward", int_3, (char) int_4);
         break;
+    case ed_spotno_oor:
+        int_1 = va_arg(ap, int);
+        int_2 = va_arg(ap, int);
+        int_3 = va_arg(ap, int);
+        printf("\nExtend depth: Spot number out of range. (%s). Spot no: %d. Move dir: %c.\n",
+               int_1 ? "BW" : "FW", int_2, (char) int_3);
+        break;
     default:
         printf("\nError in error handling (undefined error).\n");
         break;

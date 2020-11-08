@@ -29,7 +29,8 @@ typedef enum
     no_child,
     no_parent,
     no_sibbling,
-    move_obj_err
+    move_obj_err,
+    ed_spotno_oor
 
 } skbn_err;
 

@@ -184,6 +184,16 @@
     #. X   #
     ########
 
+21 test extend_depth():
+
+    ######
+    #    #
+    # X  #
+    #  . #
+    #   O#
+    ######
+
+
 2007 Test setup file for space scanning:
 
     abc

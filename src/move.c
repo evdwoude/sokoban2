@@ -21,6 +21,24 @@
 
 
 /* Code */
+/* TODO: document. */
+
+t_bool test_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t_s_dir search_dir)
+{
+    return
+        search_dir == forward ?
+                johnny->neighbour[mv_dir]
+            &&  johnny->neighbour[mv_dir]->object[box]
+            &&  johnny->neighbour[mv_dir]->neighbour[mv_dir]
+            && !johnny->neighbour[mv_dir]->neighbour[mv_dir]->object[box]
+        :
+                johnny->neighbour[mv_dir]
+            && !johnny->neighbour[mv_dir]->object[target]
+            &&  johnny->neighbour[OPPOSITE_MV_DIR(mv_dir)]
+            &&  johnny->neighbour[OPPOSITE_MV_DIR(mv_dir)]->object[target]
+        ;
+}
+
 
 
 /* TODO: document. */
@@ -38,7 +56,7 @@ void move_object(p_game_data_t p_game_data, uint32_t move, t_mv_action action, t
     san_if ( &p_game_data->spot_pool[spot_no] >= p_game_data->pool_ptr ) /* Bounds check for spot_no */
         san_exit( print_error(move_obj_err, 2, search_dir, spot_no, (int) mv_dir_name(mv_dir)) )
 
-    johnny        = &p_game_data->spot_pool[spot_no];
+    johnny = &p_game_data->spot_pool[spot_no];
 
     if (search_dir == forward)
     {
@@ -62,4 +80,9 @@ void move_object(p_game_data_t p_game_data, uint32_t move, t_mv_action action, t
 
     spots[mv_src]->object[search_dir] = not_present; /* Move the box from here ...  */
     spots[mv_dst]->object[search_dir] = present;     /*  ... to here.               */
+
+    /* Move Johnny too. Note that this is only correct for make_move and not for take_back, but   */
+    /* it is only required in the case of make_move and does not hard in the case of take_back.   */
+    p_game_data->johnny = johnny->neighbour[mv_dir];
+
 }
