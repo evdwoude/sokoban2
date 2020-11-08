@@ -26,6 +26,8 @@
  * the floor manager, or the boxes, to an adjecent spot in the warehouse.
  */
 
+
+// TODO: move the below to "documentation"
 /* We use "walk" when referring to traversing the move tree. I.e
  * when walking the move pointer though the move tree, simulteneously
  * moving the man and the boxes across the warehouse floor to keep

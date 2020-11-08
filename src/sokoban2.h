@@ -18,20 +18,21 @@
 
 typedef enum {false = 0, true = 1} t_bool;
 typedef enum {right=0, up=1, left=2, down=3} t_direction;
-typedef enum {box=0, forward=0, target=1, backward=1} t_s_dir; /* Object type and search direction, tied. */
-typedef enum {not_present=0, present=1} t_object;  /* These are fixed and tied to t_mv_action.   */
-typedef enum {make_move=not_present, take_back=present} t_mv_action; /* Tied to t_object values. */
+typedef enum {box=0, forward=0, target=1, backward=1} t_s_dir; /* Object type and search direction, tied.  */
+typedef enum {not_present=0, present=1} t_object_presence;     /* Whether a box or target is present.      */
+typedef enum {make_move=0, take_back=1} t_mv_action;           /* Action for move_object.                  */
+typedef enum {mv_src=0, mv_dst=1} t_mv_spots;                  /* Tied to t_mv_action values.              */
 
 struct spot
 {
-    struct spot *neighbour[4];       /* Connects to the neighbours, right, up, left and down. */
+    struct spot *neighbour[4];       /* Connects to the neighbours, right, up, left and down.       */
 
     struct spot *explore_reach_list; /* For exploring johnny's current reach, when searching moves. */
-    struct spot *other_reach_list;   /* For exploring johnny's current reach, all other purposes.    */
-    struct spot *position_list;      /* Link to next spot in the position base list. A value
-                                      * of HARDNOGO indicates this is a hard no-go spot. */
+    struct spot *other_reach_list;   /* For exploring johnny's current reach, all other purposes.   */
+    struct spot *position_list;      /* Link to next spot in the position base list. A value of     */
+                                     /* HARDNOGO indicates this is a hard no-go spot.               */
 
-    t_object object[2]; /* [0]: Indicates whether spot has a box.  [1]: Indicates whether spot is a target. */
+    t_object_presence object[2];     /* [0]: Whether spot has a box; [1]: Whether spot is a target. */
 
     int reach_mark;     /* For exploring johnny's current reach, all purposes. */
     int position;       /* For setup parsing only.  */

@@ -1,27 +1,10 @@
 Next:
 
-    Test move_object with setup and tree (for forward only).
-
-    Finish move_object and test with setup and tree (for forward only).
-
     depth as parameter of ascend and descend?
 
-    Reconsider OPPOSITE_SDIR() macro.
-
-    move(): F/B seacrch vs. F/B move. FsBm pulls a box while BsFm pull a target.
-        Extra parameter "action" (make_move / take_back)
-        Put OPPOSITE() inside the function rather than on the caller's parameter list.
-
-        Double check make dependencies
-
-    Create move.c and put in there:
-        move_object()
-        try_move()
-        extend_depth()
-        explore_for_reach()
-        ...
-
     Consider: make Johnny a paramter to find_or_add_position(), instead of taking johnny from game_data.
+
+    Double check make dependencies
 
     Global:
 
