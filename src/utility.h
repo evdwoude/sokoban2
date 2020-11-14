@@ -44,7 +44,7 @@ void define_hardnogos(p_game_data_t p_game_data);
 
 int is_hardnogo(struct spot* spot);
 
-char mv_dir_name(t_direction move_direction);
+char mv_dir_name(t_mv_dir move_direction);
 
 void dbg_print_setup(p_game_data_t p_game_data);
 

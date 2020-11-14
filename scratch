@@ -1,0 +1,189 @@
+Forward:
+
+0:  ######                                                                 000-001-002-003
+    #    #                                                                  |   |   |   |
+    # X  #                                                                 004-005-006-007
+    #    #                                                                  |   |   |   |
+    #  . #                                                                 008-009-010-011
+    #   O#                                                                  |   |   |   |
+    ######                                                                 012-013-014-015
+                                                                            |   |   |   |
+    1D Nw                                              4R Nw               016-017-018-019
+1:  ######                                             ######
+    #    #                                             #    #
+    # O  #                                             # OX #
+    # X  #                                             #    #
+    #  . #                                             #  . #
+    #    #                                             #    #
+    ######                                             ######              Descend       F-M: 01-D
+                                                                           Descend       F-M: 05-D
+    5D Nw            8R Nw                    13U Ex   2D Ex   7L Ex       Descend       F-M: 12-R
+2:  ######           ######                   ######   ######  ######      Ascend        F-T: 12-R
+    #    #           #    #                   #    #   #    #  #    #      Walk lateral  F-T: 05-D  F-M: 08-R
+    #    #           #    #                   # X  #   #  O #  # XO #      Descend       F-M: 06-D
+    # O  #           # OX #                   # O  #   #  X #  #    #      Ascend        F-T: 06-D
+    # X. #           #  . #                   #  . #   #  . #  #  . #      Ascend        F-T: 08-R
+    #    #           #    #                   #    #   #    #  #    #      Walk lateral  F-T: 01-D  F-M: 04-R
+    ######           ######                   ######   ######  ######      Ascend        F-T: 04-R
+
+    12R Bi  17U Ex   6D Bi   14U Ex  11L Ex
+3:  ######  ######   ######  ######  ######
+    #    #  #    #   #    #  #    #  #    #
+    #    #  #    #   #    #  #  X #  #    #
+    #    #  # X  #   #  O #  #  O #  # XO #
+    # OH #  # O. #   #  H #  #  . #  #  . #
+    #    #  #    #   #    #  #    #  #    #
+    ######  ######   ######  ######  ######
+
+
+Backward:
+
+0:  ######                                          000-001-002-003        Descend       B-M: 06-R
+    #    #                                           |   |   |   |         Descend       B-M: 10-D
+    # .  #                                          004-005-006-007        Descend       B-M: 14-D
+    #    #                                           |   |   |   |         Ascend        B-T: 14-D
+    #  X #                                          008-009-010-011        Ascend        B-T: 10-D
+    #   O#                                           |   |   |   |         Walk lateral  B-T: 06-R  B-M: 09-D
+    ######                                          012-013-014-015        Descend       B-M: 13-D
+                                                     |   |   |   |         Descend       B-M: 14-R
+                                                    016-017-018-019        Ascend        B-T: 14-R
+1:  6R Nw                           9-D Nw                                 Ascend        B-T: 13-D
+    ######                          ######                                 Ascend        B-T: 09-D
+    #    #                          #    #
+    #  .O#                          #    #
+    #    #                          # .  #
+    #  X #                          # OX #
+    #    #                          #    #
+    ######                          ######
+
+2:  10D Nw                  05L Ex  13D Nw          10R Ex    05U Ex
+    ######                  ######  ######          ######    ######
+    #    #                  #    #  #    #          #    #    # O  #
+    #    #                  #O.  #  #    #          #    #    # .  #
+    #  . #                  #    #  #    #          #  .O#    #    #
+    #  X #                  #  X #  # .X #          #  X #    #  X #
+    #    #                  #    #  # O  #          #    #    #    #
+    ######                  ######  ######          ######    ######
+
+    14D Bi  09L Ex  06U Ex          14R Bi  09U Ex
+    ######  ######  ######          ######  ######
+    #    #  #    #  #  O #          #    #  #    #
+    #    #  #    #  #  . #          #    #  # O  #
+    #    #  #O.  #  #    #          #    #  # .  #
+    #  H #  #  X #  #  X #          #  HO#  #  X #
+    #  O #  #    #  #    #          #    #  #    #
+    ######  ######  ######          ######  ######
+
+
+
+From setup-test 23, but with a few fewer prints:
+
+                 000-001
+                  |   |
+     002-003-004-005-006
+      |   |           |
+     007-008         009
+          |           |
+         010         011-012
+          |           |   |
+         013-014-015-016-017
+          |   |
+         018-019
+
+9-th time, depth:
+
+Descend       F-M: 05-L
+Walk lateral  F-T: 05-L  F-M: 03-R
+Descend       F-M: 04-R
+Descend       F-M: 01-D
+Descend       F-M: 06-D
+Descend       F-M: 09-D
+Descend       F-M: 17-L
+Descend       F-M: 16-L
+Descend       F-M: 15-L
+Descend       F-M: 18-U  F-M: 13-U    Foap: bingo
+  F-T: 13-U  F-M: 08-D    Foap: exists
+  F-T: 08-D
+Ascend        F-T: 18-U
+Ascend        F-T: 15-L
+Ascend        F-T: 16-L
+Ascend        F-T: 17-L
+Ascend        F-T: 09-D
+Ascend        F-T: 06-D
+Ascend        F-T: 01-D
+Ascend        F-T: 04-R
+Ascend        F-T: 03-R
+
+10-th time, depth:
+
+Descend       F-M: 05-L
+Walk lateral  F-T: 05-L  F-M: 03-R
+Descend       F-M: 04-R
+Descend       F-M: 01-D
+Descend       F-M: 06-D
+Descend       F-M: 09-D
+Descend       F-M: 17-L
+Descend       F-M: 16-L
+Descend       F-M: 15-L
+Descend       F-M: 18-U
+Descend       F-M: 13-U  F-M: 10-U    Foap: exists
+  F-T: 10-U  F-M: 03-D    Foap: exists
+  F-T: 03-D
+Ascend        F-T: 13-U
+Ascend        F-T: 18-U
+Ascend        F-T: 15-L
+Ascend        F-T: 16-L
+Ascend        F-T: 17-L
+Ascend        F-T: 09-D
+Ascend        F-T: 06-D
+Ascend        F-T: 01-D
+Ascend        F-T: 04-R
+Ascend        F-T: 03-R
+
+11-th time, depth:
+
+Descend       F-M: 05-L
+Walk lateral  F-T: 05-L  F-M: 03-R
+Descend       F-M: 04-R
+Descend       F-M: 01-D
+Descend       F-M: 06-D
+Descend       F-M: 09-D
+Descend       F-M: 17-L
+Descend       F-M: 16-L
+Descend       F-M: 15-L
+Descend       F-M: 18-U
+Descend       F-M: 13-U
+Ascend        F-T: 13-U
+Ascend        F-T: 18-U
+Ascend        F-T: 15-L
+Ascend        F-T: 16-L
+Ascend        F-T: 17-L
+Ascend        F-T: 09-D
+Ascend        F-T: 06-D
+Ascend        F-T: 01-D
+Ascend        F-T: 04-R
+Ascend        F-T: 03-R
+
+12-th time, depth:
+
+Descend       F-M: 05-L
+Walk lateral  F-T: 05-L  F-M: 03-R
+Descend       F-M: 04-R
+Descend       F-M: 01-D
+Descend       F-M: 06-D
+Descend       F-M: 09-D
+Descend       F-M: 17-L
+Descend       F-M: 16-L
+Descend       F-M: 15-L
+Descend       F-M: 18-U
+Descend       F-M: 13-U
+Ascend        F-T: 13-U
+Ascend        F-T: 18-U
+Ascend        F-T: 15-L
+Ascend        F-T: 16-L
+Ascend        F-T: 17-L
+Ascend        F-T: 09-D
+Ascend        F-T: 06-D
+Ascend        F-T: 01-D
+Ascend        F-T: 04-R
+Ascend        F-T: 03-R

@@ -163,8 +163,8 @@ t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, t_s_dir search_dir
 
         if ( reach == TPL_REACH(P_TPL(leaf)->leaf_data) )  /* Is position known? */
         {
-            if ( ! P_TPL(leaf)->move_path ) /* Sanity check. */
-                exit( print_error(move_path_not_polulated) );
+            san_if ( ! P_TPL(leaf)->move_path ) /* Sanity check: Known positions must have this populated. */
+                san_exit( print_error(move_path_not_polulated) );
 
             *p_leaf = leaf; /* Return the found leaf. */
 
@@ -186,7 +186,7 @@ t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, t_s_dir search_dir
 
 int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_dir)
 {
-    t_direction dir = right;
+    t_mv_dir dir = right;
     int reach_identifier;
     int mark;
     struct spot *neighbour;

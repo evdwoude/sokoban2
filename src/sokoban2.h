@@ -2,26 +2,28 @@
 #define SOKOBAN2_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /* The amout of memory to allocate for the move tree and position tree: */
+// #define TREE_MEMORY (2048)
+#define TREE_MEMORY (0x000100000) /* 1 Mbytes. */
 // #define TREE_MEMORY (0x040000000) /* 1 Gbytes. */
 // #define TREE_MEMORY (0x080000000) /* 2 Gbytes. */
 // #define TREE_MEMORY (0x100000000) /* 4 Gbytes. */
 // #define TREE_MEMORY (0x180000000) /* 6 Gbytes. */
 // #define TREE_MEMORY (0x200000000) /* 8 Gbytes. */
-#define TREE_MEMORY (2048)
 
 #define DBG_SANITY
 
 #define NR_OF_SPOTS (50*50)
 #define SPOT_NO(p_spot) ((p_spot) - p_game_data->spot_pool)
 
-typedef enum {false = 0, true = 1} t_bool;
-typedef enum {right=0, up=1, left=2, down=3} t_direction;
-typedef enum {box=0, forward=0, target=1, backward=1} t_s_dir; /* Object type and search direction, tied.  */
-typedef enum {not_present=0, present=1} t_object_presence;     /* Whether a box or target is present.      */
-typedef enum {just_make=0, take_back=1} t_mv_action;           /* Action for move_object.                  */
-typedef enum {mv_src=0, mv_dst=1} t_mv_spots;                  /* Tied to t_mv_action values.              */
+// typedef enum {false = 0, true = 1} t_bool;
+typedef enum {right=0, up=1, left=2, down=3} t_mv_dir;
+typedef enum {box=0, forward=0, target=1, backward=1} t_s_dir; /* Object type and search direction, tied. */
+typedef enum {not_present=0, present=1} t_object_presence;     /* Whether a box or target is present.     */
+typedef enum {just_move=0, take_back=1} t_action;              /* Action for move_object.                 */
+typedef enum {mv_src=0, mv_dst=1} t_mv_spots;                  /* Tied to t_action values.                */
 
 struct spot
 {

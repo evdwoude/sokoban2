@@ -23,7 +23,7 @@
 /* Code */
 /* TODO: document. */
 
-t_bool test_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t_s_dir search_dir)
+bool test_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
 {
     return
         search_dir == forward ?
@@ -31,6 +31,7 @@ t_bool test_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t
             &&  johnny->neighbour[mv_dir]->object[box]
             &&  johnny->neighbour[mv_dir]->neighbour[mv_dir]
             && !johnny->neighbour[mv_dir]->neighbour[mv_dir]->object[box]
+            && !is_hardnogo(johnny->neighbour[mv_dir]->neighbour[mv_dir])
         :
                 johnny->neighbour[mv_dir]
             && !johnny->neighbour[mv_dir]->object[target]
@@ -40,14 +41,15 @@ t_bool test_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t
 }
 
 
-
 /* TODO: document. */
-void make_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t_mv_action action, t_s_dir search_dir)
+void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_action action, t_s_dir search_dir)
 {
     p_spot spots[2]; /* spots[mv_src] is source; spots[mv_dst] is destination. */
 
     printf_move_mv("  %c-%c: %02ld-%c", search_dir?'B':'F', action?'T':'M', SPOT_NO(johnny), mv_dir_name(mv_dir));
 
+    /* Sort out which spots are source and which are destination. The search direction determines which  */
+    /* spots are involved and the action determinces which of them is source and which is destimation.   */
     if (search_dir == forward)
     {
         spots[   action] = johnny->neighbour[mv_dir];
@@ -61,10 +63,13 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t_m
 
     san_if ( ! spots[mv_src]) /* Error if source does not exist. */
         san_exit( print_error(move_obj_err, 1, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
+
     san_if ( ! spots[mv_dst]) /* Error if destination does not exist. */
         san_exit( print_error(move_obj_err, 2, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
+
     san_if ( spots[mv_src]->object[search_dir] ==  not_present) /* Error if source has has no object.  */
         san_exit( print_error(move_obj_err, 3, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
+
     san_if ( spots[mv_dst]->object[search_dir] ==  present ) /* Error if destination is not empty. */
         san_exit( print_error(move_obj_err, 4, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
 
@@ -72,7 +77,6 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t_m
     spots[mv_dst]->object[search_dir] = present;     /*  ... to here.               */
 
     /* Move Johnny too. Note that this is only correct for just_make and not for take_back, but   */
-    /* it is only required in the case of just_make and does not hard in the case of take_back.   */
+    /* it is only required in the case of just_make and does not harm in the case of take_back.   */
     p_game_data->johnny = johnny->neighbour[mv_dir];
-
 }

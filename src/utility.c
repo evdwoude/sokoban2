@@ -276,7 +276,7 @@ void set_as_hardnogo(struct spot* spot)
 }
 
 
-char mv_dir_name(t_direction move_direction)
+char mv_dir_name(t_mv_dir move_direction)
 {
     switch (move_direction)
     {

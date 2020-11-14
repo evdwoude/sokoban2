@@ -1,25 +1,68 @@
 Next:
-    Keep Johnny up to date while walking the move tree?
-    Pro: Know where Johnny is for extend_depth()
-    Con: Does not match with take_back. . .
-        Consider: Johnny a paramter to find_or_add_position(), instead of taking johnny from game_data.
 
-    Change  t_direction  into  t_mv_dir
+    Create a return path for 'no new move found'.
+
+    Double check the below and wrap up:
+        Keep Johnny up to date while walking the move tree?
+        Pro: Know where Johnny is for extend_depth()
+        Con: Does not match with take_back. . .
+            Consider: Johnny a paramter to find_or_add_position(), instead of taking johnny from game_data.
+
+    Make bingo stop and try a few primitive real setups.
+
+    Try with more corner cases, especially w.r.t. changed reaches
+
+    Test Backward cases (Similar, with tossed boxes and targets?)
+
+    Test nogos with:
+            #####
+        ##### . #
+        #       #
+        ####    #
+           #    #
+           ######
+
+    Revise this todo list
 
     Double check make dependencies
 
-    Global:
 
-        For walk_to_extend_depth():
-            Add parameter search_dir to  descend, ascend, move_lateral & extend_depth.
-            Update the warehouse from  decend, ascend, move_lateral & extend_depth.
-            Write extend_depth
-                Uses explore_for_reach
-                Write add_moves
+    Next:
 
-        Test by have a fisrt backward posiion tree available.
+    Create list of start posiitons for backward search.
+    Remove dead backward seard trees from that list
+        Needs 'no new move found'.
 
-        Build backward
+    Create stop condifiotn (program stops) when 'no new move found'. (Forward and backward differ here.)
+
+    Create Got_it()
+        print.
+        stop.
+
+
+
+    Consider to split:
+                        make_move(..., just_move/take_back, ...);
+                 into:
+                        make_move(...);  and  take_back(...);
+
+
+
+    Keep track of distance, and replace existing moves by moves on the same level but with shorter distance, considering
+    a setup a simple as:
+
+            #####
+        #####   #
+        #.X.OX  #
+        #########       (setup-test 27)
+
+
+
+    Prune dead branches.
+    This is similar to pruning dead backward trees, but more difficult. It requires tracking of "no new moves found" at
+    the move node level, rather than at the move root level.
+
+
 
     Document headers for functions in position.c. Might decrease heavy comments.
 

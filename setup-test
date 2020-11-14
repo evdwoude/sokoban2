@@ -87,7 +87,7 @@
     #####   ########
         #####
 
-13 Test finding corners and again:
+13 Test finding corners and edges again:
 
     #################
     #O              #
@@ -192,6 +192,58 @@
     #  . #
     #   O#
     ######
+
+22 Test extend_depth() and add_move():
+
+    ######
+    #    #
+    # X  #
+    #    #
+    #  . #
+    #   O#
+    ######
+
+23 Test extend_depth() and add_move():
+
+    ########
+    ####  ##
+    #  X  ##
+    # .## ##
+    ## ##  #
+    ##    O#
+    ##  ####
+    ########
+
+24 Test finding corners and edges again, again:
+
+        #####
+    ##### . #
+    #       #
+    ####    #
+       #X  O#
+       ######
+
+25 Test extend_depth() and add_move(), for different reaches:
+
+    #########
+    # X    .#
+    #.  O X #
+    #########
+
+26 Test extend_depth() and add_move():
+
+    #####
+    #.X #
+    #.XO#
+    #.X #
+    #####
+
+27 Test extend_depth() and add_move(), for different reaches. Also for adding the tracking of distance:
+
+        #####
+    #####   #
+    #.X.OX  #
+    #########
 
 
 2007 Test setup file for space scanning:
