@@ -20,7 +20,7 @@ typedef enum {false = 0, true = 1} t_bool;
 typedef enum {right=0, up=1, left=2, down=3} t_direction;
 typedef enum {box=0, forward=0, target=1, backward=1} t_s_dir; /* Object type and search direction, tied.  */
 typedef enum {not_present=0, present=1} t_object_presence;     /* Whether a box or target is present.      */
-typedef enum {make_move=0, take_back=1} t_mv_action;           /* Action for move_object.                  */
+typedef enum {just_make=0, take_back=1} t_mv_action;           /* Action for move_object.                  */
 typedef enum {mv_src=0, mv_dst=1} t_mv_spots;                  /* Tied to t_mv_action values.              */
 
 struct spot

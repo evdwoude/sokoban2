@@ -98,9 +98,10 @@ struct move_node
 #define MV_GET_SPOT_NO(data)    (((data)&MV_SPOT_NO_MASK) >> MV_SPOT_NO_SHIFT) /* Get the spot number.    */
 #define MV_GET_HAS_SIBB(data)    ((data)&MV_HAS_SIBB_MASK ? 1 : 0)             /* Has a sibbling?         */
 
-/* More direct access, from a move index: */
-// #define  MOVE_DIR(move)    (MV_GET_MOVE_DIR(P_MN(move)->move_data))         /* The move's move direction. */
-// #define  MOVE_SPOTNO(move) (MV_GET_SPOT_NO(P_MN(move)->move_data))          /* The move's spot no.        */
+/* Access directy from a move: */
+#define  MOVE_DIR(move)    (MV_GET_MOVE_DIR(P_MN(move)->move_data))         /* The move's move direction. */
+#define  MOVE_SPOTNO(move) (MV_GET_SPOT_NO(P_MN(move)->move_data))          /* The move's spot no.        */
+#define  MOVE_SPOT(move)   (&p_game_data->spot_pool[MOVE_SPOTNO(move)])     /* The move's spot.           */
 
 #endif /* RESOLVE_INTH */
 

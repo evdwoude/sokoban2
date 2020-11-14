@@ -111,7 +111,7 @@ void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir sear
     (*depth)++;                             /* Update current depth                     */
 
     /* Apply this move to the warehouse, i.e. move the box. */
-    move_object(p_game_data, *move, make_move, search_dir);
+    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), just_make, search_dir);
 }
 
 
@@ -123,7 +123,7 @@ void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir searc
     printf_walk_mv("\nAscend      ");
 
     /* Apply the undoing of this move to the warehouse, i.e. move the last-moved box back. */
-    move_object(p_game_data, *move, take_back, search_dir);
+    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), take_back, search_dir);
 
     *move = P_MN(*move)->next.parent;       /* Ascend a level up in the move tree. */
     (*depth)--;                             /* Update current depth                */
@@ -138,12 +138,12 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
     printf_walk_mv("\nWalk lateral");
 
     /* Apply the undoing of the current move to the warehouse, i.e. move the last-moved box back. */
-    move_object(p_game_data, *move, take_back, search_dir);
+    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), take_back, search_dir);
 
     *move =  P_MN(*move)->next.sibbling;    /* Move laterally in the move tree. */
 
     /* Apply the new move to the warehouse, i.e. move the now-current box. */
-    move_object(p_game_data, *move, make_move, search_dir);
+    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), just_make, search_dir);
 }
 
 
@@ -168,9 +168,9 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
             {
                 printf_walk_mv("\nspot: %ld,  direction: %c",  SPOT_NO(johnny), mv_dir_name(mv_dir));
 
-                // move object(make_move)
+                // make move
                 // consider_move()
-                // move object(take_back)
+                // take move back
             }
         }
         johnny = johnny->explore_reach_list;
