@@ -65,9 +65,108 @@ skbn_err resolve(p_game_data_t p_game_data)
     /* Add the setup position to the position tree. */
     find_or_add_position(p_game_data, forward , &move_index);
 
+
+        //  Use in combination with setup-test number 20.          Start:          On J:
+        //
+        //          A               000-001-002-003-004-005        ########        ########
+        //         / \               |                   |         #  X  .#        #    X.#
+        //        /   \             006                 007        # #### #        # ####X#
+        //       B--C--D             |                   |         #  .O  #        #  .O  #
+        //         / \              008-009-010-011-012-013        ####  X#        ####   #
+        //        /   \                          |   |   |         #. X   #        #. X   #
+        //       E-----F                        014-015-016        ########        ########
+        //      /     / \                        |   |   |
+        //     /     /   \          017-018-019-020-021-022
+        //    G     H-----I
+        //               /
+        //              /
+        //             J
+        //
+
+        uint32_t mv_A, mv_B, mv_C, mv_D, mv_E, mv_F, mv_G, mv_H, mv_I, mv_J;
+
+        mv_A = p_game_data->forward_move_root;
+        mv_B = new_move_node(p_game_data, forward);
+        mv_C = new_move_node(p_game_data, forward);
+        mv_D = new_move_node(p_game_data, forward);
+        mv_E = new_move_node(p_game_data, forward);
+        mv_F = new_move_node(p_game_data, forward);
+        mv_G = new_move_node(p_game_data, forward);
+        mv_H = new_move_node(p_game_data, forward);
+        mv_I = new_move_node(p_game_data, forward);
+        mv_J = new_move_node(p_game_data, forward);
+
+        P_MN(mv_A)->move_data     =  0; /* Represents start position; no move done yet. */
+        P_MN(mv_A)->child         =  mv_B;
+
+        P_MN(mv_B)->move_data     =  left  | MV_SET_SPOT_NO(3);
+        P_MN(mv_B)->move_data     |= MV_SET_HAS_SIBB;
+        P_MN(mv_B)->next.sibbling =  mv_C;
+
+        P_MN(mv_C)->move_data     =  right | MV_SET_SPOT_NO(1);
+        P_MN(mv_C)->move_data     |= MV_SET_HAS_SIBB;
+        P_MN(mv_C)->child         =  mv_E;
+        P_MN(mv_C)->next.sibbling =  mv_D;
+
+        P_MN(mv_D)->move_data     =  right | MV_SET_SPOT_NO(18);
+        P_MN(mv_D)->next.parent   =  mv_A;
+
+        P_MN(mv_E)->move_data     =  down | MV_SET_SPOT_NO(13);
+        P_MN(mv_E)->move_data     |= MV_SET_HAS_SIBB;
+        P_MN(mv_E)->child         =  mv_G;
+        P_MN(mv_E)->next.sibbling =  mv_F;
+
+        P_MN(mv_F)->move_data     =  up | MV_SET_SPOT_NO(22);
+        P_MN(mv_F)->child         =  mv_H;
+        P_MN(mv_F)->next.parent   =  mv_C;
+
+        P_MN(mv_G)->move_data     =  right | MV_SET_SPOT_NO(2);
+        P_MN(mv_G)->next.parent   =  mv_E;
+
+        P_MN(mv_H)->move_data     =  left | MV_SET_SPOT_NO(4);
+        P_MN(mv_H)->move_data     |= MV_SET_HAS_SIBB;
+        P_MN(mv_H)->next.sibbling =  mv_I;
+
+        P_MN(mv_I)->move_data     =  right | MV_SET_SPOT_NO(2);
+        P_MN(mv_I)->child         =  mv_J;
+        P_MN(mv_I)->next.parent   =  mv_F;
+
+        P_MN(mv_J)->move_data     =  up | MV_SET_SPOT_NO(16);
+        P_MN(mv_J)->next.parent   =  mv_I;
+
     walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, 3, forward);
 
     dbg_print_setup(p_game_data);
+
+        printf_walk_mv("\n\nBackward\n")
+
+        //  Now use test-setup 20 again for backward checks.       Start:          On D:
+        //
+        //          A               000-001-002-003-004-005        ########        ########
+        //         / \               |                   |         #  X  .#        #  X   #
+        //        /   \             006                 007        # #### #        # ####.#
+        //       B--C--D             |                   |         #  .O  #        #  .O  #
+        //                          008-009-010-011-012-013        ####  X#        ####  X#
+        //                                       |   |   |         #. X   #        #. X   #
+        //                                      014-015-016        ########        ########
+        //                                       |   |   |
+        //                          017-018-019-020-021-022
+        //
+
+        // Reuse the tree with some modifications:
+
+        P_MN(mv_B)->move_data     =  left  | MV_SET_SPOT_NO(4);
+        P_MN(mv_B)->move_data     |= MV_SET_HAS_SIBB;
+
+        P_MN(mv_C)->move_data     =  down | MV_SET_SPOT_NO(7);
+        P_MN(mv_C)->move_data     |= MV_SET_HAS_SIBB;
+        P_MN(mv_C)->child         =  0;
+
+        P_MN(mv_D)->move_data     =  left | MV_SET_SPOT_NO(4);
+
+        walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, 3, backward);
+
+        dbg_print_setup(p_game_data);
 
     return no_error;
 }

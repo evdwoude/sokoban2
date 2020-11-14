@@ -75,4 +75,5 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_direction mv_dir, t_m
     /* it is only required in the case of just_make and does not hard in the case of take_back.   */
     p_game_data->johnny = johnny->neighbour[mv_dir];
 
+    // dbg_print_setup(p_game_data);
 }
