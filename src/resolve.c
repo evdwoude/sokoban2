@@ -81,6 +81,17 @@ skbn_err resolve(p_game_data_t p_game_data)
 
     /* Now go for it: */
 
+    /* Test below with setup-test 23.                        */
+    /* Some printf were removed before capturing the output  */
+    int c;
+    for (c=0; c<13; c++)
+    {
+        printf_walk_mv("\n\n%d-th time, depth: \n", c);
+        walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  c, forward);
+    }
+    printf_walk_mv("\n\n%d-th time, depth: \n", c+5);
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, c+5, forward);
+
 
     dbg_print_setup(p_game_data);
 
@@ -169,7 +180,7 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
     p_spot johnny;
     t_mv_dir mv_dir;
 
-    printf_walk_mv("\nExtend depth: ");
+//     printf_walk_mv("\nExtend depth: ");
 
     johnny = p_game_data->johnny;
 
