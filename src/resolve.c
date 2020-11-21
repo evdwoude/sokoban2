@@ -81,6 +81,22 @@ skbn_err resolve(p_game_data_t p_game_data)
 
     /* Now go for it: */
 
+    /* Test below with setup-test 22.                                                    */
+    /* Test output is in file scratch.                                                   */
+    /* Note: the second output of setup-test 23 was created with the below as backward). */
+
+    printf_walk_mv("\n\n1-st time:\n");
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  0, forward);
+
+    printf_walk_mv("\n\n2-nd time:\n");
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  1, forward);
+
+    printf_walk_mv("\n\n3-rd time: \n");
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  2, forward);
+
+    printf_walk_mv("\n\n4-th time, 'no' depth: \n");
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  13, forward);
+//     walk_to_extend_depth(p_game_data, p_game_data->backward_move_base, 0, backward);
 
     dbg_print_setup(p_game_data);
 
@@ -242,6 +258,7 @@ void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
 
     outcome = find_or_add_position(p_game_data, search_dir, &move_path);
 
+    dbg_print_setup(p_game_data);
     printf_walk_mv("    Foap: %s\n", outcome==position_is_new ? "new" : outcome==bingo ? "bingo" : "exists");
 
     /* If the new move leads to a prevously existing position, do nothing. */
