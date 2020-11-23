@@ -24,9 +24,19 @@
 #define printf_walk_mv(...)
 #endif
 
+#ifdef DBG_WALK_MV
+#define printf_walk_indent(...) printf_walk_indent_f(__VA_ARGS__);
+#else
+#define printf_walk_indent(...)
+#endif
+
 
 
 /* Internal protos */
+
+#ifdef DBG_WALK_MV
+void printf_walk_indent_f(int print, int change);
+#endif
 
 void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir);
 
@@ -40,6 +50,20 @@ void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
 void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, uint32_t new_move);
 
 /* Code */
+
+#ifdef DBG_WALK_MV
+void printf_walk_indent_f(int print, int change)
+{
+    static int indent = 0;
+    int i;
+
+    indent += change;
+
+    if (print)
+        for (i=0; i<indent; i++)
+            printf(".   ");
+}
+#endif
 
 
 skbn_err resolve(p_game_data_t p_game_data)
@@ -80,6 +104,16 @@ skbn_err resolve(p_game_data_t p_game_data)
 
 
     /* Now go for it: */
+
+    /* Test below with setup-test 25, 26 and 27. */
+    int c;
+    for (c=0; c<13; c++)
+    {
+        printf_walk_mv("\n\n%d-th time, depth: \n", c)
+        walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  c, forward);
+    }
+    printf_walk_mv("\n\n%d-th time, depth: \n", c+5)
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, c+5, forward);
 
 
     dbg_print_setup(p_game_data);
@@ -122,13 +156,15 @@ void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir sear
     san_if ( ! P_MN(*move)->child ) /* Sanity check: Do we have a child to descend to? */
         san_exit( print_error(no_child) )
 
-    printf_walk_mv("\nDescend     ");
+    printf_walk_indent(1, 1)
 
     *move = P_MN(*move)->child;             /* Descend a level deeper in the move tree. */
     (*depth)++;                             /* Update current depth                     */
 
     /* Apply this move to the warehouse, i.e. move the box. */
     make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), just_move, search_dir);
+
+    printf_walk_mv("\n");
 }
 
 
@@ -137,7 +173,7 @@ void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir searc
     san_if ( ! P_MN(*move)->next.parent) /* Sanity check: Do we have a parent to ascend to? */
         san_exit( print_error(no_parent) )
 
-    printf_walk_mv("\nAscend      ");
+    printf_walk_indent(0, -1)
 
     /* Apply the undoing of this move to the warehouse, i.e. move the last-moved box back. */
     make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), take_back, search_dir);
@@ -152,7 +188,7 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
     san_if ( ! P_MN(*move)->next.sibbling) /* Sanity check: Do we have a sibbling to move to? */
         san_exit( print_error(no_sibbling) )
 
-    printf_walk_mv("\nWalk lateral");
+    printf_walk_indent(1, 0)
 
     /* Apply the undoing of the current move to the warehouse, i.e. move the last-moved box back. */
     make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), take_back, search_dir);
@@ -161,6 +197,8 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 
     /* Apply the new move to the warehouse, i.e. move the now-current box. */
     make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), just_move, search_dir);
+
+    printf_walk_mv("\n")
 }
 
 
@@ -169,11 +207,11 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
     p_spot johnny;
     t_mv_dir mv_dir;
 
-    printf_walk_mv("\nExtend depth: ");
-
     johnny = p_game_data->johnny;
 
     explore_for_reach(p_game_data, johnny, search_dir);
+
+    printf_walk_indent(0, 1)
 
     while (johnny) /* For all spots in reach list: */
     {
@@ -181,7 +219,7 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
         {
             if (test_move(p_game_data, johnny, mv_dir, search_dir))
             {
-                printf_walk_mv("\nConsider spot %ld, dir %c",  SPOT_NO(johnny), mv_dir_name(mv_dir));
+                printf_walk_indent(1, 0)
 
                 make_move(p_game_data, johnny, mv_dir, just_move, search_dir);
                 consider(p_game_data, move, johnny, mv_dir, search_dir);
@@ -190,6 +228,8 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
         }
         johnny = johnny->explore_reach_list;
     }
+
+    printf_walk_indent(0, -1)
 
     return;
 }
@@ -242,7 +282,7 @@ void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
 
     outcome = find_or_add_position(p_game_data, search_dir, &move_path);
 
-    printf_walk_mv("    Foap: %s\n", outcome==position_is_new ? "new" : outcome==bingo ? "bingo" : "exists");
+    printf_walk_mv("%s\n", outcome==position_is_new ? "new" : outcome==bingo ? "bingo" : "exists")
 
     /* If the new move leads to a prevously existing position, do nothing. */
     if (outcome == position_exists_on_same_direction)

@@ -15,6 +15,7 @@
 
 #define DBG_CREATE_BASE 1       /* Debug prints on creating the trasnposition base. */
 //#define DBG_ADD_TP 1            /* Prints on add_postion function                   */
+#define DBG_PRINT_MOVE 1        /* Before, prints the move checked.                 */
 
 /* Conditional compile 'fabric' */
 
@@ -22,6 +23,12 @@
 #define printf_add_tp(...) printf(__VA_ARGS__);
 #else
 #define printf_add_tp(...)
+#endif
+
+#ifdef DBG_PRINT_MOVE
+#define printf_print_move(...) printf(__VA_ARGS__);
+#else
+#define printf_print_move(...)
 #endif
 
 
@@ -99,6 +106,7 @@ t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, t_s_dir search_
             /* The whole position is known. Either bingo or known (in same direction). */
             printf_add_tp(outcome == bingo ? "  !!" : "  --");
             *move_path = &(P_TPL(leaf)->move_path); /* Return the (opposite) move_path in case of bingo. */
+            printf_print_move("     (%04d): ", leaf);
             return outcome;
         }
     }
@@ -108,6 +116,7 @@ t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, t_s_dir search_
     printf_add_tp(" N_%03d_%d", leaf, reach);
 
     *move_path = &(P_TPL(leaf)->move_path); /* Return move_path reference for population by caller. */
+    printf_print_move("     (%04d): ", leaf);
     return position_is_new;
 }
 

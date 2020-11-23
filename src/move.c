@@ -46,7 +46,7 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_acti
 {
     p_spot spots[2]; /* spots[mv_src] is source; spots[mv_dst] is destination. */
 
-    printf_move_mv("  %c-%c: %02ld-%c", search_dir?'B':'F', action?'T':'M', SPOT_NO(johnny), mv_dir_name(mv_dir));
+    printf_move_mv(action==just_move?"%c: %02ld-%c":"", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir));
 
     /* Sort out which spots are source and which are destination. The search direction determines which  */
     /* spots are involved and the action determinces which of them is source and which is destimation.   */
