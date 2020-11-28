@@ -34,10 +34,6 @@
 
 /* Internal protos */
 
-#ifdef DBG_WALK_MV
-void printf_walk_indent_f(int print, int change);
-#endif
-
 void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir);
 
 void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
@@ -49,22 +45,12 @@ void explore_for_reach(p_game_data_t p_game_data, p_spot spot, t_s_dir search_di
 void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir);
 void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, uint32_t new_move);
 
-/* Code */
-
 #ifdef DBG_WALK_MV
-void printf_walk_indent_f(int print, int change)
-{
-    static int indent = 0;
-    int i;
-
-    indent += change;
-
-    if (print)
-        for (i=0; i<indent; i++)
-            printf(".   ");
-}
+void printf_walk_indent_f(int print, int change);
 #endif
 
+
+/* Code */
 
 skbn_err resolve(p_game_data_t p_game_data)
 {
@@ -127,8 +113,7 @@ void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_a
     uint32_t move = root;
     int depth = 0;
 
-    /* Re-initlialise Johnny, because  A: make_move(..., take_back, ...) doesn't do it, and            */
-    /*                                 B: Johnny's position differs anyway for the various move roots. */
+    /* Re-initlialise Johnny, because Johnny's position differs for the various move roots. */
     p_game_data->johnny = MOVE_SPOT(p_game_data->forward_move_root);
 
     while (1)
@@ -162,7 +147,7 @@ void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir sear
     (*depth)++;                             /* Update current depth                     */
 
     /* Apply this move to the warehouse, i.e. move the box. */
-    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), just_move, search_dir);
+    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), search_dir);
 
     printf_walk_mv("\n");
 }
@@ -175,8 +160,8 @@ void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir searc
 
     printf_walk_indent(0, -1)
 
-    /* Apply the undoing of this move to the warehouse, i.e. move the last-moved box back. */
-    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), take_back, search_dir);
+    /* Apply the undoing of this move to the warehouse, i.e. take the last-moved box back. */
+    take_back(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), search_dir);
 
     *move = P_MN(*move)->next.parent;       /* Ascend a level up in the move tree. */
     (*depth)--;                             /* Update current depth                */
@@ -190,13 +175,13 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 
     printf_walk_indent(1, 0)
 
-    /* Apply the undoing of the current move to the warehouse, i.e. move the last-moved box back. */
-    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), take_back, search_dir);
+    /* Apply the undoing of the current move to the warehouse, i.e. take the last-moved box back. */
+    take_back(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), search_dir);
 
     *move =  P_MN(*move)->next.sibbling;    /* Move laterally in the move tree. */
 
     /* Apply the new move to the warehouse, i.e. move the now-current box. */
-    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), just_move, search_dir);
+    make_move(p_game_data, MOVE_SPOT(*move), MOVE_DIR(*move), search_dir);
 
     printf_walk_mv("\n")
 }
@@ -221,9 +206,9 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
             {
                 printf_walk_indent(1, 0)
 
-                make_move(p_game_data, johnny, mv_dir, just_move, search_dir);
+                make_move(p_game_data, johnny, mv_dir, search_dir);
                 consider(p_game_data, move, johnny, mv_dir, search_dir);
-                make_move(p_game_data, johnny, mv_dir, take_back, search_dir);
+                take_back(p_game_data, johnny, mv_dir, search_dir);
             }
         }
         johnny = johnny->explore_reach_list;
@@ -324,6 +309,21 @@ void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
     P_MN(sibbling)->next.sibbling  = new_move;          /* Link the new child up to his older sibblings.     */
     return;
 }
+
+
+#ifdef DBG_WALK_MV
+void printf_walk_indent_f(int print, int change)
+{
+    static int indent = 0;
+    int i;
+
+    indent += change;
+
+    if (print)
+        for (i=0; i<indent; i++)
+            printf(".   ");
+}
+#endif
 
 
 

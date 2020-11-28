@@ -1,50 +1,40 @@
 Next:
 
+    Consider to split:
+                    make_move(..., just_move/take_back, ...);
+                into:
+                    make_move(...);  and  take_back(...);
+
+
     Create a return path for 'no new move found'.
 
-    Double check the below and wrap up:
-        Keep Johnny up to date while walking the move tree?
-        Pro: Know where Johnny is for extend_depth()
-        Con: Does not match with take_back. . .
-            Consider: Johnny a paramter to find_or_add_position(), instead of taking johnny from game_data.
+    Create Got_it()
+        Rename bingo back  got_it.
+        print.
+        stop.
 
-    Make bingo stop and try a few primitive real setups.
+    Try a few primitive real setups.
 
-    Try with more corner cases, especially w.r.t. changed reaches
-
-    Test Backward cases (Similar, with tossed boxes and targets?)
-
-    Test nogos with:
-            #####
-        ##### . #
-        #       #
-        ####    #
-           #    #
-           ######
 
     Revise this todo list
-
-    Double check make dependencies
 
 
     Next:
 
-    Create list of start posiitons for backward search.
-    Remove dead backward seard trees from that list
-        Needs 'no new move found'.
+    Create list of start positons for backward search.
 
     Create stop condifiotn (program stops) when 'no new move found'. (Forward and backward differ here.)
 
-    Create Got_it()
-        print.
-        stop.
 
 
 
-    Consider to split:
-                        make_move(..., just_move/take_back, ...);
-                 into:
-                        make_move(...);  and  take_back(...);
+    Remove dead backward seard trees.
+
+    Prune dead branches.
+    - Save time for subsequent tree walks
+    - Could also be used to reuse the memory blocks.
+    This is similar to pruning dead backward trees, but more difficult. It requires tracking of
+    "no new moves found" at the move node level, rather than at the move root level.
 
 
 
@@ -58,31 +48,25 @@ Next:
 
 
 
-    Prune dead branches.
-    This is similar to pruning dead backward trees, but more difficult. It requires tracking of "no new moves found" at
-    the move node level, rather than at the move root level.
+    Add nogos for dead-end lanes:
+            #####
+        ##### . #
+        #       #
+        ####    #
+           #    #
+           ######
 
 
 
-    Document headers for functions in position.c. Might decrease heavy comments.
+
+    Document headers for functions. Might decrease heavy comments.
 
     Use more exit() calls and clean up code.
         At least do it for allocate_memory()
 
-    Rename bingo back to gotcha.
+    Bring documentation up to date.
 
-    Todo:
-        Document latest changes
-        Test for the maximum value of the index before returning a new tree memblock.
-        Double check the dependencies.
-
-    Return values of functions:
-            A function primarily returns the intrinsic result.
-            If an error conditon is a potential outcome:
-                - Embed the errror condition in the function result
-                - Where ever that is not feasible, use a sepate return variable for the error.
-
-
+    Double check: Test for the maximum value of the index before returning a new tree memblock.
 
     Double check the conditions for new_hardnogos in the linescanner.
 
