@@ -12,10 +12,10 @@ objects = sokoban2.o error.o setup.o resolve.o move.o position.o utility.o
 ~/bin/soko2 : $(objects)
 	gcc -o ~/bin/soko2 -Wall -Wextra $(objects)
 
-sokoban2.o: sokoban2.h error.h setup.h utility.h
+sokoban2.o: sokoban2.h error.h setup.h resolve.h utility.h
 error.o: error.h
-setup.o: sokoban2.h error.h setup.h utility.h
-resolve.o: sokoban2.h error.h resolve_int.h position.h utility.h resolve.h
+setup.o: sokoban2.h error.h setup.h
+resolve.o: sokoban2.h error.h resolve_int.h  move.h position.h utility.h resolve.h
 move.o: sokoban2.h error.h resolve_int.h utility.h move.h
 position.o: sokoban2.h error.h resolve_int.h utility.h position.h
 utility.o: sokoban2.h error.h resolve_int.h utility.h

@@ -42,41 +42,90 @@ bool test_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_di
 
 
 /* TODO: document. */
-void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_action action, t_s_dir search_dir)
+void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
 {
-    p_spot spots[2]; /* spots[mv_src] is source; spots[mv_dst] is destination. */
+    p_spot src, dst; /* src is source; dst is destination. */
 
-    printf_move_mv(action==just_move?"%c: %02ld-%c":"", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir));
+    printf_move_mv("%c: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir));
 
-    /* Sort out which spots are source and which are destination. The search direction determines which  */
-    /* spots are involved and the action determinces which of them is source and which is destimation.   */
+    /* Sort out which spots are source and which are destination. */
+    /* The search direction determines which spots are involved.  */
+    /* Note that the main difference between make_move() and take_back() is that src and dst are swapped. */
     if (search_dir == forward)
     {
-        spots[   action] = johnny->neighbour[mv_dir];
-        spots[ ! action] = johnny->neighbour[mv_dir]->neighbour[mv_dir];
+        src = johnny->neighbour[mv_dir];  /* action */
+        dst = johnny->neighbour[mv_dir]->neighbour[mv_dir];  /* action */
     }
     else
     {
-        spots[   action] = johnny->neighbour[OPPOSITE_MV_DIR(mv_dir)];
-        spots[ ! action] = johnny;
+        src = johnny->neighbour[OPPOSITE_MV_DIR(mv_dir)];  /* action */
+        dst = johnny;  /* action */
     }
 
-    san_if ( ! spots[mv_src]) /* Error if source does not exist. */
+    san_if ( ! src) /* Error if source does not exist. */
         san_exit( print_error(move_obj_err, 1, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
 
-    san_if ( ! spots[mv_dst]) /* Error if destination does not exist. */
+    san_if ( ! dst) /* Error if destination does not exist. */
         san_exit( print_error(move_obj_err, 2, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
 
-    san_if ( spots[mv_src]->object[search_dir] ==  not_present) /* Error if source has has no object.  */
+    san_if ( src->object[search_dir] ==  not_present) /* Error if source has has no object.  */
         san_exit( print_error(move_obj_err, 3, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
 
-    san_if ( spots[mv_dst]->object[search_dir] ==  present ) /* Error if destination is not empty. */
+    san_if ( dst->object[search_dir] ==  present ) /* Error if destination is not empty. */
         san_exit( print_error(move_obj_err, 4, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
 
-    spots[mv_src]->object[search_dir] = not_present; /* Move the box from here ...  */
-    spots[mv_dst]->object[search_dir] = present;     /*  ... to here.               */
+    src->object[search_dir] = not_present; /* Move the box from here ...  */
+    dst->object[search_dir] = present;     /*  ... to here.               */
 
-    /* Move Johnny too. Note that this is only correct for just_make and not for take_back, but   */
-    /* it is only required in the case of just_make and does not harm in the case of take_back.   */
+    /* Move Johnny too. */
     p_game_data->johnny = johnny->neighbour[mv_dir];
 }
+
+
+/* TODO: document. */
+void take_back(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
+{
+    p_spot src, dst; /* src is source; dst is destination. */
+
+//     printf_move_mv("%c-T: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir));
+
+    /* Sort out which spots are source and which are destination. */
+    /* The search direction determines which spots are involved.  */
+    /* Note that the main difference between make_move() and take_back() is that src and dst are swapped. */
+    if (search_dir == forward)
+    {
+        src = johnny->neighbour[mv_dir]->neighbour[mv_dir];
+        dst = johnny->neighbour[mv_dir];
+    }
+    else
+    {
+        src = johnny;
+        dst = johnny->neighbour[OPPOSITE_MV_DIR(mv_dir)];
+    }
+
+    san_if ( ! src) /* Error if source does not exist. */
+        san_exit( print_error(move_obj_err, 1, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
+
+    san_if ( ! dst) /* Error if destination does not exist. */
+        san_exit( print_error(move_obj_err, 2, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
+
+    san_if ( src->object[search_dir] ==  not_present) /* Error if source has has no object.  */
+        san_exit( print_error(move_obj_err, 3, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
+
+    san_if ( dst->object[search_dir] ==  present ) /* Error if destination is not empty. */
+        san_exit( print_error(move_obj_err, 4, search_dir, SPOT_NO(johnny), (int) mv_dir_name(mv_dir)) )
+
+    src->object[search_dir] = not_present; /* Move the box from here ...  */
+    dst->object[search_dir] = present;     /*  ... to here.               */
+
+    /* Note: moving Johnny is neither correct nor necessary for take_back(). */
+//     p_game_data->johnny = johnny->neighbour[mv_dir];
+}
+
+
+
+
+
+
+
+
