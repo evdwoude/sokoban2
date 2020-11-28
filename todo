@@ -1,11 +1,4 @@
 Next:
-
-    Consider to split:
-                    make_move(..., just_move/take_back, ...);
-                into:
-                    make_move(...);  and  take_back(...);
-
-
     Create a return path for 'no new move found'.
 
     Create Got_it()

@@ -34,15 +34,15 @@
 
 /* Internal protos */
 
-void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir);
+void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended);
 
 void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
 void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
 void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir);
 
-void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir);
+void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, bool *extended);
 void explore_for_reach(p_game_data_t p_game_data, p_spot spot, t_s_dir search_dir);
-void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir);
+void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, bool *extended);
 void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, uint32_t new_move);
 
 #ifdef DBG_WALK_MV
@@ -55,6 +55,7 @@ void printf_walk_indent_f(int print, int change);
 skbn_err resolve(p_game_data_t p_game_data)
 {
     int32_t *move_index = NULL;
+    bool extended = false;
 
     /* Define all hard no go spots. Spots that we never should put a box on. */
     define_hardnogos(p_game_data);
@@ -93,13 +94,18 @@ skbn_err resolve(p_game_data_t p_game_data)
 
     /* Test below with setup-test 25, 26 and 27. */
     int c;
+
     for (c=0; c<13; c++)
     {
-        printf_walk_mv("\n\n%d-th time, depth: \n", c)
-        walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  c, forward);
+        printf_walk_mv("\n\n%d-th time:\n", c)
+        walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  c, forward, &extended);
+        printf_walk_mv("\nExtended: %s\n", extended?"yes":"no")
+        extended = false;
     }
-    printf_walk_mv("\n\n%d-th time, depth: \n", c+5)
-    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root, c+5, forward);
+    c+=2;
+    printf_walk_mv("\n\n%d-th time:\n", c)
+    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  c, forward, &extended);
+    printf_walk_mv("\nExtended: %s\n", extended?"yes":"no")
 
 
     dbg_print_setup(p_game_data);
@@ -108,7 +114,7 @@ skbn_err resolve(p_game_data_t p_game_data)
 }
 
 
-void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir)
+void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended)
 {
     uint32_t move = root;
     int depth = 0;
@@ -122,7 +128,7 @@ void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_a
             descend(p_game_data, &move, &depth, search_dir);
 
         if (depth == extend_at)
-            extend_depth(p_game_data, move, search_dir);
+            extend_depth(p_game_data, move, search_dir, extended);
 
         while ( ! MV_GET_HAS_SIBB(P_MN(move)->move_data) )
             if (move != root)
@@ -187,7 +193,7 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 }
 
 
-void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
+void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, bool *extended)
 {
     p_spot johnny;
     t_mv_dir mv_dir;
@@ -207,7 +213,7 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir)
                 printf_walk_indent(1, 0)
 
                 make_move(p_game_data, johnny, mv_dir, search_dir);
-                consider(p_game_data, move, johnny, mv_dir, search_dir);
+                consider(p_game_data, move, johnny, mv_dir, search_dir, extended);
                 take_back(p_game_data, johnny, mv_dir, search_dir);
             }
         }
@@ -260,7 +266,7 @@ void explore_for_reach(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_
 }
 
 
-void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
+void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, bool *extended)
 {
     t_outcome_add_tp outcome;
     int32_t new_move, *move_path;
@@ -272,6 +278,8 @@ void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
     /* If the new move leads to a prevously existing position, do nothing. */
     if (outcome == position_exists_on_same_direction)
          return;
+
+    *extended = true;
 
     /* The move appears to be relevant. */
     new_move = new_move_node(p_game_data, search_dir);       /* Create new move node.                        */
