@@ -79,7 +79,7 @@ void create_position_base(p_game_data_t p_game_data)
  *  - Error finding a new memory block for a position node or leaf.
  */
 
-t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, t_s_dir search_dir, int32_t **move_path)
+t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, t_s_dir search_dir, uint32_t **move_path)
 {
     t_outcome_add_tp outcome = position_exists_on_same_direction; /* The outcome of this function. */
 
