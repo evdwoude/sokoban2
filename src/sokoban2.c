@@ -25,16 +25,16 @@ int main(int argc, char *argv[])
 {
     skbn_err error;
 
-    game_data.pool_ptr           = &(game_data.spot_pool[0]);
-    game_data.johnny             = NULL;
-    game_data.position_head      = NULL;
-    game_data.position_root      = 0;
-    game_data.forward_move_root  = 0;
-    game_data.backward_move_base = 0;
-    game_data.next_reach         = 0;
-    game_data.p_memory_start     = NULL;
-    game_data.p_memory_bottom    = NULL;
-    game_data.p_memory_top       = NULL;
+    game_data.pool_ptr                = &(game_data.spot_pool[0]);
+    game_data.johnny                  = NULL;
+    game_data.position_head           = NULL;
+    game_data.position_root           = 0;
+    game_data.forward_move_root       = 0;
+    game_data.backward_move_root_list = 0;
+    game_data.next_reach              = 0;
+    game_data.p_memory_start          = NULL;
+    game_data.p_memory_bottom         = NULL;
+    game_data.p_memory_top            = NULL;
 
 
     time_t start_time, end_time;

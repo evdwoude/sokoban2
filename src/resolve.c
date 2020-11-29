@@ -33,8 +33,11 @@
 
 
 /* Internal protos */
+uint32_t init_move_tree(p_game_data_t p_game_data, t_s_dir search_dir);
 
-void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended);
+void search_forward_and_backward(p_game_data_t p_game_data);
+
+void walk_tree(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended);
 
 void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
 void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
@@ -54,8 +57,8 @@ void printf_walk_indent_f(int print, int change);
 
 skbn_err resolve(p_game_data_t p_game_data)
 {
-    int32_t *move_index = NULL;
-    bool extended = false;
+    struct spot* spot;
+    uint32_t new_backward_root = 0;
 
     /* Define all hard no go spots. Spots that we never should put a box on. */
     define_hardnogos(p_game_data);
@@ -63,34 +66,90 @@ skbn_err resolve(p_game_data_t p_game_data)
     /* Using the defined hard nogos, create the linked list of spots that form the base of the positions. */
     create_position_base(p_game_data);
 
-    /* Create a root node for the position tree */
+    /* Create the root node for the position tree */
     p_game_data->position_root = new_position_node(p_game_data);
 
 
-    /* Forward search initialisations: */
+    /* Move tree initialisation for forward search. */
+    p_game_data->forward_move_root = init_move_tree(p_game_data, forward);
+    printf_walk_mv("\n\n");
 
-    /* Create a root node for the forward move tree */
-    p_game_data->forward_move_root = new_move_node(p_game_data, forward);
+    /* Move tree initialisation for backward search. */
+    for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
+    {
+        if (spot->object[backward] == present)
+            continue;
 
-    /* Re-use the move's spot number for reinitialisation of Johhny before each consequive tree walk. */
-    P_MN(p_game_data->forward_move_root)->move_data = MV_SET_SPOT_NO( SPOT_NO(p_game_data->johnny) );
+        p_game_data->johnny = spot;
+        new_backward_root = init_move_tree(p_game_data, backward);
+        if (new_backward_root)
+        {
+            printf_walk_mv("  *");
 
-    /* Add the setup position to the position tree. */
-    find_or_add_position(p_game_data, forward , &move_index);
-    *move_index = p_game_data->forward_move_root;
+            /* Add the new backward moveroot to the head of the list. */
+            P_MN(new_backward_root)->next.sibbling   = p_game_data->backward_move_root_list;
+            p_game_data->backward_move_root_list     = new_backward_root;
+
+        }
+        printf_walk_mv("\n");
+    }
 
 
-    /* Backward search initialisations: */
+    /* Test printing the forward root. */
+    printf_walk_mv("\nForward root (reach):");
+    printf_walk_mv(" %d", MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
 
-    /* TODO: Make this a list of roots */
-    p_game_data->backward_move_base = new_move_node(p_game_data, forward);
+    /* Test printing the backward root list. */
+    printf_walk_mv("\nBackward root list (reaches):");
+    new_backward_root = p_game_data->backward_move_root_list;
+    while (new_backward_root)
+    {
+        printf_walk_mv(" %d", MV_GET_SPOT_NO(P_MN(new_backward_root)->move_data));
+        new_backward_root = P_MN(new_backward_root)->next.sibbling;
+    }
+    printf_walk_mv("\n");
 
-    /* Add the setup end-position to the position tree. TODO: add multiple, for all reaches. */
-    find_or_add_position(p_game_data, backward , &move_index);
-    *move_index = 1; /* TODO: Populate with it's proper base. */
 
 
     /* Now go for it: */
+//     search_forward_and_backward(p_game_data);
+
+    return no_error;
+}
+
+
+uint32_t init_move_tree(p_game_data_t p_game_data, t_s_dir search_dir)
+{
+    t_outcome_add_tp    outcome;
+    uint32_t            new_root;
+    uint32_t            *move_path = NULL;
+
+    outcome = find_or_add_position(p_game_data, search_dir, &move_path);
+
+    printf_walk_mv("   %2ld%c", SPOT_NO(p_game_data->johnny),
+        outcome == position_exists_on_same_direction ? '-' : outcome == bingo ? '!' : '+'
+    );
+
+    /* If this is an existing position (same search direction, same reach), do nothing. */
+    if (outcome == position_exists_on_same_direction)
+        return 0;
+
+    /* The position is new, either the first on this search direction, or another backward reach. */
+
+    new_root = new_move_node(p_game_data, search_dir); /* Create new move root.                   */
+    *move_path = new_root;                             /* Refer to it from the new position.      */
+
+    /* In the root node, spot number is used for Johhny's start spot instead for the move spot.   */
+    P_MN(new_root)->move_data = MV_SET_SPOT_NO( SPOT_NO(p_game_data->johnny));
+
+    // TODO:  Bingo?
+
+    return new_root;
+}
+
+void search_forward_and_backward(p_game_data_t p_game_data)
+{
+    bool extended = false;
 
     /* Test below with setup-test 25, 26 and 27. */
     int c;
@@ -98,23 +157,21 @@ skbn_err resolve(p_game_data_t p_game_data)
     for (c=0; c<13; c++)
     {
         printf_walk_mv("\n\n%d-th time:\n", c)
-        walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  c, forward, &extended);
+        walk_tree(p_game_data, p_game_data->forward_move_root,  c, forward, &extended);
         printf_walk_mv("\nExtended: %s\n", extended?"yes":"no")
         extended = false;
     }
     c+=2;
     printf_walk_mv("\n\n%d-th time:\n", c)
-    walk_to_extend_depth(p_game_data, p_game_data->forward_move_root,  c, forward, &extended);
+    walk_tree(p_game_data, p_game_data->forward_move_root,  c, forward, &extended);
     printf_walk_mv("\nExtended: %s\n", extended?"yes":"no")
-
 
     dbg_print_setup(p_game_data);
 
-    return no_error;
 }
 
 
-void walk_to_extend_depth(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended)
+void walk_tree(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended)
 {
     uint32_t move = root;
     int depth = 0;
@@ -269,7 +326,7 @@ void explore_for_reach(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_
 void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, bool *extended)
 {
     t_outcome_add_tp outcome;
-    int32_t new_move, *move_path;
+    uint32_t new_move, *move_path;
 
     outcome = find_or_add_position(p_game_data, search_dir, &move_path);
 

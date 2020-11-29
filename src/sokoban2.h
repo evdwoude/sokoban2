@@ -53,9 +53,9 @@ struct game_data
      */
     struct spot *position_head;  /* Head of the position base list.          */
 
-    uint32_t position_root;      /* Root node of the position tree.          */
-    uint32_t forward_move_root;  /* Root node of the forward move tree.      */
-    uint32_t backward_move_base; /* Base of the list of backward move trees. */
+    uint32_t position_root;           /* Index of root node of the position tree.            */
+    uint32_t forward_move_root;       /* Index of root node of the forward move tree.        */
+    uint32_t backward_move_root_list; /* Index of root node of the first backward move tree. */
 
     int next_reach;         /* For exploring johnny's current reach. */
 

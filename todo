@@ -1,27 +1,28 @@
+Done:
+    Create list of start positons for backward search.
+
 Next:
-    Create a return path for 'no new move found'.
+    Call walk from all move roots and test
+
 
     Create Got_it()
+        Call it from regular as well as from init.
         Rename bingo back  got_it.
-        print.
         stop.
+        print.
+
+        Test bingo from the start position (called from init)
+        Test bingo from with just one forward move.
 
     Try a few primitive real setups.
 
 
-    Revise this todo list
-
-
     Next:
 
-    Create list of start positons for backward search.
-
-    Create stop condifiotn (program stops) when 'no new move found'. (Forward and backward differ here.)
+        Create extra stop condition: program stops when 'no new move found'. (Forward and backward differ here.)
 
 
-
-
-    Remove dead backward seard trees.
+    Remove dead backward search trees.
 
     Prune dead branches.
     - Save time for subsequent tree walks
