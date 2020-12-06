@@ -4,6 +4,10 @@ Done:
 Next:
     Call walk from all move roots and test
 
+    Create initialise() and move content of search_forward_and_backward() back onto resolve().
+
+    Handle bingo from init_move_tree()
+
 
     Create Got_it()
         Call it from regular as well as from init.
@@ -37,12 +41,13 @@ Next:
 
             #####
         #####   #
-        #.X.OX  #
+        #.X oX  #
         #########       (setup-test 27)
 
 
 
     Add nogos for dead-end lanes:
+
             #####
         ##### . #
         #       #

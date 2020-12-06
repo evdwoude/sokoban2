@@ -46,7 +46,7 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_di
 {
     p_spot src, dst; /* src is source; dst is destination. */
 
-    printf_move_mv("%c: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir));
+    printf_move_mv("%c: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir))
 
     /* Sort out which spots are source and which are destination. */
     /* The search direction determines which spots are involved.  */
@@ -87,7 +87,7 @@ void take_back(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_di
 {
     p_spot src, dst; /* src is source; dst is destination. */
 
-//     printf_move_mv("%c-T: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir));
+//     printf_move_mv("%c-T: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir))
 
     /* Sort out which spots are source and which are destination. */
     /* The search direction determines which spots are involved.  */

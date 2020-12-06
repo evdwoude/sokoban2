@@ -240,10 +240,10 @@
 
 27 Test extend_depth() and add_move(), for different reaches. Also for adding the tracking of distance:
 
-        #####
-    #####   #
-    #.XoX   #
-    #########
+        ######
+    ######   #
+    #.X  oX  #
+    ##########
 
 28:
 
