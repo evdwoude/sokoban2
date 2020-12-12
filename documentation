@@ -242,7 +242,6 @@ Examples sokobans:
        WB-1013         1  (Easy):
        WB-1014         1  (Super easy):
        WB-1016         1  (Super easy):
-       WB-1017         1                    3      39,143     150,988   2,797,763      81,104,216
        WB-1019         1  (1 sec):
        WB-1020         1  (1 sec):
        WB-1021         1  (228 moves, 1 sec):
@@ -254,16 +253,24 @@ Examples sokobans:
 Hard:
            N:   Me:    S:      Moves:   Time:   FW nodes:   BW nodes:    T nodes:         Memory:
 
-       WB-1015         1  (7 sec):
+       WB-1017         1                    3      39,143     150,988   2,797,763      81,104,216
+       WB-1015         1                    7
        WB-1007         1                   12     375,273   1,317,775  16,361,052     516,100,352
        BG-627          1                   17     177,101     705,732   6,314,530     216,508,128
        WB-1006         1                   31   1,666,994   6,486,704  47,530,847   1,739,692,360
        HB-50608        1                   30   1,350,435   4,901,326  42,168,158   1,468,962,752
        WB-1018         1                   42   2,939,196   9,308,427  75,989,196   2,709,496,272
 
-       WB-1009         1  Not solved.
-       WB-1010         1  Not solved.
-       WB-1025         1  Not solved.
-       WB-1022         1  Not solved.
 
-       HB-60008        1  Not solved.
+       WB-1009         1  Not solved.
+       WB-1010         1  With Soko2 only.  7 minutes, about 8.5 G.
+       WB-1022         1  Not solved.
+       WB-1025         1  Not solved.
+
+       HB-60008        1  With Soko2 only. 22 minutes, about 9.5 G.
+
+
+
+
+
+

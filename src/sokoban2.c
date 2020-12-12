@@ -11,15 +11,12 @@
 
 void exit_function(int status, void *arg);
 
-/* Exported data */
-
-/* Imported data */
-
-/* Local data */
-
 /* Code */
 
 struct game_data game_data;
+
+time_t start_time, end_time;
+long diff_time;
 
 int main(int argc, char *argv[])
 {
@@ -36,15 +33,10 @@ int main(int argc, char *argv[])
     game_data.p_memory_bottom         = NULL;
     game_data.p_memory_top            = NULL;
 
-
-    time_t start_time, end_time;
-    long diff_time;
-
-    p_game_data_t p_game_data = &game_data;
-
     start_time = time(NULL);
 
-    printf("\nSokoban2 v0.13.");
+    printf("\nSokoban2 v0.13. sizeof(uint32_t): %ld.  maxint32: %ld ", sizeof(uint32_t),
+           (unsigned long int) UINT32_MAX );
 
     if (on_exit(&exit_function, (void *) &game_data))
         return print_error(cant_register_exit_function);
@@ -60,15 +52,6 @@ int main(int argc, char *argv[])
 
     resolve(&game_data);
 
-    /* TOO: move the below into the exit function. */
-    end_time = time(NULL);
-    diff_time = (long) difftime(end_time, start_time);
-
-//     printf("\nDuration: %ld:%ld:%ld.\n",
-//         diff_time / 3600,
-//         (diff_time / 60) % 60,
-//         diff_time % 60 );
-
     return 0;
 }
 
@@ -81,6 +64,17 @@ void exit_function(int status, void *arg)
 //         printf("\nExit: freeing momory. %d, %ld", status, (long int) (((p_game_data_t)arg)->p_memory_start));
         free( ((p_game_data_t)arg)->p_memory_start );
     }
+
+    end_time = time(NULL);
+    diff_time = (long) difftime(end_time, start_time);
+
+    printf("\n\nDuration: %ld:%ld:%ld.\n",
+        diff_time / 3600,
+        (diff_time / 60) % 60,
+        diff_time % 60 );
+
+    if (status)
+         printf("\nExit status: %d.\n", status);
 }
 
 

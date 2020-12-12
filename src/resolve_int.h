@@ -14,10 +14,10 @@
 /* Take the opposte of the move direction. I.e, "right" for "left", "up" for "down" and both v.v. */
 #define OPPOSITE_MV_DIR(move_dir) ((move_dir) ^ 2)
 
-/* TODO (Document):
- *
+// TODO (Document):
+/*
  * Remove the below text and merge into documentation
-/* We use "move" when referring to a game move. I.e. the moving of Johhny,
+ * We use "move" when referring to a game move. I.e. the moving of Johhny,
  * the floor manager, or the boxes, to an adjecent spot in the warehouse.
  */
 
@@ -54,14 +54,14 @@ struct position_leaf
 
 /* Defines and macros for position leaf's leaf_data manipulations: */
 /* Basic masks: */
-#define TPL_REACH_MASK          0x7FFFFFFF             /* Mask for the reach identifier.                */
-#define TPL_SEARCH_DIR_MASK     0x80000000             /* Mask for the search direction.                */
+#define TPL_REACH_MASK          0x7FFFFFFF             /* Mask for the reach identifier.                    */
+#define TPL_SEARCH_DIR_MASK     0x80000000             /* Mask for the search direction.                    */
 /* To write: */
-#define TPL_FORWARD             0                      /* Value to write the search direction forward.  */
-#define TPL_BACKWARD            TPL_SEARCH_DIR_MASK    /* Value to write the search direction backward. */
+#define TPL_FORWARD             0                      /* Value to write the search direction forward.      */
+#define TPL_BACKWARD            TPL_SEARCH_DIR_MASK    /* Value to write the search direction backward.     */
 /* To Read: */
-#define TPL_REACH(data)         ((data)&TPL_REACH_MASK)                            /* Get reach ident   */
-#define TPL_SEARCH_DIR(data)    ((data)&TPL_SEARCH_DIR_MASK ? backward : forward)  /* Get search dir    */
+#define TPL_REACH(data)         ((data)&TPL_REACH_MASK)                            /* Get reach ident       */
+#define TPL_SEARCH_DIR(data)    ((t_s_dir)((data)&TPL_SEARCH_DIR_MASK ? backward : forward))  /* Get s_dir  */
 
 
 struct move_node

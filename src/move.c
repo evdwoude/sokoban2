@@ -10,7 +10,7 @@
 
 /* Conditional compile switches and 'fabric' */
 
-#define DBG_MOVE_MV 1 /* Prints on walking the move tree. */
+//#define DBG_MOVE_MV 1 /* Prints on walking the move tree. */
 
 
 #ifdef DBG_MOVE_MV
@@ -23,7 +23,7 @@
 /* Code */
 /* TODO: document. */
 
-bool test_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
+bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
 {
     return
         search_dir == forward ?
@@ -46,7 +46,7 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_di
 {
     p_spot src, dst; /* src is source; dst is destination. */
 
-    printf_move_mv("%c: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir))
+    printf_move_mv("%c: %02lu-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir))
 
     /* Sort out which spots are source and which are destination. */
     /* The search direction determines which spots are involved.  */
@@ -83,11 +83,15 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_di
 
 
 /* TODO: document. */
+
+/* Parameter p_game_data_t p_game_data is only used when DBG_SANITY is defined. */
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 void take_back(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
 {
     p_spot src, dst; /* src is source; dst is destination. */
 
-//     printf_move_mv("%c-T: %02ld-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir))
+//     printf_move_mv("%c-T: %02lu-%c", search_dir?'B':'F', SPOT_NO(johnny), mv_dir_name(mv_dir))
 
     /* Sort out which spots are source and which are destination. */
     /* The search direction determines which spots are involved.  */
@@ -119,7 +123,6 @@ void take_back(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_di
     dst->object[search_dir] = present;     /*  ... to here.               */
 
     /* Note: moving Johnny is neither correct nor necessary for take_back(). */
-//     p_game_data->johnny = johnny->neighbour[mv_dir];
 }
 
 

@@ -1,13 +1,36 @@
-Done:
-    Create list of start positons for backward search.
-
 Next:
-    Call walk from all move roots and test
 
-    Create initialise() and move content of search_forward_and_backward() back onto resolve().
+    Line breaks and line space in printing.
+
+    In print_steps() combine the nested if's ?
+
+    For this sokokan, print stats.
+    For the old Sokoban, print stats with every "another 500 blocks" and see how far it got with HB-60008.
+    Update documentation with new performance figures.
+
+    Double check why it works when scr == dst, in find_steps(), line 118, is seems it is overstepping src.
+    Double check why it works when scr == dst with the last move.
+
+    Work down the below list and do the necessary check before proceeding.
+
+
+    search_forward_and_backward():
+        Cleanup
+        balance between
+        Move content of search_forward_and_backward() back onto resolve()  ?
 
     Handle bingo from init_move_tree()
+        Test bingo from the start position (called from init)
+        Test bingo with just one forward move.
+        Test bingo with just one backward move.
+        Test bingo with just two moves (One forward and ove backward.)
 
+    Change "backward" info "backward" everywhere.
+
+    Create file resolve-helper, and move in there;
+        init_all_move_trees()
+        init_move_tree()
+        explore_for_reach()
 
     Create Got_it()
         Call it from regular as well as from init.
@@ -15,14 +38,15 @@ Next:
         stop.
         print.
 
-        Test bingo from the start position (called from init)
-        Test bingo from with just one forward move.
-
     Try a few primitive real setups.
 
+    solution:
+        Should print OK when:
+            1 forward move only
+            1 backward move only
+            0 moves (start posision == end position)
 
     Next:
-
         Create extra stop condition: program stops when 'no new move found'. (Forward and backward differ here.)
 
 
@@ -48,12 +72,12 @@ Next:
 
     Add nogos for dead-end lanes:
 
-            #####
-        ##### . #
-        #       #
-        ####    #
-           #    #
-           ######
+            #####        #########
+        ##### . #        #----  .#
+        #----   #        #-###   #
+        ####  O #        #    O  #
+           #   X#        #.    XX
+           ######        #########
 
 
 

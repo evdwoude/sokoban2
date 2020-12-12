@@ -15,7 +15,7 @@
 
 #define DBG_CREATE_BASE 1       /* Debug prints on creating the trasnposition base. */
 //#define DBG_ADD_TP 1            /* Prints on add_postion function                   */
-#define DBG_PRINT_MOVE 1        /* Before, prints the move checked.                 */
+//#define DBG_PRINT_LEAF 1        /* Prints the move checked.                         */
 
 /* Conditional compile 'fabric' */
 
@@ -25,15 +25,14 @@
 #define printf_add_tp(...)
 #endif
 
-#ifdef DBG_PRINT_MOVE
-#define printf_print_move(...) printf(__VA_ARGS__);
+#ifdef DBG_PRINT_LEAF
+#define printf_print_leaf(...) printf(__VA_ARGS__);
 #else
-#define printf_print_move(...)
+#define printf_print_leaf(...)
 #endif
 
 
 /* Internal protos */
-
 
 t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, t_s_dir search_dir, uint32_t *p_leaf);
 
@@ -41,11 +40,6 @@ t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, t_s_dir search_dir
 
 int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_dir);
 
-/* Exported data */
-
-/* Imported data */
-
-/* Local data */
 
 /* Code */
 
@@ -66,7 +60,7 @@ void create_position_base(p_game_data_t p_game_data)
 #ifdef DBG_CREATE_BASE
     printf("Position spots:\n");
     for(spot = p_game_data->position_head; spot; spot = spot->position_list)
-        printf(" %ld", SPOT_NO(spot));
+        printf(" %lu", SPOT_NO(spot));
     printf("\n\n");
 #endif /* DBG_CREATE_BASE */
 }
@@ -106,17 +100,17 @@ t_outcome_add_tp find_or_add_position(p_game_data_t p_game_data, t_s_dir search_
             /* The whole position is known. Either bingo or known (in same direction). */
             printf_add_tp(outcome == bingo ? "  !!" : "  --");
             *move_path = &(P_TPL(leaf)->move_path); /* Return the (opposite) move_path in case of bingo. */
-            printf_print_move("     (%04d): ", leaf);
+            printf_print_leaf("     (%04u): ", leaf);
             return outcome;
         }
     }
     /* Here the position is new, either due to boxes or reaches. (And leaf refers to the new leaf.)
      * Populate the new leaf with the reach identifier and the seacrh direction */
     P_TPL(leaf)->leaf_data = reach | (search_dir ? TPL_BACKWARD : TPL_FORWARD);
-    printf_add_tp(" N_%03d_%d", leaf, reach);
+    printf_add_tp(" N_%03u_%u", leaf, reach);
 
     *move_path = &(P_TPL(leaf)->move_path); /* Return move_path reference for population by caller. */
-    printf_print_move("     (%04d): ", leaf);
+    printf_print_leaf("     (%04u): ", leaf);
     return position_is_new;
 }
 
@@ -138,7 +132,7 @@ t_outcome_add_tp find_or_add_box_arrangement(p_game_data_t p_game_data, t_s_dir 
         else
             next = &(P_TPN(node_or_leaf)->spot_is_empty);
 
-        printf_add_tp("%c_%03d%c ",
+        printf_add_tp("%c_%03u%c ",
                 spot->object[box] ?  (spot->object[target] ? 'H' : 'X') : (spot->object[target] ? '.' : 'Z'),
                 node_or_leaf, *next ? '-' : '+');
 
@@ -168,7 +162,7 @@ t_outcome_add_tp find_or_add_reach(p_game_data_t p_game_data, t_s_dir search_dir
     /* Walk down the leaf list until we find a matching reach identifier. */
     while (leaf) /* Note: this loops enters at least once. */
     {
-        printf_add_tp(" L_%03d", leaf);
+        printf_add_tp(" L_%03u", leaf);
 
         if ( reach == TPL_REACH(P_TPL(leaf)->leaf_data) )  /* Is position known? */
         {
@@ -197,7 +191,7 @@ int find_reach_identifier(p_game_data_t p_game_data, p_spot johnny, t_s_dir sear
 {
     t_mv_dir dir = right;
     int reach_identifier;
-    int mark;
+    uint32_t mark;
     struct spot *neighbour;
     struct spot *end;
 
