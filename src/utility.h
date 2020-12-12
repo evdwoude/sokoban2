@@ -20,13 +20,13 @@
 
 
 /* Get the reference (address i.e. pointer value) of a position node. */
-#define P_TPN(i) ((struct position_node *) (p_game_data->p_memory_start + (i) * MEM_REF_UNIT))
+#define P_TPN(i) ((struct position_node *) (p_game_data->p_memory_start + ((uint64_t)(i)) * ((uint64_t)MEM_REF_UNIT)))
 
 /* Get the reference (address i.e. pointer value) of a position leaf. */
-#define P_TPL(i) ((struct position_leaf *) (p_game_data->p_memory_start + (i) * MEM_REF_UNIT))
+#define P_TPL(i) ((struct position_leaf *) (p_game_data->p_memory_start + ((uint64_t)(i)) * ((uint64_t)MEM_REF_UNIT)))
 
 /* Get the reference (address i.e. pointer value) of a move node. */
-#define P_MN(i) ((struct move_node *) (p_game_data->p_memory_start + (i) * MEM_REF_UNIT))
+#define P_MN(i) ((struct move_node *) (p_game_data->p_memory_start + ((uint64_t)(i)) * ((uint64_t)MEM_REF_UNIT)))
 
 void reinit_mark(p_game_data_t p_game_data);
 
