@@ -28,9 +28,9 @@
 /* Get the reference (address i.e. pointer value) of a move node. */
 #define P_MN(i) ((struct move_node *) (p_game_data->p_memory_start + ((uint64_t)(i)) * ((uint64_t)MEM_REF_UNIT)))
 
-void reinit_mark(p_game_data_t p_game_data);
+void reinit_mark(p_game_data_t p_game_data, uint32_t initialiser);
 
-int next_mark(p_game_data_t p_game_data);
+uint32_t next_mark(p_game_data_t p_game_data);
 
 skbn_err allocate_memory(p_game_data_t p_game_data);
 
@@ -48,5 +48,6 @@ char mv_dir_name(t_mv_dir move_direction);
 
 void dbg_print_setup(p_game_data_t p_game_data);
 
+void print_stats(p_game_data_t p_game_data);
 
 #endif /* UTILITYH */

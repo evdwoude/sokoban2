@@ -4,16 +4,19 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
 /* The amout of memory to allocate for the move tree and position tree: */
 // #define TREE_MEMORY (2048)
-#define TREE_MEMORY (0x000100000) /* 1 Mbytes. */
-// #define TREE_MEMORY (0x040000000) /* 1 Gbytes. */
-// #define TREE_MEMORY (0x080000000) /* 2 Gbytes. */
-// #define TREE_MEMORY (0x100000000) /* 4 Gbytes. */
-// #define TREE_MEMORY (0x180000000) /* 6 Gbytes. */
-// #define TREE_MEMORY (0x200000000) /* 8 Gbytes. */
+// #define TREE_MEMORY (0x000100000) /* 1 Mbytes. */
+// #define TREE_MEMORY (0x040000000) /* 1.07 Gbytes. */
+// #define TREE_MEMORY (0x080000000) /* 2.15 Gbytes. */
+// #define TREE_MEMORY (0x100000000) /* 4.29 Gbytes. */
+// #define TREE_MEMORY (0x180000000) /* 6.44 Gbytes. */
+// #define TREE_MEMORY (0x200000000) /* 8.59 Gbytes. */
+#define TREE_MEMORY (0x240000000)   /*  9.66 Gbytes. */
+//#define TREE_MEMORY (0x280000000) /* 10.74 Gbytes. */
 
-#define DBG_SANITY
+// #define DBG_SANITY
 
 #define NR_OF_SPOTS (50*50)
 #define SPOT_NO(p_spot) ((p_spot) - p_game_data->spot_pool)
@@ -34,8 +37,8 @@ struct spot
 
     t_object_presence object[2];     /* [0]: Whether spot has a box; [1]: Whether spot is a target. */
 
-    int reach_mark;     /* For exploring johnny's current reach, all purposes. */
-    int position;       /* For setup parsing only.  */
+    uint32_t reach_mark;             /* For exploring johnny's current reach, all purposes. */
+    int position;                    /* For setup parsing only.  */
 };
 
 typedef struct spot *p_spot;
@@ -57,11 +60,11 @@ struct game_data
     uint32_t forward_move_root;       /* Index of root node of the forward move tree.        */
     uint32_t backward_move_root_list; /* Index of root node of the first backward move tree. */
 
-    int next_reach;         /* For exploring johnny's current reach. */
+    uint32_t next_reach;    /* For exploring johnny's current reach. */
 
-    void *p_memory_start;   /* Pointer to the memory allocated for the move trees and position tree.      */
-    void *p_memory_bottom;  /* Pointer to free tree memory, from the bottom up.                           */
-    void *p_memory_top;     /* Pointer to free tree memory, from the top down.                            */
+    char *p_memory_start;   /* Pointer to the memory allocated for the move trees and position tree.      */
+    char *p_memory_bottom;  /* Pointer to free tree memory, from the bottom up.                           */
+    char *p_memory_top;     /* Pointer to free tree memory, from the top down.                            */
                             /* Note: p_memory_bottom points to the first free location while p_memory_top */
                             /* points to the first non-free location after the free space.                */
 

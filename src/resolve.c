@@ -8,13 +8,14 @@
 #include "move.h"
 #include "position.h"
 #include "utility.h"
+#include "solution.h"
 #include "resolve.h"
 
 /* Local defs */
 
 /* Conditional compile switches  */
 
-#define DBG_WALK_MV 1 /* Prints on walking the move tree. */
+//#define DBG_WALK_MV 1 /* Prints on walking the move tree. */
 
 /* Conditional compile 'fabric' */
 
@@ -33,7 +34,7 @@
 
 
 /* Internal protos */
-uint32_t init_all_move_trees(p_game_data_t p_game_data);
+void init_all_move_trees(p_game_data_t p_game_data);
 uint32_t init_move_tree(p_game_data_t p_game_data, t_s_dir search_dir);
 
 void search_forward_and_backward(p_game_data_t p_game_data);
@@ -77,7 +78,7 @@ skbn_err resolve(p_game_data_t p_game_data)
 }
 
 
-uint32_t init_all_move_trees(p_game_data_t p_game_data)
+void init_all_move_trees(p_game_data_t p_game_data)
 {
     struct spot* spot;
     uint32_t new_backward_root = 0;
@@ -100,6 +101,7 @@ uint32_t init_all_move_trees(p_game_data_t p_game_data)
                 printf_walk_mv("  *");
 
                 /* Add the new backward moveroot to the head of the list. */
+                /* Important: Don't mark these roots as sibblings (stop conditon of walk_tree()). */
                 P_MN(new_backward_root)->next.sibbling   = p_game_data->backward_move_root_list;
                 p_game_data->backward_move_root_list     = new_backward_root;
 
@@ -140,40 +142,37 @@ uint32_t init_move_tree(p_game_data_t p_game_data, t_s_dir search_dir)
 }
 
 
-int depth = 0;
-
 void search_forward_and_backward(p_game_data_t p_game_data)
 {
     uint32_t backward_root = 0;
 
     /* Test printing the forward root. */
     printf_walk_mv("\nForward root (reach):");
-    printf_walk_mv(" %d", MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
+    printf_walk_mv(" %u", MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
 
     /* Test printing the backward root list. */
     printf_walk_mv("\nBackward root list (reaches):");
     backward_root = p_game_data->backward_move_root_list;
     while (backward_root)
     {
-        printf_walk_mv(" %d", MV_GET_SPOT_NO(P_MN(backward_root)->move_data));
+        printf_walk_mv(" %u", MV_GET_SPOT_NO(P_MN(backward_root)->move_data));
         backward_root = P_MN(backward_root)->next.sibbling;
     }
     printf_walk_mv("\n\n");
 
 
     bool tree_extended = true;
-//     int depth = 0;
+    int depth = 0;
 
     while (tree_extended)
     {
         tree_extended = false;
         printf_walk_mv("\nDepth %d\n", depth)
-        printf("\nDepth %d.", depth);
 
         backward_root = p_game_data->backward_move_root_list;
         while (backward_root)
         {
-            printf_walk_mv("\nBackward reach: %d\n",
+            printf_walk_mv("\nBackward reach: %u\n",
                            MV_GET_SPOT_NO(P_MN(backward_root)->move_data));
 
             walk_tree(p_game_data, backward_root, depth, backward, &tree_extended);
@@ -182,13 +181,14 @@ void search_forward_and_backward(p_game_data_t p_game_data)
             backward_root = P_MN(backward_root)->next.sibbling;
         }
 
-        printf_walk_mv("\nForward reach: %d\n",
+        printf_walk_mv("\nForward reach: %u\n",
                            MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
 
         walk_tree(p_game_data, p_game_data->forward_move_root,  depth, forward, &tree_extended);
         printf_walk_mv("Extended: %s\n", tree_extended?"yes":"no")
 
         depth++;
+        print_stats(p_game_data);
     }
     dbg_print_setup(p_game_data);
 }
@@ -284,11 +284,11 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, 
 
     printf_walk_indent(0, 1)
 
-    while (johnny) /* For all spots in reach list: */
+    while (johnny) /* For all spots within reach: */
     {
         for (mv_dir=right; mv_dir<=down; mv_dir++) /* For all move directions: */
         {
-            if (test_move(p_game_data, johnny, mv_dir, search_dir))
+            if (test_move(johnny, mv_dir, search_dir))
             {
                 printf_walk_indent(1, 0)
 
@@ -309,7 +309,7 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, 
 void explore_for_reach(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_dir)
 {
     t_mv_dir dir = right;
-    int mark;
+    uint32_t mark;
     struct spot *neighbour;
     struct spot *end;
 
@@ -353,28 +353,25 @@ void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
 
     outcome = find_or_add_position(p_game_data, search_dir, &move_path);
 
-    printf_walk_mv("%s\n", outcome==position_is_new ? "new" : outcome==bingo ? "bingo" : "exists")
+    printf_walk_mv("%s", outcome==position_is_new ? "new" : outcome==bingo ? "bingo" : "exists\n")
 
     /* If the new move leads to a prevously existing position, do nothing. */
     if (outcome == position_exists_on_same_direction)
-         return;
-
-    *extended = true;
+        return;
 
     /* The move appears to be relevant. */
-    new_move = new_move_node(p_game_data, search_dir);       /* Create new move node.                        */
-    *move_path = new_move;                                   /* Refer to the new move from the new position. */
-    add_move(p_game_data, parent, johnny, mv_dir, new_move); /* Add the new move to the move tree.           */
+    new_move = new_move_node(p_game_data, search_dir);       /* Create new move node.               */
+    add_move(p_game_data, parent, johnny, mv_dir, new_move); /* Add the new move to the move tree.  */
 
-    // if (outcome == bingo)  /* If the new move leads to the solution, call it out. (The new move was        */
-    //     bingo();           /* deliberately added to move tree first, so it's now avaible in the solution.) */
-
+    /* If the new move leads to the solution, call it out and quit. */
     if (outcome == bingo)
-    {
-        printf("\n\n\nBingo! (Depth=%d.)\n\n", depth);
-        exit(0);
-    }
+        print_solution(p_game_data, new_move, *move_path, search_dir);
 
+    /* So no bingo; just a new position. */
+    *move_path = new_move;  /* Refer to the new move from the new position. */
+    *extended = true;       /* Notify that the move tree was extended by at least one new move. */
+
+    printf_walk_mv("\n");
 }
 
 
@@ -400,8 +397,8 @@ void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
     while ( MV_GET_HAS_SIBB(P_MN(sibbling)->move_data) ) /* Then goto the youngest sibbling. */
         sibbling = P_MN(sibbling)->next.sibbling;
 
-    P_MN(sibbling)->move_data     |= MV_SET_HAS_SIBB;   /* The previously youngest child has a sibbling now. */
-    P_MN(sibbling)->next.sibbling  = new_move;          /* Link the new child up to his older sibblings.     */
+    P_MN(sibbling)->move_data     |= MV_SET_HAS_SIBB;    /* The up-to-now youngest child gets a sibbling. */
+    P_MN(sibbling)->next.sibbling  = new_move;           /* Link the new child up to his older sibblings. */
     return;
 }
 

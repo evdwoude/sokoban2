@@ -13,8 +13,9 @@
 
 /* Conditional compile switches  */
 
-//#define DBG_MARK 1        // Prints marker and marker wrappings
+// #define DBG_MARK 1        // Prints marker and marker wrappings
 // #define DBG_MEM  1        // Prints memory allocations
+// #define DBG_MOVE  1        // Prints memory allocations for moves only.
 #define DBG_HARDNOGOS 1   // Prints the search result for hard no-go's.
 //#define DBG_C 1           // Prints
 //#define DBG_D 1           // Prints
@@ -34,6 +35,12 @@
 #define printf_mem(...)
 #endif
 
+#ifdef DBG_MOVE
+#define printf_move(...) printf(__VA_ARGS__);
+#else
+#define printf_move(...)
+#endif
+
 #ifdef DBG_HARDNOGOS
 #define printf_hardnogo(...) printf(__VA_ARGS__);
 #define dbg_hardnogo_if(condition) if(condition)
@@ -49,6 +56,7 @@
 
 void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int main_dir, int *new_hardnogos);
 void set_as_hardnogo(struct spot* spot);
+void printlong(unsigned long this, unsigned long minlen);
 
 /* Exported data */
 
@@ -58,7 +66,7 @@ void set_as_hardnogo(struct spot* spot);
 
 /* Code */
 
-void reinit_mark(p_game_data_t p_game_data)
+void reinit_mark(p_game_data_t p_game_data, uint32_t initialiser)
 {
     p_spot spot;
 
@@ -66,14 +74,18 @@ void reinit_mark(p_game_data_t p_game_data)
 
     for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
     {
-        spot->reach_mark = 0;
+        spot->reach_mark = initialiser;
         printf_mark(" %ld", SPOT_NO(spot))
     }
+
+    /* And reinitialize next_reach as zero + 1. */
+    p_game_data->next_reach = 1;
+
     printf_mark("\n")
 }
 
 
-/*int next_mark(p_game_data_t p_game_data)
+/* uint32_t next_mark(p_game_data_t p_game_data)
  *
  * Used for explore functions.
  *
@@ -82,19 +94,15 @@ void reinit_mark(p_game_data_t p_game_data)
  * required (and automatically performed) when the globla spot mark wraps. Reinitilization is also
  * required before searching for the amount of reaches a backward search can start from.
  */
-int next_mark(p_game_data_t p_game_data)
+uint32_t next_mark(p_game_data_t p_game_data)
 {
     p_game_data->next_reach++;
-    if (p_game_data->next_reach > 0x10000)
-    {
-        /* If next_reach wrapped, reiniatise all spots. */
-        reinit_mark(p_game_data);
 
-        /* And reinitialize next_reach as zero + 1. */
-        p_game_data->next_reach = 1;
-    }
+    /* If next_reach wrapped, reiniatise all spots. */
+    if (p_game_data->next_reach > 0x10000000)
+        reinit_mark(p_game_data, 0);
 
-    printf_mark("\nMark: %d",  p_game_data->next_reach)
+    printf_mark("\nMark: %u",  p_game_data->next_reach)
     return p_game_data->next_reach;
 }
 
@@ -118,7 +126,7 @@ skbn_err allocate_memory(p_game_data_t p_game_data)
         return print_error(cant_allocate_memory);
 
     /* Check whether the base of the memory is MEM_REF_UNIT aligned. */
-    if ((long int) p_game_data->p_memory_start & MEM_REF_UNIT-1) /* (MEM_REF_UNIT is a power of 2.) */
+    if ((long int) p_game_data->p_memory_start & (MEM_REF_UNIT-1)) /* (MEM_REF_UNIT is a power of 2.) */
     {
         free(p_game_data->p_memory_start);
         return print_error(memory_not_aligned, MEM_REF_UNIT);
@@ -138,7 +146,7 @@ uint32_t new_position_node(p_game_data_t p_game_data)
         exit( print_error(out_of_tree_memory) );
 
     index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-        printf_mem("{N%d}", index)
+    printf_mem("{N%u}", index)
 
     p_game_data->p_memory_bottom += TP_NODE_SIZE;
     p_game_data->tp_node_count++;
@@ -153,7 +161,7 @@ uint32_t new_position_leaf(p_game_data_t p_game_data)
         exit( print_error(out_of_tree_memory) );
 
     index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-        printf_mem("{L%d}", index)
+    printf_mem("{L%u}", index)
 
     p_game_data->p_memory_bottom += TP_LEAF_SIZE;
     p_game_data->tp_leaf_count++;
@@ -168,7 +176,8 @@ uint32_t new_move_node(p_game_data_t p_game_data, t_s_dir search_dir)
         exit( print_error(out_of_tree_memory) );
 
     index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-        printf_mem("{M%d}", index)
+    printf_mem("{M%u}", index)
+    printf_move(" {%u}", index)
 
     p_game_data->p_memory_bottom += MV_NODE_SIZE;
     if (search_dir == forward)
@@ -204,7 +213,7 @@ void define_hardnogos(p_game_data_t p_game_data)
         {
             set_as_hardnogo(spot);
 
-            printf_hardnogo(" %ld", SPOT_NO(spot))
+            printf_hardnogo(" %lu", SPOT_NO(spot))
         }
     }
 
@@ -261,7 +270,7 @@ void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int m
     for (scan = spot->neighbour[main_dir]; scan && ! is_hardnogo(scan); scan = scan->neighbour[main_dir])
     {
         dbg_hardnogo_if( ! is_hardnogo(scan))
-            printf_hardnogo(" %ld", SPOT_NO(scan))
+            printf_hardnogo(" %lu", SPOT_NO(scan))
 
         set_as_hardnogo(scan);
         *new_hardnogos  = 1;
@@ -293,7 +302,6 @@ void dbg_print_setup(p_game_data_t p_game_data)
 {
     struct spot* curr_spot;
     struct spot* next_spot;
-    struct spot* line_start;
 
     int line_pos = 0;         // For printing space where there is nothing.
     int c;
@@ -316,7 +324,6 @@ void dbg_print_setup(p_game_data_t p_game_data)
 
     /* Print it */
     curr_spot = &(p_game_data->spot_pool[0]);
-    line_start = curr_spot;
 
     printf("\n    #");
     for (c=left_most; c<=right_most; c++)
@@ -367,3 +374,45 @@ void dbg_print_setup(p_game_data_t p_game_data)
 }
 
 
+void print_stats(p_game_data_t p_game_data)
+{
+    unsigned long bottom_section, top_section;
+
+    bottom_section  = p_game_data->p_memory_bottom - p_game_data->p_memory_start;
+    top_section     = p_game_data->p_memory_start + MEM_UNIT_COUNT * MEM_REF_UNIT - p_game_data->p_memory_top;
+
+    printf("\nMemory (Botom+top): ");
+    printlong(bottom_section, 15);
+    printlong(top_section, 15);
+
+}
+
+#define MAXLONGLEN 30
+
+void printlong(unsigned long this, unsigned long minlen)
+{
+    char chars[MAXLONGLEN];
+    char *pchar = &chars[MAXLONGLEN];
+    int comma = 0;
+
+    *--pchar = 0;
+    if (!this)
+        *--pchar = '0';
+
+    while (this)
+    {
+        *--pchar = this % 10 + '0';
+        this /= 10;
+        comma = (comma + 1) % 3;
+        if (!comma)
+            *--pchar = ',';
+    }
+    if (*pchar == ',')
+        pchar++;
+
+    if (minlen < MAXLONGLEN)
+        while ( pchar > &chars[MAXLONGLEN-minlen] )
+            *--pchar = ' ';
+
+    printf("%s", pchar);
+}
