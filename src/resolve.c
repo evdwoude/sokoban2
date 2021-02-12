@@ -146,6 +146,7 @@ void search_forward_and_backward(p_game_data_t p_game_data)
 {
     uint32_t backward_root = 0;
 
+    // TODO: Remove the test prints: (But only after having built the removing of dead backward trees.)
     /* Test printing the forward root. */
     printf_walk_mv("\nForward root (reach):");
     printf_walk_mv(" %u", MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
@@ -162,33 +163,41 @@ void search_forward_and_backward(p_game_data_t p_game_data)
 
 
     bool tree_extended = true;
-    int depth = 0;
+    int fw_depth = 0;
+    int bw_depth = 0;
 
+    print_header();
     while (tree_extended)
     {
         tree_extended = false;
-        printf_walk_mv("\nDepth %d\n", depth)
+        printf_walk_mv("\nDepth %d\n", fw_depth + bw_depth)
 
-        backward_root = p_game_data->backward_move_root_list;
-        while (backward_root)
+        if (p_game_data->fw_move_count <= p_game_data->bw_move_count)
         {
-            printf_walk_mv("\nBackward reach: %u\n",
-                           MV_GET_SPOT_NO(P_MN(backward_root)->move_data));
+            printf_walk_mv("\nForward reach: %u\n",
+                            MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
 
-            walk_tree(p_game_data, backward_root, depth, backward, &tree_extended);
+            walk_tree(p_game_data, p_game_data->forward_move_root,  fw_depth, forward, &tree_extended);
             printf_walk_mv("Extended: %s\n", tree_extended?"yes":"no")
 
-            backward_root = P_MN(backward_root)->next.sibbling;
+            fw_depth++;
         }
+        else
+        {
+            backward_root = p_game_data->backward_move_root_list;
+            while (backward_root)
+            {
+                printf_walk_mv("\nBackward reach: %u\n",
+                            MV_GET_SPOT_NO(P_MN(backward_root)->move_data));
 
-        printf_walk_mv("\nForward reach: %u\n",
-                           MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
+                walk_tree(p_game_data, backward_root, bw_depth, backward, &tree_extended);
+                printf_walk_mv("Extended: %s\n", tree_extended?"yes":"no")
 
-        walk_tree(p_game_data, p_game_data->forward_move_root,  depth, forward, &tree_extended);
-        printf_walk_mv("Extended: %s\n", tree_extended?"yes":"no")
-
-        depth++;
-        print_stats(p_game_data);
+                backward_root = P_MN(backward_root)->next.sibbling;
+            }
+            bw_depth++;
+        }
+        print_stats(p_game_data, fw_depth + bw_depth, -1);
     }
     dbg_print_setup(p_game_data);
 }

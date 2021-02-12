@@ -30,13 +30,20 @@ typedef enum {is_move=0, is_step=1} t_move_type;
 /* Internal protos */
 
 void construct_forward_path(p_game_data_t p_game_data, uint32_t move, bool restore);
-void construct_bckward_path(p_game_data_t p_game_data, uint32_t move, bool restore);
+void construct_backward_path(p_game_data_t p_game_data, uint32_t move, bool restore);
 
 void print_path(p_game_data_t p_game_data);
-void find_steps(p_game_data_t p_game_data, p_spot src, p_spot dst);
+void make_distance_map(p_game_data_t p_game_data, p_spot src, p_spot dst);
 void print_steps(p_spot src, p_spot dst);
 void print_single(t_mv_dir move_direction, t_move_type move_type);
 const char *one_or_two_newlines(int line_count);
+
+
+/* Local variables */
+
+// TODO: Make local:
+int move_count = 0;
+int step_count = 0;
 
 
 /* Code */
@@ -49,16 +56,16 @@ void print_solution(p_game_data_t p_game_data, uint32_t this_move, uint32_t that
     if (search_dir == forward)
     {
         construct_forward_path(p_game_data, this_move, true );
-        construct_bckward_path(p_game_data, that_move, false);
+        construct_backward_path(p_game_data, that_move, false);
 
-        P_MN(this_move)->child = that_move;    /* Connect paths.  */
+        P_MN(this_move)->child = that_move;    /* Connect paths (from forward and backward move trees). */
     }
     else
     {
         construct_forward_path(p_game_data, that_move, false);
-        construct_bckward_path(p_game_data, this_move, true );
+        construct_backward_path(p_game_data, this_move, true );
 
-        P_MN(that_move)->child = this_move;    /* Connect paths.  */
+        P_MN(that_move)->child = this_move;    /* Connect paths (from forward and backward move trees). */
     }
 
     /* Restore Johhny's start spot. We need him to reconstruct the steps between the moves. */
@@ -86,7 +93,7 @@ void construct_forward_path(p_game_data_t p_game_data, uint32_t move, bool resto
             take_back(p_game_data, MOVE_SPOT(move), MOVE_DIR(move), forward);
 
         /* Find parent. */
-        while ( MV_GET_HAS_SIBB(P_MN(next)->move_data) )    /* Find younghest sibbling */
+        while ( MV_GET_HAS_SIBB(P_MN(next)->move_data) )    /* Find youngest sibbling. */
             next = P_MN(next)->next.sibbling;
         next = P_MN(next)->next.parent;                     /* From there goto parent. */
 
@@ -97,12 +104,12 @@ void construct_forward_path(p_game_data_t p_game_data, uint32_t move, bool resto
 }
 
 
-void construct_bckward_path(p_game_data_t p_game_data, uint32_t move, bool restore)
+void construct_backward_path(p_game_data_t p_game_data, uint32_t move, bool restore)
 {
     uint32_t root = p_game_data->backward_move_root_list;
     uint32_t next;
 
-    debug_solution("\nBckward roots:");
+    debug_solution("\nBackward roots:");
 
     /* Mark the backward move roots as root. (This unlinks them from each other, but that's fine.) */
     while (root)
@@ -114,7 +121,7 @@ void construct_bckward_path(p_game_data_t p_game_data, uint32_t move, bool resto
         root = next;
     }
 
-    debug_solution("\nBckward moves:");
+    debug_solution("\nBackward moves:");
 
     next = move;
     while ( P_MN(move)->next.parent != 0 ) /* While not a backward root, ... */
@@ -144,34 +151,37 @@ void print_path(p_game_data_t p_game_data)
 {
     uint32_t move = P_MN(p_game_data->forward_move_root)->child;
 
-    printf("\n");
-    dbg_print_setup(p_game_data);
-
-    printf("\n\nSolution:");
-    printf("%s", one_or_two_newlines(0) );
+    printf("\nSolution:\n\n  ");
 
     move = P_MN(p_game_data->forward_move_root)->child;
     while ( P_MN(move)->next.parent != 0 )
     {
-        find_steps(p_game_data, p_game_data->johnny, MOVE_SPOT(move));
+        /* Create map that indicates distances from spots around destination, upto source. */
+        make_distance_map(p_game_data, p_game_data->johnny, MOVE_SPOT(move));
+
+        /* Print steps (from source to destimation, according to map). */
+        print_steps(p_game_data->johnny, MOVE_SPOT(move));
+
+        /* Print move. */
         print_single(MOVE_DIR(move), is_move);
 
         make_move(p_game_data, MOVE_SPOT(move), MOVE_DIR(move), forward);
         move = P_MN(move)->child;
     }
 
-    debug_solution("\n");
+    printf("\n\n");
+    print_header();
+    print_stats(p_game_data, move_count, step_count);
 }
 
 
-void find_steps(p_game_data_t p_game_data, p_spot src, p_spot dst)
+void make_distance_map(p_game_data_t p_game_data, p_spot src, p_spot dst)
 {
     uint32_t mark = 0;
     p_spot johnny = dst;
     p_spot end = johnny;
-
-    t_mv_dir dir;
     p_spot neighbour;
+    t_mv_dir dir;
 
     reinit_mark(p_game_data, UINT32_MAX); /* Mark all spots as unexplored. */
 
@@ -181,7 +191,7 @@ void find_steps(p_game_data_t p_game_data, p_spot src, p_spot dst)
     if (dst == src)
         return;
 
-    /* Starting from dst, find src, thereby marking visited spots with increasing "distance". */
+    /* Starting from dst, find src, thereby marking visited spots with its distance to dst. */
     /* (Build up a list of spots to visit, while at the same time walk down that list.) */
     while (johnny)
     {
@@ -196,13 +206,10 @@ void find_steps(p_game_data_t p_game_data, p_spot src, p_spot dst)
                 &&  !neighbour->object[forward]           /* Is that spot empty?    */
                 &&  neighbour->reach_mark == UINT32_MAX ) /* Not yet explored?      */
             {
-                neighbour->reach_mark  = mark;            /* Mark it: */
+                neighbour->reach_mark  = mark;            /* Mark its distance. */
 
                 if (neighbour == src)
-                {
-                    print_steps(src, dst);
                     return;
-                }
 
                 /* Add it to end of list: */
                 end->other_reach_list = neighbour;
@@ -240,7 +247,7 @@ void print_steps(p_spot src, p_spot dst)
                 }
             }
         }
-        print_single(dir_to_lowest, is_step);
+        print_single(dir_to_lowest, is_step); /* Print step. */
 
         /* Goto the lowest neighbour and continue. */
         src = src->neighbour[dir_to_lowest];
@@ -254,9 +261,10 @@ void print_single(t_mv_dir move_direction, t_move_type move_type)
     static int n_lines = 0;
     static int last_is_move = 0;
 
-
     if (move_type == is_step)
     {
+        step_count++;
+
         if (line_length >= LINE_LENGTH)
         {
             printf("%s%s", last_is_move ? "" : "-", one_or_two_newlines(++n_lines));
@@ -283,6 +291,8 @@ void print_single(t_mv_dir move_direction, t_move_type move_type)
     }
     else
     {
+        move_count++;
+
         if (last_is_move)
         {
             if (line_length >= LINE_LENGTH)
@@ -297,7 +307,8 @@ void print_single(t_mv_dir move_direction, t_move_type move_type)
             }
         }
 
-        printf("%c", mv_dir_name(move_direction));
+        printf("X");
+//         printf("%c", mv_dir_name(move_direction));
         line_length++;
 
         last_is_move  = 1;

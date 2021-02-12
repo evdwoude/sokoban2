@@ -1,22 +1,24 @@
 Next:
+    In solution.c,
+        Double check find_path() and print_path().
+        Find better function names for find_path and print_path.
 
-    Line breaks and line space in printing.
+        In print_steps() combine the nested if's ?
 
-    In print_steps() combine the nested if's ?
+        Split print_single() into print_step() and print_move().
 
-    For this sokokan, print stats.
-    For the old Sokoban, print stats with every "another 500 blocks" and see how far it got with HB-60008.
-    Update documentation with new performance figures.
+    Review init_move_tree().
 
-    Double check why it works when scr == dst, in find_steps(), line 118, is seems it is overstepping src.
-    Double check why it works when scr == dst with the last move.
+    Stats printing: reduce the interim prints.
 
-    Work down the below list and do the necessary check before proceeding.
+    Update documentation with new performance figures of both soko and soko2.
 
 
-    search_forward_and_backward():
-        Cleanup
-        balance between
+    Work down the below list and do the necessary checks before proceeding.
+
+    In resolve.c, function search_forward_and_backward():
+        cleanup
+        balance between fw and bw
         Move content of search_forward_and_backward() back onto resolve()  ?
 
     Handle bingo from init_move_tree()

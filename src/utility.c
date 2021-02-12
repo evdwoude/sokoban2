@@ -373,18 +373,28 @@ void dbg_print_setup(p_game_data_t p_game_data)
     printf("#");
 }
 
+void print_header(void)
+{
+    printf("  Total:  Moves:  Steps:      FW nodes:      BW nodes:           Memory:\n");
+}
 
-void print_stats(p_game_data_t p_game_data)
+void print_stats(p_game_data_t p_game_data, int move_count, int step_count)
 {
     unsigned long bottom_section, top_section;
+
+    if (step_count == -1)
+        printf("       -    %4d       -", move_count );
+    else
+        printf("    %4d    %4d    %4d", move_count + step_count, move_count, step_count );
+
+    printlong(p_game_data->fw_move_count, 16);
+    printlong(p_game_data->bw_move_count, 16);
 
     bottom_section  = p_game_data->p_memory_bottom - p_game_data->p_memory_start;
     top_section     = p_game_data->p_memory_start + MEM_UNIT_COUNT * MEM_REF_UNIT - p_game_data->p_memory_top;
 
-    printf("\nMemory (Botom+top): ");
-    printlong(bottom_section, 15);
-    printlong(top_section, 15);
-
+    printlong(bottom_section + top_section, 19);
+    printf("\n");
 }
 
 #define MAXLONGLEN 30
