@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 
 /* So for the only thing to worry about is the memort allocation, as for now setup() does not use exit()
  * and will take care of closing the setup file by its own.*/
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void exit_function(int status, void *arg)
 {
     if (arg && ((p_game_data_t)arg)->p_memory_start)
@@ -68,13 +69,10 @@ void exit_function(int status, void *arg)
     end_time = time(NULL);
     diff_time = (long) difftime(end_time, start_time);
 
-    printf("\n\nDuration: %ld:%ld:%ld.\n",
+    printf("\nDuration (h:m:s):  %ld:%ld:%ld.\n",
         diff_time / 3600,
         (diff_time / 60) % 60,
         diff_time % 60 );
-
-    if (status)
-         printf("\nExit status: %d.\n", status);
 }
 
 

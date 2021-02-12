@@ -262,12 +262,13 @@ Hard:
        WB-1018         1                   42   2,939,196   9,308,427  75,989,196   2,709,496,272
 
 
-       WB-1009         1  Not solved.
+       WB-1009         1  With Soko2 only. With F/B balancing: 2 minutes, about 2.5 G/
        WB-1010         1  With Soko2 only.  7 minutes, about 8.5 G.
        WB-1022         1  Not solved.
        WB-1025         1  Not solved.
 
-       HB-60008        1  With Soko2 only. 22 minutes, about 9.5 G.
+       HB-60008        1  With Soko2 only. No F/B balancing:  22 minutes, about 9.5 G.
+       HB-60008        1  With Soko2 only. With F/B balancing: 3 minutes, about 3.1 G.
 
 
 
