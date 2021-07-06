@@ -1,4 +1,6 @@
 Next:
+    Test optimisation: balanced FW/BW based on counted tree width, (count new extentions only).
+
     In solution.c,
         Double check find_path() and print_path().
         Find better function names for find_path and print_path.
@@ -27,7 +29,8 @@ Next:
         Test bingo with just one backward move.
         Test bingo with just two moves (One forward and ove backward.)
 
-    Change "backward" info "backward" everywhere.
+    In position.c:
+        Call find_reach_identifier() from find_or_add_reach() instead of find_or_add_position().
 
     Create file resolve-helper, and move in there;
         init_all_move_trees()
