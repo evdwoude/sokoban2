@@ -171,7 +171,7 @@ void print_path(p_game_data_t p_game_data)
 
     printf("\n\n");
     print_header();
-    print_stats(p_game_data, move_count, step_count);
+    print_stats(p_game_data, move_count, 0, step_count);
 }
 
 
@@ -307,8 +307,7 @@ void print_single(t_mv_dir move_direction, t_move_type move_type)
             }
         }
 
-        printf("X");
-//         printf("%c", mv_dir_name(move_direction));
+        printf("%c", mv_dir_name(move_direction));
         line_length++;
 
         last_is_move  = 1;

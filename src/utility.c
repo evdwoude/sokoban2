@@ -373,19 +373,24 @@ void dbg_print_setup(p_game_data_t p_game_data)
     printf("#");
 }
 
-void print_header(void)
+void print_interim_header(void)
 {
-    printf("  Total:  Moves:  Steps:      FW nodes:      BW nodes:           Memory:\n");
+    printf("  Total:     Fw:  Bw:  Steps:      FW nodes:      BW nodes:           Memory:\n");
 }
 
-void print_stats(p_game_data_t p_game_data, int move_count, int step_count)
+void print_header(void)
+{
+    printf("  Total:       Moves:  Steps:      FW nodes:      BW nodes:           Memory:\n");
+}
+
+void print_stats(p_game_data_t p_game_data, int move_count_fw, int move_count_bw, int step_count)
 {
     unsigned long bottom_section, top_section;
 
     if (step_count == -1)
-        printf("       -    %4d       -", move_count );
+        printf("       -    %4d %4d       -", move_count_fw, move_count_bw);
     else
-        printf("    %4d    %4d    %4d", move_count + step_count, move_count, step_count );
+        printf("    %4d         %4d    %4d", move_count_fw + step_count, move_count_fw, step_count );
 
     printlong(p_game_data->fw_move_count, 16);
     printlong(p_game_data->bw_move_count, 16);

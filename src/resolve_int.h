@@ -87,7 +87,7 @@ struct move_node
 /* Basic masks: */
 #define MV_MOVE_DIR_MASK        0x00000003             /* Mask for the move direction.                    */
 #define MV_SPOT_NO_MASK         0x7FFFFFFC             /* Mask for the spot number.                       */
-#define MV_HAS_SIBB_MASK        0x80000000             /* Mask for the idicaation of a present sibbling.  */
+#define MV_HAS_SIBB_MASK        0x80000000             /* Mask for the idication of a present sibbling.   */
 /* Well, eh, util?: */
 #define MV_SPOT_NO_SHIFT        2                      /* Amount of bits to shift the spot nunber (L/R).  */
 /* To write: */

@@ -7,14 +7,14 @@
 
 /* The amout of memory to allocate for the move tree and position tree: */
 // #define TREE_MEMORY (2048)
-// #define TREE_MEMORY (0x000100000) /* 1 Mbytes. */
-// #define TREE_MEMORY (0x040000000) /* 1.07 Gbytes. */
-// #define TREE_MEMORY (0x080000000) /* 2.15 Gbytes. */
-// #define TREE_MEMORY (0x100000000) /* 4.29 Gbytes. */
-// #define TREE_MEMORY (0x180000000) /* 6.44 Gbytes. */
-// #define TREE_MEMORY (0x200000000) /* 8.59 Gbytes. */
-#define TREE_MEMORY (0x240000000)   /*  9.66 Gbytes. */
-//#define TREE_MEMORY (0x280000000) /* 10.74 Gbytes. */
+// #define TREE_MEMORY (0x000100000) /*  1    Mbytes. */
+// #define TREE_MEMORY (0x040000000) /*  1.07 Gbytes. */
+// #define TREE_MEMORY (0x080000000) /*  2.15 Gbytes. */
+// #define TREE_MEMORY (0x100000000) /*  4.29 Gbytes. */
+// #define TREE_MEMORY (0x180000000) /*  6.44 Gbytes. */
+// #define TREE_MEMORY (0x200000000) /*  8.59 Gbytes. */
+#define TREE_MEMORY    (0x240000000) /*  9.66 Gbytes. */
+// #define TREE_MEMORY (0x280000000) /* 10.74 Gbytes. */
 
 // #define DBG_SANITY
 
