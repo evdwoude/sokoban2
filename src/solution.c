@@ -171,7 +171,7 @@ void print_path(p_game_data_t p_game_data)
 
     printf("\n\n");
     print_header();
-    print_stats(p_game_data, move_count, 0, step_count);
+    print_stats(p_game_data, move_count, step_count);
 }
 
 

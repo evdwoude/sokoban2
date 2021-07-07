@@ -39,15 +39,15 @@ uint32_t init_move_tree(p_game_data_t p_game_data, t_s_dir search_dir);
 
 void search_forward_and_backward(p_game_data_t p_game_data);
 
-void walk_tree(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended);
+void walk_tree(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, int *extention);
 
 void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
 void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir);
 void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir);
 
-void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, bool *extended);
+void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, int *extention);
 void explore_for_reach(p_game_data_t p_game_data, p_spot spot, t_s_dir search_dir);
-void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, bool *extended);
+void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, int *extention);
 void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, uint32_t new_move);
 
 void clean_up_ascending(uint32_t move);
@@ -165,48 +165,53 @@ void search_forward_and_backward(p_game_data_t p_game_data)
     printf_walk_mv("\n\n");
 
 
-    bool tree_extended = true;
+    int extention = 1;
+    int fw_width = 0;
+    int bw_width = 0;
     int fw_depth = 0;
     int bw_depth = 0;
 
     print_interim_header();
-    while (tree_extended)
+    while (extention)
     {
-        tree_extended = false;
+        extention = 0;
         printf_walk_mv("\nDepth %d\n", fw_depth + bw_depth)
 
-        if ( p_game_data->fw_move_count / (fw_depth+1)  <=  p_game_data->bw_move_count / (bw_depth+1) )
+        if (fw_width < bw_width)
         {
             printf_walk_mv("\nForward reach: %u\n",
                             MV_GET_SPOT_NO(P_MN(p_game_data->forward_move_root)->move_data));
 
-            walk_tree(p_game_data, p_game_data->forward_move_root,  fw_depth, forward, &tree_extended);
-            printf_walk_mv("Extended: %s\n", tree_extended?"yes":"no")
+            walk_tree(p_game_data, p_game_data->forward_move_root,  fw_depth, forward, &extention);
+            printf_walk_mv("Extended: %s\n", extention?"yes":"no")
 
+            fw_width = extention;
             fw_depth++;
         }
         else
         {
             backward_root = p_game_data->backward_move_root_list;
+            bw_width = 0;
             while (backward_root)
             {
                 printf_walk_mv("\nBackward reach: %u\n",
                             MV_GET_SPOT_NO(P_MN(backward_root)->move_data));
 
-                walk_tree(p_game_data, backward_root, bw_depth, backward, &tree_extended);
-                printf_walk_mv("Extended: %s\n", tree_extended?"yes":"no")
+                walk_tree(p_game_data, backward_root, bw_depth, backward, &extention);
+                printf_walk_mv("Extended: %s\n", extention?"yes":"no")
 
                 backward_root = P_MN(backward_root)->next.sibbling;
+                bw_width += extention;
             }
             bw_depth++;
         }
-        print_stats(p_game_data, fw_depth, bw_depth, -1);
+        print_interim_stats(p_game_data, fw_depth, bw_depth, fw_width, bw_width);
     }
     dbg_print_setup(p_game_data);
 }
 
 
-void walk_tree(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, bool *extended)
+void walk_tree(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir search_dir, int *extention)
 {
     uint32_t move = root;
     int depth = 0;
@@ -220,7 +225,7 @@ void walk_tree(p_game_data_t p_game_data, uint32_t root, int extend_at, t_s_dir 
             descend(p_game_data, &move, &depth, search_dir);
 
         if (depth == extend_at)
-            extend_depth(p_game_data, move, search_dir, extended);
+            extend_depth(p_game_data, move, search_dir, extention);
 
         while ( ! MV_GET_HAS_SIBB(P_MN(move)->move_data) )
             if (move != root)
@@ -294,7 +299,7 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 }
 
 
-void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, bool *extended)
+void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, int *extention)
 {
     p_spot johnny;
     t_mv_dir mv_dir;
@@ -314,7 +319,7 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, 
                 printf_walk_indent(1, 0)
 
                 make_move(p_game_data, johnny, mv_dir, search_dir);
-                consider(p_game_data, move, johnny, mv_dir, search_dir, extended);
+                consider(p_game_data, move, johnny, mv_dir, search_dir, extention);
                 take_back(p_game_data, johnny, mv_dir, search_dir);
             }
         }
@@ -367,7 +372,7 @@ void explore_for_reach(p_game_data_t p_game_data, p_spot johnny, t_s_dir search_
 }
 
 
-void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, bool *extended)
+void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, int *extention)
 {
     t_outcome_add_tp outcome;
     uint32_t new_move, *move_path;
@@ -390,7 +395,7 @@ void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
 
     /* So no bingo; just a new position. */
     *move_path = new_move;  /* Refer to the new move from the new position. */
-    *extended = true;       /* Notify that the move tree was extended by at least one new move. */
+    *extention += 1;        /* Notify that the move tree was extended by at least one new move, and count extentions. */
 
     printf_walk_mv("\n");
 }

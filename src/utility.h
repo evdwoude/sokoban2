@@ -49,9 +49,9 @@ char mv_dir_name(t_mv_dir move_direction);
 void dbg_print_setup(p_game_data_t p_game_data);
 
 void print_interim_header(void);
+void print_interim_stats(p_game_data_t p_game_data, int move_count_fw, int move_count_bw, int fw_width, int bw_width);
 
 void print_header(void);
-
-void print_stats(p_game_data_t p_game_data, int move_count_fw, int move_count_bw, int step_count);
+void print_stats(p_game_data_t p_game_data, int move_count, int step_count);
 
 #endif /* UTILITYH */
