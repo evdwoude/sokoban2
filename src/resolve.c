@@ -50,8 +50,9 @@ void explore_for_reach(p_game_data_t p_game_data, p_spot spot, t_s_dir search_di
 void consider(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, int *extention);
 void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_dir mv_dir, uint32_t new_move);
 
-void clean_up_ascending(uint32_t move);
-void clean_up_walking_lateral(uint32_t move);
+void clean_up_ascending(p_game_data_t p_game_data, uint32_t move, uint32_t parent);
+void clean_up_walking_lateral(p_game_data_t p_game_data, uint32_t move, uint32_t sibbling);
+void clean_up_move(p_game_data_t p_game_data, uint32_t move);
 
 #ifdef DBG_WALK_MV
 void printf_walk_indent_f(int print, int change);
@@ -258,8 +259,8 @@ void descend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir sear
 
 void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir search_dir)
 {
-//     uint32_t cleanup = *move;
-//
+    uint32_t cleanup = *move;
+
     san_if ( ! P_MN(*move)->next.parent) /* Sanity check: Do we have a parent to ascend to? */
         san_exit( print_error(no_parent) )
 
@@ -270,14 +271,16 @@ void ascend(p_game_data_t p_game_data, uint32_t *move, int *depth, t_s_dir searc
     *move = P_MN(*move)->next.parent;       /* Ascend a level up in the move tree. */
     (*depth)--;                             /* Update current depth                */
 
-//     /* Clean up the move we just left if it has no children. */
-//     if ( ! P_MN(*move)->child)
-//         clean_up_ascending(cleanup, move);
+    /* Clean up the move we just left if, it has no children. */
+    if ( ! P_MN(cleanup)->child)
+        clean_up_ascending(p_game_data, cleanup, *move);
 }
 
 
 void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 {
+    uint32_t cleanup = *move;
+
     san_if ( ! P_MN(*move)->next.sibbling) /* Sanity check: Do we have a sibbling to move to? */
         san_exit( print_error(no_sibbling) )
 
@@ -293,9 +296,9 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
 
     printf_walk_mv("\n")
 
-//     /* Clean up the move we just left if it has no children. */
-//     if ( ! P_MN(*move)->child)
-//         clean_up_walking_lateral(cleanup, move);
+    /* Clean up the move we just left if it has no children. */
+     if ( ! P_MN(cleanup)->child)
+         clean_up_walking_lateral(p_game_data, cleanup, *move);
 }
 
 
@@ -429,67 +432,67 @@ void add_move(p_game_data_t p_game_data, uint32_t parent, p_spot johnny, t_mv_di
 }
 
 
-// /*    pre-assured:
-//  *      move exists
-//  *      parent exists and is move's parent
-//  *      move has no sibbling
-// */
-// void clean_up_ascending(uint32_t move, uint32_t parent);
-// {
-//     uint32_t sibbling;
-//
-//     if ( P_MN(parent)->child == move)       /* If parent'child is our cleanup move              */
-//         P_MN(parent)->child = 0;            /*      then all there is it no longer has one.     */
-//     else
-//     {
-//         sibbling = P_MN(parent)->child;                 /* First goto the oldest sibbling.      */
-//         while (P_MN(sibbling)->next.sibbling != move)   /* and find our next-older sibbling     */
-//             sibbling = P_MN(sibbling)->next.sibbling;
-//
-//                                                         /* He is now the youngest, so:          */
-//         P_MN(sibbling)->move_data &= ~MV_SET_HAS_SIBB;  /*      - has no sibbling any more      */
-//         P_MN(sibbling)->next.parent == parent;          /*      - he now refers to his parent   */
-//     }
-//
-//     //    clean_up_move(move);
-// }
-//
-//
-//     while ( MV_GET_HAS_SIBB(P_MN(sibbling)->move_data) ) /* Then goto the youngest sibbling. */
-//         sibbling = P_MN(sibbling)->next.sibbling;
-//
-//     P_MN(sibbling)->move_data     |= MV_SET_HAS_SIBB;    /* The up-to-now youngest child gets a sibbling. */
-//     P_MN(sibbling)->next.sibbling  = new_move;           /* Link the new child up to his older sibblings. */
-//     return;
-//
-//
-//
-// /*    pre-assured:
-//  *      move exists
-//  *      sibbling exists and  is move's next younger older sibbling
-// */
-// void clean_up_walking_lateral(uint32_t move, uint32_t sibbling);
-// {
-//     /* find parent */
-//     while (sibbling has sibbilg
-//         sibbing is next sibblinh
-//     parent = sibbling's parent;
-//
-//     if (parent.child == move)
-//     {
-//         parent.child = sibbling;
-//     }
-//     else
-//     {
-//         goto oldest sibbling
-//         while sibbling.next != move
-//             goto next sibbling
-//
-//         sibbling.next == sibbling
-//     }
-//
-//     clean_up_move(move);
-// }
+/*    pre-assured:
+ *      move exists and has no children
+ *      parent exists and is move's parent
+ *      move has no sibbling
+*/
+void clean_up_ascending(p_game_data_t p_game_data, uint32_t move, uint32_t parent)
+{
+    uint32_t sibbling;
+
+    if (P_MN(parent)->child == move)                   /* If parent'child is our cleanup move       */
+        P_MN(parent)->child = 0;                        /* then all there is: it no longer has one. */
+    else                                                /* else remove it from list of sibblings:   */
+    {
+        sibbling = P_MN(parent)->child;                 /* First goto the oldest child              */
+        while (P_MN(sibbling)->next.sibbling != move)   /* and find our next-older sibbling         */
+            sibbling = P_MN(sibbling)->next.sibbling;
+
+                                                        /* He is now the youngest, so:              */
+        P_MN(sibbling)->move_data &= ~MV_SET_HAS_SIBB;  /*   - has no sibbling any more             */
+        P_MN(sibbling)->next.parent = parent;           /*   - he now refers to his parent          */
+    }
+
+    clean_up_move(p_game_data, move);
+}
+
+
+/*    pre-assured:
+ *      move exists and has no children
+ *      sibbling exists and is move's next younger older sibbling
+*/
+void clean_up_walking_lateral(p_game_data_t p_game_data, uint32_t move, uint32_t sibbling)
+{
+    uint32_t finder;
+
+    /* First find the parent:    */
+    finder = sibbling;                                  /* Start as far down the list as we can.                */
+    while ( MV_GET_HAS_SIBB(P_MN(finder)->move_data) )  /* Goto the youngest sibbling.                          */
+        finder = P_MN(finder)->next.sibbling;
+    finder = P_MN(finder)->next.parent;                 /* Goto the parent.                                     */
+
+    /* We're now at the parent. */
+    if (P_MN(finder)->child == move)                    /* If our cleanup move was the oldest child             */
+        P_MN(finder)->child = sibbling;                 /* then the new oldest child is our younger sibbling.   */
+    else
+    {
+        finder = P_MN(finder)->child;                   /* First goto the oldest child                          */
+        while (P_MN(finder)->next.sibbling != move)     /* and find our next-older sibbling.                    */
+            finder = P_MN(finder)->next.sibbling;
+
+        P_MN(finder)->next.sibbling = sibbling;         /* Link our older and younger sibbling together.        */
+    }
+
+    clean_up_move(p_game_data, move);
+}
+
+
+void clean_up_move(p_game_data_t p_game_data, uint32_t move)
+{
+    if (move != 0)
+        p_game_data->cleanups += 1;
+}
 
 
 #ifdef DBG_WALK_MV

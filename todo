@@ -9,6 +9,8 @@ Next:
 
         Split print_single() into print_step() and print_move().
 
+        add_move() does not use p_game_data
+
     Review init_move_tree().
 
     Stats printing: reduce the interim prints.
@@ -37,11 +39,14 @@ Next:
         init_move_tree()
         explore_for_reach()
 
+    Find and fix all TODOs.
+
     Create Got_it()
         Call it from regular as well as from init.
         Rename bingo back  got_it.
         stop.
         print.
+
 
     Try a few primitive real setups.
 

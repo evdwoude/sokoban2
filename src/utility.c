@@ -109,6 +109,8 @@ uint32_t next_mark(p_game_data_t p_game_data)
 
 skbn_err allocate_memory(p_game_data_t p_game_data)
 {
+//     int n=1;
+
      /* Sanity checks for the way we'er gonna use the tree memory. */
      if (sizeof(struct position_node) != TP_NODE_SIZE)
          return print_error(position_node_size, TP_NODE_SIZE);
@@ -120,10 +122,17 @@ skbn_err allocate_memory(p_game_data_t p_game_data)
          return print_error(move_node_size, MV_NODE_SIZE);
 
     /* Allocate space for the trees. */
-    p_game_data->p_memory_start = calloc(MEM_UNIT_COUNT, MEM_REF_UNIT);
+//     while (1)
+//     {
+        p_game_data->p_memory_start = calloc(MEM_UNIT_COUNT, MEM_REF_UNIT);
+//         printlong( (long unsigned int)(p_game_data->p_memory_start), 24);
+//         printlong( (long unsigned int)(MEM_UNIT_COUNT) * (long unsigned int)(MEM_REF_UNIT), 24);
+//         printf("    %d\n", n++);
 
-    if ( ! p_game_data->p_memory_start)
-        return print_error(cant_allocate_memory);
+        if ( ! p_game_data->p_memory_start)
+            return print_error(cant_allocate_memory);
+//     }
+
 
     /* Check whether the base of the memory is MEM_REF_UNIT aligned. */
     if ((long int) p_game_data->p_memory_start & (MEM_REF_UNIT-1)) /* (MEM_REF_UNIT is a power of 2.) */
@@ -375,7 +384,7 @@ void dbg_print_setup(p_game_data_t p_game_data)
 
 void print_interim_header(void)
 {
-    printf("  Fw:  Bw:      Fw width:      Bw width:      FW nodes:      BW nodes:           Memory:\n");
+    printf("  Fw:  Bw:      Fw width:      Bw width:      FW nodes:      BW nodes:      Cleanups:           Memory:\n");
 }
 
 void print_interim_stats(p_game_data_t p_game_data, int move_count_fw, int move_count_bw, int fw_width, int bw_width)
@@ -389,6 +398,8 @@ void print_interim_stats(p_game_data_t p_game_data, int move_count_fw, int move_
 
     printlong(p_game_data->fw_move_count, 16);
     printlong(p_game_data->bw_move_count, 16);
+
+    printlong(p_game_data->cleanups, 16);
 
     bottom_section  = p_game_data->p_memory_bottom - p_game_data->p_memory_start;
     top_section     = p_game_data->p_memory_start + MEM_UNIT_COUNT * MEM_REF_UNIT - p_game_data->p_memory_top;

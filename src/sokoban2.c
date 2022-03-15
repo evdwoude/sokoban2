@@ -13,7 +13,7 @@ void exit_function(int status, void *arg);
 
 /* Code */
 
-struct game_data game_data;
+struct game_data game_data = {0};
 
 time_t start_time, end_time;
 long diff_time;
@@ -23,15 +23,22 @@ int main(int argc, char *argv[])
     skbn_err error;
 
     game_data.pool_ptr                = &(game_data.spot_pool[0]);
-    game_data.johnny                  = NULL;
-    game_data.position_head           = NULL;
-    game_data.position_root           = 0;
-    game_data.forward_move_root       = 0;
-    game_data.backward_move_root_list = 0;
-    game_data.next_reach              = 0;
-    game_data.p_memory_start          = NULL;
-    game_data.p_memory_bottom         = NULL;
-    game_data.p_memory_top            = NULL;
+//     game_data.johnny                  = NULL;
+//     game_data.position_head           = NULL;
+//     game_data.position_root           = 0;
+//     game_data.forward_move_root       = 0;
+//     game_data.backward_move_root_list = 0;
+//     game_data.next_reach              = 0;
+//     game_data.p_memory_start          = NULL;
+//     game_data.p_memory_bottom         = NULL;
+//     game_data.p_memory_top            = NULL;
+//
+//     game_data.fw_move_count           = 0;
+//     game_data.bw_move_count           = 0;
+//     game_data.tp_node_count           = 0;
+//     game_data.tp_leaf_count           = 0;
+//
+//     game_data.cleanups                = 0;
 
     start_time = time(NULL);
 
@@ -69,7 +76,7 @@ void exit_function(int status, void *arg)
     end_time = time(NULL);
     diff_time = (long) difftime(end_time, start_time);
 
-    printf("\nDuration (h:m:s):  %ld:%ld:%ld.\n",
+    printf("\nDuration (hh:mm:ss):  %02ld:%02ld:%02ld.\n",
         diff_time / 3600,
         (diff_time / 60) % 60,
         diff_time % 60 );
