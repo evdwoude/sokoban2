@@ -11,7 +11,7 @@ skbn_err print_error(skbn_err error, ...)
     int int_3;
     int int_4;
 
-    char * char_1;
+//     char * char_1;
 
     va_start(ap, error);
 
