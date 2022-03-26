@@ -42,11 +42,18 @@ int main(int argc, char *argv[])
 
     start_time = time(NULL);
 
-    printf("\nSokoban2 v0.13. sizeof(uint32_t): %ld.  maxint32: %ld ", sizeof(uint32_t),
+    printf("\nSokoban2 v0.13. sizeof(uint32_t): %ld.  maxint32: %ld.\n", sizeof(uint32_t),
            (unsigned long int) UINT32_MAX );
 
     if (on_exit(&exit_function, (void *) &game_data))
         return print_error(cant_register_exit_function);
+
+    if (argc >= 4 && argv[3][0] == '-')
+        if (argv[3][1] == 'n')
+        {
+            game_data.no_solution_print = true;
+            printf("Omit printing of the solution.\n");
+        }
 
     error = setup(&game_data, argc, argv);
     if (error)

@@ -71,7 +71,18 @@ void print_solution(p_game_data_t p_game_data, uint32_t this_move, uint32_t that
     /* Restore Johhny's start spot. We need him to reconstruct the steps between the moves. */
     p_game_data->johnny = MOVE_SPOT(p_game_data->forward_move_root);
 
+
+    if (p_game_data->no_solution_print)
+    {
+        printf("\nSolution found, but not printing.\n");
+        exit(no_error);
+    }
+    printf("\nSolution:\n\n");
     print_path(p_game_data); /* Print the moves and the steps in between. */
+
+    printf("\n\n");
+    print_header();
+    print_stats(p_game_data, move_count, step_count);
 
     exit(no_error);
 }
@@ -151,8 +162,6 @@ void print_path(p_game_data_t p_game_data)
 {
     uint32_t move = P_MN(p_game_data->forward_move_root)->child;
 
-    printf("\nSolution:\n\n  ");
-
     move = P_MN(p_game_data->forward_move_root)->child;
     while ( P_MN(move)->next.parent != 0 )
     {
@@ -168,10 +177,6 @@ void print_path(p_game_data_t p_game_data)
         make_move(p_game_data, MOVE_SPOT(move), MOVE_DIR(move), forward);
         move = P_MN(move)->child;
     }
-
-    printf("\n\n");
-    print_header();
-    print_stats(p_game_data, move_count, step_count);
 }
 
 

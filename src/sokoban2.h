@@ -76,6 +76,9 @@ struct game_data
     int tp_leaf_count;      /* Amount of position leafs used.      */
 
     int cleanups;           /* Amount of moves that are cleaned up on the go. TODO: remove this again.    */
+
+    /* Flags: */
+    int no_solution_print;  /* Omit the printing of the solution. */
 };
 
 typedef struct game_data *p_game_data_t;
