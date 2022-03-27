@@ -108,7 +108,6 @@ void init_all_move_trees(p_game_data_t p_game_data)
                 /* Important: Don't mark these roots as sibblings (stop conditon of walk_tree()). */
                 P_MN(new_backward_root)->next.sibbling   = p_game_data->backward_move_root_list;
                 p_game_data->backward_move_root_list     = new_backward_root;
-
             }
             printf_walk_mv("\n");
         }
@@ -297,8 +296,8 @@ void walk_lateral(p_game_data_t p_game_data, uint32_t *move, t_s_dir search_dir)
     printf_walk_mv("\n")
 
     /* Clean up the move we just left if it has no children. */
-     if ( ! P_MN(cleanup)->child)
-         clean_up_walking_lateral(p_game_data, cleanup, *move);
+    if ( ! P_MN(cleanup)->child)
+        clean_up_walking_lateral(p_game_data, cleanup, *move);
 }
 
 
@@ -454,13 +453,13 @@ void clean_up_ascending(p_game_data_t p_game_data, uint32_t move, uint32_t paren
         P_MN(sibbling)->next.parent = parent;           /*   - he now refers to his parent          */
     }
 
-    clean_up_move(p_game_data, move);
+    return_move_node(p_game_data, move);                /* Move is out. Return to pool.             */
 }
 
 
 /*    pre-assured:
  *      move exists and has no children
- *      sibbling exists and is move's next younger older sibbling
+ *      sibbling exists and is move's next younger sibbling
 */
 void clean_up_walking_lateral(p_game_data_t p_game_data, uint32_t move, uint32_t sibbling)
 {
@@ -484,14 +483,7 @@ void clean_up_walking_lateral(p_game_data_t p_game_data, uint32_t move, uint32_t
         P_MN(finder)->next.sibbling = sibbling;         /* Link our older and younger sibbling together.        */
     }
 
-    clean_up_move(p_game_data, move);
-}
-
-
-void clean_up_move(p_game_data_t p_game_data, uint32_t move)
-{
-    if (move != 0)
-        p_game_data->cleanups += 1;
+    return_move_node(p_game_data, move);                /* Move is out. Return to pool.                         */
 }
 
 

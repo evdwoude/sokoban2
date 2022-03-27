@@ -9,7 +9,7 @@
 
 /* Local defs */
 
-#define HARDNOGO ((p_spot) -1)  /* Indicates that a spot is a hard no go: Never put a box on it. */
+#define HARDNOGO ((p_spot) -1)  /* Indicates that a spot is a "hard no go": Never put a box on it. */
 
 /* Conditional compile switches  */
 
@@ -181,19 +181,47 @@ uint32_t new_move_node(p_game_data_t p_game_data, t_s_dir search_dir)
 {
     uint32_t index;
 
-    if (p_game_data->p_memory_bottom + MV_NODE_SIZE > p_game_data->p_memory_top)
-        exit( print_error(out_of_tree_memory) );
+    /* Check if we have previously used moves in the recycle pool. */
+    if (p_game_data->move_pool)
+    {
+        /* Use a node from the recycle pool. */
+        index = p_game_data->move_pool;
+        p_game_data->move_pool = P_MN(index)->child;
 
-    index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
-    printf_mem("{M%u}", index)
-    printf_move(" {%u}", index)
+        memset((void *)(P_MN(index)), 0,  MV_NODE_SIZE);
 
-    p_game_data->p_memory_bottom += MV_NODE_SIZE;
+        p_game_data->reuses += 1;
+    }
+    else
+    {
+        /* Use a new node from the allocated pool. */
+        if (p_game_data->p_memory_bottom + MV_NODE_SIZE > p_game_data->p_memory_top)
+            exit( print_error(out_of_tree_memory) );
+
+        index = (uint32_t) ((p_game_data->p_memory_bottom - p_game_data->p_memory_start) / MEM_REF_UNIT);
+        printf_mem("{M%u}", index)
+        printf_move(" {%u}", index)
+
+        p_game_data->p_memory_bottom += MV_NODE_SIZE;
+    }
+
     if (search_dir == forward)
         p_game_data->fw_move_count++;
     else
         p_game_data->bw_move_count++;
+
     return index;
+}
+
+
+void return_move_node(p_game_data_t p_game_data, uint32_t index)
+{
+    /* Add the used move to the pool of move nodes (begining of list). */
+
+    P_MN(index)->child = p_game_data->move_pool; /* If move_pool was 0, child will indicate end of list. */
+    p_game_data->move_pool = index;
+
+    p_game_data->cleanups += 1; /* statistics. The amount of move nodes returned to the pool. */
 }
 
 
@@ -384,7 +412,8 @@ void dbg_print_setup(p_game_data_t p_game_data)
 
 void print_interim_header(void)
 {
-    printf("  Fw:  Bw:      Fw width:      Bw width:      FW nodes:      BW nodes:      Cleanups:           Memory:\n");
+    printf("\n");
+    printf("  Fw:  Bw:      Fw width:      Bw width:      FW nodes:      BW nodes:      Cleanups:        Reused:           Memory:\n");
 }
 
 void print_interim_stats(p_game_data_t p_game_data, int move_count_fw, int move_count_bw, int fw_width, int bw_width)
@@ -400,6 +429,7 @@ void print_interim_stats(p_game_data_t p_game_data, int move_count_fw, int move_
     printlong(p_game_data->bw_move_count, 16);
 
     printlong(p_game_data->cleanups, 16);
+    printlong(p_game_data->reuses, 16);
 
     bottom_section  = p_game_data->p_memory_bottom - p_game_data->p_memory_start;
     top_section     = p_game_data->p_memory_start + MEM_UNIT_COUNT * MEM_REF_UNIT - p_game_data->p_memory_top;

@@ -1,4 +1,10 @@
 Next:
+    Fix printlong() length parameter.
+
+    Count and print position nodes and leafs.
+
+    Remove cleanups and reuses from game_data and print_interim_header().
+
     Test optimisation: balanced FW/BW based on counted tree width, (count new extentions only).
 
     In solution.c,
@@ -17,6 +23,8 @@ Next:
 
     Update documentation with new performance figures of both soko and soko2.
 
+
+    Find and fix all TODOs.
 
     Work down the below list and do the necessary checks before proceeding.
 

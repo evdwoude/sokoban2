@@ -8,7 +8,7 @@
 /* The amout of memory to allocate for the move tree and position tree: */
 // #define TREE_MEMORY (2048)
 // #define TREE_MEMORY (0x000100000) /*  1    Mbytes. */
-#define TREE_MEMORY (0x040000000) /*  1.07 Gbytes. */
+// #define TREE_MEMORY (0x040000000) /*  1.07 Gbytes. */
 // #define TREE_MEMORY (0x080000000) /*  2.15 Gbytes. */
 // #define TREE_MEMORY (0x100000000) /*  4.29 Gbytes. */
 // #define TREE_MEMORY (0x180000000) /*  6.44 Gbytes. */
@@ -16,6 +16,8 @@
 // #define TREE_MEMORY (0x200000000) /*  8.59 Gbytes. */
 // #define TREE_MEMORY (0x240000000) /*  9.66 Gbytes. */
 // #define TREE_MEMORY (0x280000000) /* 10.74 Gbytes. */
+// #define TREE_MEMORY (0x2C0000000) /* 11.81 Gbytes. */
+#define TREE_MEMORY (0x300000000) /* 12.88 Gbytes. */
 
 // #define DBG_SANITY
 
@@ -69,13 +71,16 @@ struct game_data
                             /* Note: p_memory_bottom points to the first free location while p_memory_top */
                             /* points to the first non-free location after the free space.                */
 
+    uint32_t move_pool;     /* Pointer to pool of previously used but returned move nodes. */
+
     /* Statistics: */
     int fw_move_count;      /* Amount of forward move  nodes used. */
     int bw_move_count;      /* Amount of backward move nodes used. */
     int tp_node_count;      /* Amount of position nodes used.      */
     int tp_leaf_count;      /* Amount of position leafs used.      */
 
-    int cleanups;           /* Amount of moves that are cleaned up on the go. TODO: remove this again.    */
+    int cleanups;           /* Amount of move nodes that are cleaned up on the go. TODO: remove this again.    */
+    int reuses;             /* Amount of move nodes that are reusedup on the go. TODO: remove this again.    */
 
     /* Flags: */
     int no_solution_print;  /* Omit the printing of the solution. */

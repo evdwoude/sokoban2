@@ -88,7 +88,6 @@ void print_solution(p_game_data_t p_game_data, uint32_t this_move, uint32_t that
 }
 
 
-
 void construct_forward_path(p_game_data_t p_game_data, uint32_t move, bool restore)
 {
     uint32_t next;

@@ -40,6 +40,8 @@ uint32_t new_position_leaf(p_game_data_t p_game_data);
 
 uint32_t new_move_node(p_game_data_t p_game_data, t_s_dir search_dir);
 
+void return_move_node(p_game_data_t p_game_data, uint32_t index);
+
 void define_hardnogos(p_game_data_t p_game_data);
 
 int is_hardnogo(struct spot* spot);
