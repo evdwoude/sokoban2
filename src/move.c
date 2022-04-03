@@ -4,6 +4,7 @@
 #include "sokoban2.h"
 #include "error.h"
 #include "resolve_int.h"
+#include "blockers.h"
 #include "utility.h"
 #include "move.h"
 
@@ -19,11 +20,16 @@
 #define printf_move_mv(...)
 #endif
 
+/* Parameter p_game_data_t p_game_data is only used when DBG_SANITY is defined. */
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+
 
 /* Code */
 /* TODO: document. */
 
-bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
+//bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
+bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, p_game_data_t p_game_data)
 {
     return
         search_dir == forward ?
@@ -32,6 +38,8 @@ bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
             &&  johnny->neighbour[mv_dir]->neighbour[mv_dir]
             && !johnny->neighbour[mv_dir]->neighbour[mv_dir]->object[box]
             && !is_hardnogo(johnny->neighbour[mv_dir]->neighbour[mv_dir])
+//             && !is_fw_blocker(johnny->neighbour[mv_dir]->neighbour[mv_dir], mv_dir)
+             && !is_fw_blocker(johnny->neighbour[mv_dir]->neighbour[mv_dir], mv_dir, p_game_data)
         :
                 johnny->neighbour[mv_dir]
             && !johnny->neighbour[mv_dir]->object[target]
@@ -83,9 +91,6 @@ void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_di
 
 
 /* TODO: document. */
-
-/* Parameter p_game_data_t p_game_data is only used when DBG_SANITY is defined. */
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 void take_back(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir)
 {

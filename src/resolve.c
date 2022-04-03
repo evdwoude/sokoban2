@@ -7,6 +7,7 @@
 #include "resolve_int.h"
 #include "move.h"
 #include "position.h"
+#include "blockers.h"
 #include "utility.h"
 #include "solution.h"
 #include "resolve.h"
@@ -207,7 +208,10 @@ void search_forward_and_backward(p_game_data_t p_game_data)
         }
         print_interim_stats(p_game_data, fw_depth, bw_depth, fw_width, bw_width);
     }
+
     dbg_print_setup(p_game_data);
+
+    printf("\n\nCounldn't find a sloution.    ");
 }
 
 
@@ -316,7 +320,7 @@ void extend_depth(p_game_data_t p_game_data, uint32_t move, t_s_dir search_dir, 
     {
         for (mv_dir=right; mv_dir<=down; mv_dir++) /* For all move directions: */
         {
-            if (test_move(johnny, mv_dir, search_dir))
+            if (test_move(johnny, mv_dir, search_dir, p_game_data))
             {
                 printf_walk_indent(1, 0)
 

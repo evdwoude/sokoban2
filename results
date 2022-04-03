@@ -3,8 +3,6 @@ setup-blue-glasses: BG
 setup-white-brown:  WB
 setup-hairband:     HB
 
-        N:   Me:    S:      Moves:   Time:   FW nodes:   BW nodes:    T nodes:         Memory:
-
     BG-101
     BG-501
     BG-503
@@ -17,55 +15,65 @@ setup-hairband:     HB
     BG-625
     BG-627
 
-    WB-1001         1
-    WB-1002         1
-    WB-1003         1  (6):
-    WB-1004         1  (Faulty setup no solution.):
-    WB-1005         1  (Does it easy):
-    WB-1008         1  (Easy):
-    WB-1011         1  (Easy):
-    WB-1012         1  (Easy):
-    WB-1013         1  (Easy):
-    WB-1014         1  (Super easy):
-    WB-1016         1  (Super easy):
-    WB-1019         1  (1 sec):
-    WB-1020         1  (1 sec):
-    WB-1021         1  (228 moves, 1 sec):
-    WB-1023         1  (Easy):
-    WB-1024         1  (Easy):
+    WB-1001
+    WB-1002
+    WB-1003        6:
+    WB-1004        Faulty setup no solution.
+    WB-1005        Does it easy
+    WB-1008        Easy
+    WB-1011        Easy
+    WB-1012        Easy
+    WB-1013        Easy
+    WB-1014        Super easy
+    WB-1016        Super easy
+    WB-1019        1 sec
+    WB-1020        1 sec
+    WB-1021        228 moves, 1 sec
+    WB-1023        Easy
+    WB-1024        Easy
 
-    HB-10099        1
+    HB-10099        Super easy
+
+
+Simple:
+                Time:   FW nodes:   BW nodes:    T nodes:         Memory:
+
+    WB-1017         3      39,143     150,988   2,797,763      81,104,216
+    WB-1015         7
+    WB-1007        12     375,273   1,317,775  16,361,052     516,100,352
+    BG-627         17     177,101     705,732   6,314,530     216,508,128
+
+
+Medium:
+                 Total:       Moves:  Steps:                 FW nodes:      BW nodes:           Memory:
+    WB-1006         234           50     184                   197,500        302,820        25,785,748
+    HB-50608        327           91     236                   182,710        850,099        48,198,152
+    WB-1018         123           24      99                   701,436        155,562        53,824,404
+    HB-20026        300           66     234                   316,487      1,015,977        90,666,320
+    HB-40034        100           26      74                 5,684,584        984,647       385,286,452
 
 Hard:
-        N:   Me:    S:      Moves:   Time:   FW nodes:   BW nodes:    T nodes:         Memory:
+    WB-1009     With F/B balancing, weight:   1:45 m:s, ~2.5 G.
+    WB-1009     With F/B balancing, width_1:  1:22 m:s, ~2.0 G.
+    WB-1009     With F/B balancing, width_1:  1:22 m:s, ~2.0 G.
+    WB-1009     With F/B balancing, width_2:  0:59 m:s, ~1.8 G.
 
-    WB-1017         1                    3      39,143     150,988   2,797,763      81,104,216
-    WB-1015         1                    7
-    WB-1007         1                   12     375,273   1,317,775  16,361,052     516,100,352
-    BG-627          1                   17     177,101     705,732   6,314,530     216,508,128
-    WB-1006         1                   31   1,666,994   6,486,704  47,530,847   1,739,692,360
-    HB-50608        1                   30   1,350,435   4,901,326  42,168,158   1,468,962,752
-    WB-1018         1                   42   2,939,196   9,308,427  75,989,196   2,709,496,272
+    WB-1010     No   F/B balancing:           7    min, ~8.5 G.
+    WB-1010     With F/B balancing, width_1:  0:33 m:s, ~1.1 G.
+    WB-1010     With F/B balancing, width_2:  0:58 m:s, ~1.8 G.
 
+    HB-60008         359           81     278                10,745,427     31,376,490     1,940,104,472
 
-    WB-1009         1  With Soko2 only. With F/B balancing, weight:   1:45 m:s, ~2.5 G.
-    WB-1009         1  With Soko2 only. With F/B balancing, width_1:  1:22 m:s, ~2.0 G.
-    WB-1009         1  With Soko2 only. With F/B balancing, width_1:  1:22 m:s, ~2.0 G.
-    WB-1009         1  With Soko2 only. With F/B balancing, width_1:  0:59 m:s, ~1.8 G.
+    WB-1022     Not solved yet
+    WB-1025     Not solved yet
+    HB-20248    Not solved yet
 
-    WB-1010         1  With Soko2 only. No   F/B balancing:           7    min, ~8.5 G.
-    WB-1010         1  With Soko2 only. With F/B balancing, width_1:  0:33 m:s, ~1.1 G.
-    WB-1010         1  With Soko2 only. With F/B balancing, width_2:  0:58 m:s, ~1.8 G.
-
-    WB-1022         1  Not solved.
-    WB-1025         1  Not solved.
-
-    HB-60008        1  With Soko2 only. No F/B balancing:            22    min, ~9.5 G.
-    HB-60008        1  With Soko2 only. With F/B balancing, weight:   3    min, ~3.1 G.
-    HB-60008        1  With Soko2 only. With F/B balancing, width_1:  2:33 min, ~2.5 G.
-    HB-60008        1  With Soko2 only. With F/B balancing, width_2:  2:17 min, ~2.4 G.
-
+Blockers:
+    HB-10125 (T/F):      621  /    378
+    HB-20026 (T/F):    19565  /   6942
+    HB-40092 (T/F):      468  /      1
+    HB-50608 (T/F):    76818  /  12589
+    HB-60008 (T/F):  2252240  /  68691
 
 .
-
 

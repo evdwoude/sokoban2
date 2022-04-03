@@ -1,4 +1,7 @@
 Next:
+    Check speed improvement of identifying reach with an arbitrary spot within the reach.
+        To do this, check avarage leaf-chain length.
+
     Fix printlong() length parameter.
 
     Count and print position nodes and leafs.
@@ -23,6 +26,7 @@ Next:
 
     Update documentation with new performance figures of both soko and soko2.
 
+    BUG: Setup creates spots in outer space (WB-1009)
 
     Find and fix all TODOs.
 
@@ -46,8 +50,6 @@ Next:
         init_all_move_trees()
         init_move_tree()
         explore_for_reach()
-
-    Find and fix all TODOs.
 
     Create Got_it()
         Call it from regular as well as from init.
