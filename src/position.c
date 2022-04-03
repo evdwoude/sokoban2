@@ -5,6 +5,7 @@
 #include "sokoban2.h"
 #include "error.h"
 #include "resolve_int.h"
+#include "blockers.h"
 #include "utility.h"
 #include "position.h"
 

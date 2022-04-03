@@ -15,9 +15,9 @@
 // #define TREE_MEMORY (0x1C0000000) /*  7.52 Gbytes. */
 // #define TREE_MEMORY (0x200000000) /*  8.59 Gbytes. */
 // #define TREE_MEMORY (0x240000000) /*  9.66 Gbytes. */
-// #define TREE_MEMORY (0x280000000) /* 10.74 Gbytes. */
-// #define TREE_MEMORY (0x2C0000000) /* 11.81 Gbytes. */
-#define TREE_MEMORY (0x300000000) /* 12.88 Gbytes. */
+//#define TREE_MEMORY (0x280000000) /* 10.74 Gbytes. */
+#define TREE_MEMORY (0x2C0000000) /* 11.81 Gbytes. */
+// #define TREE_MEMORY (0x300000000) /* 12.88 Gbytes. */
 
 // #define DBG_SANITY
 
@@ -84,6 +84,10 @@ struct game_data
 
     /* Flags: */
     int no_solution_print;  /* Omit the printing of the solution. */
+
+    int no_true_blockers;
+    int no_false_blockers;
+
 };
 
 typedef struct game_data *p_game_data_t;

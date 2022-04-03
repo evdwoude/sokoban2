@@ -1,7 +1,8 @@
 #ifndef MOVEH
 #define MOVEH
 
-bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir);
+//bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir);
+bool test_move(p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir, p_game_data_t p_game_data);
 
 void make_move(p_game_data_t p_game_data, p_spot johnny, t_mv_dir mv_dir, t_s_dir search_dir);
 

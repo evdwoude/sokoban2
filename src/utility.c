@@ -9,14 +9,11 @@
 
 /* Local defs */
 
-#define HARDNOGO ((p_spot) -1)  /* Indicates that a spot is a "hard no go": Never put a box on it. */
-
 /* Conditional compile switches  */
 
 // #define DBG_MARK 1        // Prints marker and marker wrappings
 // #define DBG_MEM  1        // Prints memory allocations
 // #define DBG_MOVE  1        // Prints memory allocations for moves only.
-#define DBG_HARDNOGOS 1   // Prints the search result for hard no-go's.
 //#define DBG_C 1           // Prints
 //#define DBG_D 1           // Prints
 
@@ -41,21 +38,9 @@
 #define printf_move(...)
 #endif
 
-#ifdef DBG_HARDNOGOS
-#define printf_hardnogo(...) printf(__VA_ARGS__);
-#define dbg_hardnogo_if(condition) if(condition)
-#define dbg_hardnogo_for(condition) for(condition)
-#else
-#define printf_hardnogo(...)
-#define dbg_hardnogo_if(condition)
-#define dbg_hardnogo_for(condition)
-#endif
-
 
 /* Internal protos */
 
-void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int main_dir, int *new_hardnogos);
-void set_as_hardnogo(struct spot* spot);
 void printlong(unsigned long this, unsigned long minlen);
 
 /* Exported data */
@@ -225,103 +210,6 @@ void return_move_node(p_game_data_t p_game_data, uint32_t index)
 }
 
 
-/* void define_hardnogos(p_game_data_t p_game_data);
- *
- * Find and mark all spots where placing a box would always and immediately result in a dead end.
- * This includes the dead ends that result from individual boxes put on specific, spots, identifiable
- * from the static setup (i.e. the start position).
- * It excludes all dead ends that involve multiple boxes. These dead ends are more complex to find and
- * can't be idenfified up-front (staticallly), but only on-the-go, which is quite expensive.
- */
-void define_hardnogos(p_game_data_t p_game_data)
-{
-    struct spot* spot;
-    int new_hardnogos = 1;
-
-    /* First find all spots that are adjecent to at least two non-opposing walls, i.e. corners. */
-    printf_hardnogo("\n\nCorners:\n")
-    for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
-    {
-        if (    !spot->object[target]
-            && (    (spot->neighbour[right] == NULL  &&  spot->neighbour[up   ] == NULL)
-                ||  (spot->neighbour[up   ] == NULL  &&  spot->neighbour[left ] == NULL)
-                ||  (spot->neighbour[left ] == NULL  &&  spot->neighbour[down ] == NULL)
-                ||  (spot->neighbour[down ] == NULL  &&  spot->neighbour[right] == NULL) ) )
-        {
-            set_as_hardnogo(spot);
-
-            printf_hardnogo(" %lu", SPOT_NO(spot))
-        }
-    }
-
-    /* TODO: Document: find what here ?
-     * Scan the setup multiple times: new found hard nogos can trigger the finding of more hard nogos.
-     * Keep re-scanning until no new hard nogos are found anymore. (The only indication that another
-     * round will not find more hard no gos is when the previous round didn't find any.) */
-    printf_hardnogo("\nIn betweens:")
-    while (new_hardnogos)
-    {
-        new_hardnogos = 0;
-        printf_hardnogo("\n")
-
-        /* From every spot that is marked as hard no go, do a horizontal and vertical line scan. */
-        for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
-            if (is_hardnogo(spot))
-            {
-                scan_line_for_hardnogos(p_game_data, spot, right, &new_hardnogos); /* Horizontal line scan. */
-                scan_line_for_hardnogos(p_game_data, spot,  down, &new_hardnogos); /* Vertical line scan.   */
-            }
-    }
-}
-
-
-/* TODO: Document. */
-int is_hardnogo(struct spot* spot)
-{
-    return spot->position_list == HARDNOGO;
-}
-
-
-/* TODO: Document. */
-void scan_line_for_hardnogos(p_game_data_t p_game_data, struct spot* spot, int main_dir, int *new_hardnogos)
-{
-    struct spot* scan;
-
-    int sub_dir_a = left;
-    int sub_dir_b = right;
-
-    if (main_dir == right || main_dir == left)
-    {
-        sub_dir_a = up;
-        sub_dir_b = down;
-    }
-
-    /* Scan line for any spot that can not (yet) be regarded as a hard no go */
-    for (scan = spot->neighbour[main_dir]; scan && ! is_hardnogo(scan); scan = scan->neighbour[main_dir])
-        if (scan->object[target] || (scan->neighbour[sub_dir_a] != NULL && scan->neighbour[sub_dir_b] != NULL))
-            return;
-
-    /* Apparently, there is (at least one) new hard no go on this line, so just mark them all. (Except when
-     * the line length is zero (exluding start/end), in which case the for loop below will not enter and
-     * thus correctly omitting the marking of new_hardnogos. */
-    for (scan = spot->neighbour[main_dir]; scan && ! is_hardnogo(scan); scan = scan->neighbour[main_dir])
-    {
-        dbg_hardnogo_if( ! is_hardnogo(scan))
-            printf_hardnogo(" %lu", SPOT_NO(scan))
-
-        set_as_hardnogo(scan);
-        *new_hardnogos  = 1;
-    }
-}
-
-
-void set_as_hardnogo(struct spot* spot)
-{
-    spot->position_list = HARDNOGO;
-    return;
-}
-
-
 char mv_dir_name(t_mv_dir move_direction)
 {
     switch (move_direction)
@@ -457,6 +345,8 @@ void print_stats(p_game_data_t p_game_data, int move_count, int step_count)
 
     printlong(bottom_section + top_section, 19);
     printf("\n");
+
+    printf("Blockers (T/F): %d / %d.\n", p_game_data->no_true_blockers, p_game_data->no_false_blockers);
 }
 
 #define MAXLONGLEN 30
