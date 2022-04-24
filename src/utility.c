@@ -346,7 +346,7 @@ void print_stats(p_game_data_t p_game_data, int move_count, int step_count)
     printlong(bottom_section + top_section, 19);
     printf("\n");
 
-    printf("Blockers (T/F): %d / %d.\n", p_game_data->no_true_blockers, p_game_data->no_false_blockers);
+    printf("\nBlockers (T/F): %d / %d.\n", p_game_data->no_true_blockers, p_game_data->no_false_blockers);
 }
 
 #define MAXLONGLEN 30

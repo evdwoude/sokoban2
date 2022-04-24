@@ -48,6 +48,7 @@ void create_position_base(p_game_data_t p_game_data)
 {
     struct spot* spot;
     struct spot** p_end;
+    int amount = 0;
 
     p_end = &(p_game_data->position_head);
     for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
@@ -59,10 +60,13 @@ void create_position_base(p_game_data_t p_game_data)
     *p_end = NULL;
 
 #ifdef DBG_CREATE_BASE
-    printf("Position spots:\n");
+    printf("Position spots: ");
     for(spot = p_game_data->position_head; spot; spot = spot->position_list)
+    {
+        amount++;
         printf(" %lu", SPOT_NO(spot));
-    printf("\n\n");
+    }
+    printf("\n\nAmount p-spots:  %d.\n", amount);
 #endif /* DBG_CREATE_BASE */
 }
 

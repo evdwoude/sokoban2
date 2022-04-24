@@ -88,7 +88,7 @@ void define_hardnogos(p_game_data_t p_game_data)
     int new_hardnogos = 1;
 
     /* First find all spots that are adjecent to at least two non-opposing walls, i.e. corners. */
-    printf_hardnogo("\n\nCorners:\n")
+    printf_hardnogo("\n\nCorners:        ")
     for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
     {
         if (    !spot->object[target]
@@ -107,11 +107,10 @@ void define_hardnogos(p_game_data_t p_game_data)
      * Scan the setup multiple times: new found hard nogos can trigger the finding of more hard nogos.
      * Keep re-scanning until no new hard nogos are found anymore. (The only indication that another
      * round will not find more hard no gos is when the previous round didn't find any.) */
-    printf_hardnogo("\nIn betweens:")
+    printf_hardnogo("\nIn betweens:    ")
     while (new_hardnogos)
     {
         new_hardnogos = 0;
-        printf_hardnogo("\n")
 
         /* From every spot that is marked as hard no go, do a horizontal and vertical line scan. */
         for (spot = &(p_game_data->spot_pool[0]); spot < p_game_data->pool_ptr; spot++)
@@ -121,6 +120,7 @@ void define_hardnogos(p_game_data_t p_game_data)
                 scan_line_for_hardnogos(p_game_data, spot,  down, &new_hardnogos); /* Vertical line scan.   */
             }
     }
+    printf_hardnogo("\n")
 }
 
 

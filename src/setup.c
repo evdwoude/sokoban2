@@ -94,6 +94,8 @@ skbn_err setup(p_game_data_t p_game_data, int argc, char *argv[])
     print_medium_setup_def(p_game_data)
     print_large_setup_def(p_game_data)
 
+    printf("\nNumber of boxes: %d.", number_of_boxes);
+
     /* Close the setup file. */
     if (fclose(setupfile))
         return print_error(cant_close_setupfile, argv[1]);
