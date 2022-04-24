@@ -1,4 +1,22 @@
+Furter optimations (later, do next first):
+
+    Blockers:
+        Z-shapes
+        Soft nogos
+        Small corridors (alleys)
+        Open spaces (FW)
+        Open spaces (BW)
+    Hashing:
+
+    Shortest path first (steps):
+        Does 'explore reach' already do that?
+
+    Others:
+        No position tracking (After all blockers are in) (consequently no FW/BW combi so check which is best)
+
 Next:
+    Sort and clean up this list.
+
     Check speed improvement of identifying reach with an arbitrary spot within the reach.
         To do this, check avarage leaf-chain length.
 
